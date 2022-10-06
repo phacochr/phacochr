@@ -60,7 +60,7 @@ phaco_geocode <- function(data_to_geocode,
   } else {
     code_postal <- "int"
   }
-
+# test
   # PRECHARGEMENT DES FICHIERS COMPLETS DES ADRESSES (en prévision d'une utilisation serveur ?)
   # ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
   if (preloading_RAM == TRUE){
