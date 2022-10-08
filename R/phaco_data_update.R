@@ -163,7 +163,7 @@ if (max(as.Date(log$update)) + days(7) < Sys.Date()) {
   }
 
   # Charger le fichier secteurs statistiques
-  BE_SS <- st_read(paste0(path_data,"/statbel/sh_statbel_statistical_sectors_31370_20220101.sqlite/sh_statbel_statistical_sectors_20220101.sqlite")) %>%
+  BE_SS <- st_read(paste0(path_data,"/statbel/sh_statbel_statistical_sectors_31370_20220101.sqlite/sh_statbel_statistical_sectors_20220101.gpkg")) %>%
     st_set_crs(31370) %>%
     st_zm(drop = TRUE)
 
