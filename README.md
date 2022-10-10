@@ -25,7 +25,7 @@ Vous pouvez installer le package phacochr depuis
 # install.packages("devtools")
 library(devtools)
 devtools::install_github("phacochr/phacochr")
-phaco_setup_data()
+phacochr::phaco_setup_data()
 ```
 
 ## Example
