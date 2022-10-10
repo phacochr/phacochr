@@ -20,17 +20,16 @@
 #' @import stringr
 #' @import purrr
 #' @import doParallel
-#' @import foreach
+#' @importFrom foreach %dopar% foreach getDoParRegistered
 #' @import readxl
 #' @import lubridate
 #' @import fuzzyjoin
-#' @import stringdist
+#' @importFROM stringdist stringdist_left_join stringdist
 #' @import sf
 #' @import spdep
 #' @import sp
 #' @import tmap
 #' @import mapsf
-#' @import scales
 #' @import rappdirs
 #'
 #' @export
@@ -73,7 +72,7 @@ phaco_geocode <- function(data_to_geocode,
   if (preloading_RAM == TRUE){
       start_time <- Sys.time()
     message("Pré-chargement des données openaddress...")
-
+   # table_postal_arrond <- read_delim("home/user/.local/share/phacochr/data_phacochr/BeST/PREPROCESSED/table_postal_arrond.csv", delim = ";", col_types = cols(.default = col_character()))
     table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
 
     postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
@@ -88,7 +87,7 @@ phaco_geocode <- function(data_to_geocode,
                              ".csv") %>%
       map_dfr(read_delim, delim = ";", col_types = cols(.default = col_character())) %>%
       left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>%
-      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) %>% # HUGO @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
+      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) %>% # @@@@QUESTION : POURQUOI ON FAIT CA ? pour faire l'opération de soustraction pour l'approx
       mutate(address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
     #select(-street_FINAL_detected, -postal_id, -street_id_phaco)
 
