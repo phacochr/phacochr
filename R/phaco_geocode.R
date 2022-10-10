@@ -51,7 +51,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # Définition du chemin ou se trouve les données
 
-  path_data<- paste0(user_data_dir("phacochr"),"/data/")
+  path_data<- paste0(user_data_dir("phacochr"),"/data_phacochr/")
 
 
 
