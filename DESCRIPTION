@@ -5,13 +5,13 @@ Authors@R:
     c(person("Joel", "Gires", email = "jgires@ccc.brussels", role = c("aut", "cre")),
     person("Hugo", "Perilleux", email = "hugo.perilleux@ulb.be", role = "aut"))
 Description: What the package does (one paragraph).
-License: GPL-3
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, mapsf, purrr,
     readr, readxl, scales, sf, sp, spdep, stringdist,
-    stringr, tidyr, tmap, rappdirs
+    stringr, tidyr, tmap, rappdirs, utils
 Depends: 
     R (>= 2.10)
 LazyData: true

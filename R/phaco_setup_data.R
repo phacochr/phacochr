@@ -1,15 +1,14 @@
-
 #' phaco_setup_data
-#'
 #'
 #' @return
 #' @import rappdirs
 #' @import readr
+#' @import utils
 #'
 #' @export
 #'
 #' @examples
-#'phaco_setup_data()
+#' phaco_setup_data()
 
 phaco_setup_data <- function(){
   # créer le chemin en fonction du système d'exploitation (Mac, Windows ou Linux)
@@ -23,5 +22,4 @@ phaco_setup_data <- function(){
   unzip(paste0(path_data,"/data_phacochr.zip"),exdir= path_data)
   file.remove(paste0(path_data,"/data_phacochr.zip"))
   message(paste0("Données importées"))
-
 }
