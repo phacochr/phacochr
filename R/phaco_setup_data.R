@@ -3,6 +3,8 @@
 #' @import rappdirs
 #' @import readr
 #' @import utils
+#' @import cli
+
 #'
 #' @export
 #'
@@ -21,5 +23,5 @@ phaco_setup_data <- function(){
   # dezippe et supprimer le fichier zip telecharge
   unzip(paste0(path_data,"/data_phacochr.zip"),exdir= path_data)
   file.remove(paste0(path_data,"/data_phacochr.zip"))
-  message(paste0("Donnees importees"))
+  cli_alert_success("Donnees importees")
 }

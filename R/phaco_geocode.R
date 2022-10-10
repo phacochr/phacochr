@@ -30,6 +30,11 @@
 #' @export
 #'
 #' @examples
+#' x<- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
+#' rue= c("rue Beilliard","avenue Antoine Depage"),
+#' num=c("71", "30"),
+#' code_postal=c("1040","1000"))
+#'
 #'
 phaco_geocode <- function(data_to_geocode,
                           colonne_rue,

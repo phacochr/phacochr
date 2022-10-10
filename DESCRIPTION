@@ -1,6 +1,6 @@
 Package: phacochr
 Title: Geocodeur belge
-Version: 0.7.2
+Version: 0.7.3
 Authors@R: 
     c(person("Joel", "Gires", email = "jgires@ccc.brussels", role = c("aut", "cre")),
     person("Hugo", "Perilleux", email = "hugo.perilleux@ulb.be", role = "aut"))
@@ -8,9 +8,9 @@ Description: What the package does (one paragraph).
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.1
 Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, purrr,
-    readr, readxl, stringdist, sf,
+    readr, readxl, stringdist, sf, cli,
     stringr, tidyr, rappdirs, utils
 Depends: 
     R (>= 2.10)

@@ -52,10 +52,6 @@ x<- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
 rue= c("rue Beilliard","avenue Antoine Depage"),
 num=c("71", "30"),
 code_postal=c("1040","1000"))
-result <-phaco_geocode(data_to_geocode = x,
-colonne_rue= "rue",
-colonne_num_rue= "num",
-colonne_code_postal="code_postal")
 
 
 }
