@@ -14,6 +14,7 @@ phaco_setup_data <- function(){
   # creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
 
   path_data<- user_data_dir("phacochr")
+  dir.create(path_data)
   message(paste0("Importation des données dans le dossier :", path_data))
   #dir.create()
   # Telecharger les donnees
