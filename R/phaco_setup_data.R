@@ -4,6 +4,7 @@
 #'
 #' @return
 #' @import rappdirs
+#' @import readr
 #'
 #' @export
 #'
@@ -11,7 +12,6 @@
 #'phaco_setup_data()
 
 phaco_setup_data <- function(){
-  library(rappdirs)
   # créer le chemin en fonction du système d'exploitation (Mac, Windows ou Linux)
   path_data<- user_data_dir("phacochr")
   #dir.create()
