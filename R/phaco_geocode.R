@@ -801,7 +801,7 @@ phaco_geocode <- function(data_to_geocode,
 
     # On joint les données de région, provinces, communes, quartiers (BXL)... aux secteurs stat
 
-    table_secteurs_prov_commune_quartier <- read_delim(paste0(path_data," STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", col_types = cols(.default = col_character()))
+    table_secteurs_prov_commune_quartier <- read_delim(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", col_types = cols(.default = col_character()))
 
 
     FULL_GEOCODING <- FULL_GEOCODING %>%
