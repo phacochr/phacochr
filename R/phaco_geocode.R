@@ -143,7 +143,7 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 3. Détection des régions/arrondissements en Belgique =====================================================================================
 
-  table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character())))
+  table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
 
   data_to_geocode <- data_to_geocode %>%
     left_join(table_postal_arrond, by = c("code_postal_to_geocode" = "postcode"))
