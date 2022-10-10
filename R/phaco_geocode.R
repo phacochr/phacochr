@@ -73,7 +73,7 @@ phaco_geocode <- function(data_to_geocode,
     message("Pré-chargement des données openaddress...")
     table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
 
-    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
+    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
       mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
 
     if (length(lang_encoded) != 3){
@@ -436,7 +436,7 @@ phaco_geocode <- function(data_to_geocode,
     ### i. Préparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
     # J'importe les rues
-    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
+    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
       mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
 
     if (length(lang_encoded) != 3){
