@@ -20,10 +20,42 @@ phaco_geocode(
 )
 }
 \arguments{
-\item{data_to_geocode}{un dataframe}
+\item{data_to_geocode}{un dataframe avec les adresses a geocoder}
 
-\item{lang_encoded}{}
+\item{colonne_rue}{nom de la colonne avec les rues}
+
+\item{colonne_num_rue}{nom de la colonne avec les numeros}
+
+\item{colonne_code_postal}{nom de la colonne avec les codes postaux}
+
+\item{method_stringdist}{methode pour la jointure inexacte}
+
+\item{corrections_REGEX}{correction orthographiques}
+
+\item{error_max}{nombre d'erreurs maximale entre le nom de la rue a trouver et le nom de la rue dans la base de donnee de reference (BeST)}
+
+\item{approx_num}{nombre de numero maximum si le numero n'a pas ete trouve}
+
+\item{elargissement_com_adj}{elargissement aux communes limitrophes}
+
+\item{preloading_RAM}{precharhement dans la RAM des l'ensemble des donnees BeST}
+
+\item{benchmarking_time}{affichage du temps ecoule}
+
+\item{lang_encoded}{langue utilisee pour encoder les noms de rue}
 }
 \description{
 phaco_geocode
+}
+\examples{
+x<- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
+rue= c("rue Beilliard","avenue Antoine Depage"),
+num=c("71", "30"),
+code_postal=c("1040","1000"))
+result <-phaco_geocode(data_to_geocode = x,
+colonne_rue= "rue",
+colonne_num_rue= "num",
+colonne_code_postal="code_postal")
+
+
 }

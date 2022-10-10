@@ -1,19 +1,18 @@
 #' phaco_geocode
 #'
-#' @param data_to_geocode un dataframe
-#' @param colonne_rue
-#' @param colonne_num_rue
-#' @param colonne_code_postal
-#' @param method_stringdist
-#' @param corrections_REGEX
-#' @param error_max
-#' @param approx_num
-#' @param elargissement_com_adj
-#' @param preloading_RAM
-#' @param benchmarking_time
-#' @param lang_encoded
+#' @param data_to_geocode un dataframe avec les adresses a geocoder
+#' @param colonne_rue nom de la colonne avec les rues
+#' @param colonne_num_rue nom de la colonne avec les numeros
+#' @param colonne_code_postal nom de la colonne avec les codes postaux
+#' @param method_stringdist methode pour la jointure inexacte
+#' @param corrections_REGEX correction orthographiques
+#' @param error_max nombre d'erreurs maximale entre le nom de la rue a trouver et le nom de la rue dans la base de donnee de reference (BeST)
+#' @param approx_num nombre de numero maximum si le numero n'a pas ete trouve
+#' @param elargissement_com_adj elargissement aux communes limitrophes
+#' @param preloading_RAM precharhement dans la RAM des l'ensemble des donnees BeST
+#' @param benchmarking_time affichage du temps ecoule
+#' @param lang_encoded langue utilisee pour encoder les noms de rue
 #'
-#' @return
 #' @import dplyr
 #' @import tidyr
 #' @import readr
@@ -24,12 +23,8 @@
 #' @import readxl
 #' @import lubridate
 #' @import fuzzyjoin
-#' @importFROM stringdist stringdist_left_join stringdist
+#' @importFrom stringdist stringdist
 #' @import sf
-#' @import spdep
-#' @import sp
-#' @import tmap
-#' @import mapsf
 #' @import rappdirs
 #'
 #' @export
