@@ -49,6 +49,12 @@ phaco_geocode <- function(data_to_geocode,
                           benchmarking_time = TRUE,
                           lang_encoded = c("FR", "NL", "DE")){
 
+  # Définition du chemin ou se trouve les données
+
+  path_data<- paste0(user_data_dir("phacochr"),"/data/")
+
+
+
   if(exists("colonne_num_rue")){
     num_rue <- "sep"
   } else {
@@ -60,30 +66,31 @@ phaco_geocode <- function(data_to_geocode,
   } else {
     code_postal <- "int"
   }
-# test 2
+# test 3
   # PRECHARGEMENT DES FICHIERS COMPLETS DES ADRESSES (en prévision d'une utilisation serveur ?)
   # ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
   if (preloading_RAM == TRUE){
       start_time <- Sys.time()
     message("Pré-chargement des données openaddress...")
 
-    data(table_postal_arrond)
+    table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
 
-    data(postal_street)
-    postal_street <- postal_street %>%
+    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
       mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
 
     if (length(lang_encoded) != 3){
       postal_street <- postal_street %>%
         filter(langue_FINAL_detected %in% lang_encoded)
     }
-
-    data(openaddress_be)
-    openaddress_be <- openaddress_be %>%
+    openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
+                             unique(table_postal_arrond$arrond[!is.na(table_postal_arrond$arrond)]),
+                             ".csv") %>%
+      map_dfr(read_delim, delim = ";", col_types = cols(.default = col_character())) %>%
       left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>%
-      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
-             address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
+      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) %>% # HUGO @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
+      mutate(address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
     #select(-street_FINAL_detected, -postal_id, -street_id_phaco)
+
 
     rm(table_postal_arrond, postal_street)
 
@@ -138,7 +145,7 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 3. Détection des régions/arrondissements en Belgique =====================================================================================
 
-  data(table_postal_arrond)
+  table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv", delim = ";", col_types = cols(.default = col_character())))
 
   data_to_geocode <- data_to_geocode %>%
     left_join(table_postal_arrond, by = c("code_postal_to_geocode" = "postcode"))
@@ -431,8 +438,7 @@ phaco_geocode <- function(data_to_geocode,
     ### i. Préparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
     # J'importe les rues
-    data(postal_street)
-    postal_street <- postal_street %>%
+    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
       mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
 
     if (length(lang_encoded) != 3){
@@ -526,7 +532,7 @@ phaco_geocode <- function(data_to_geocode,
       if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas où toutes les adresses auraient été trouvées (alors il ne faut pas lancer la partie entre crochets)
 
         # On charge la table de conversion code postal > code INS recodé (voir preprocessing)
-        data(table_INS_recod_code_postal)
+        table_INS_recod_code_postal <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";", col_types = cols(.default = col_character()))
 
         # On ajoute ce code INS recodé 1) aux rues et 2) aux adresses non trouvées
         postal_street_adj <- postal_street %>%
@@ -535,7 +541,7 @@ phaco_geocode <- function(data_to_geocode,
           left_join(table_INS_recod_code_postal, by = c("code_postal_to_geocode" = "code_postal"))
 
         # On charge la table des communes (= code INS recodés) adjacentes par commune (voir preprocessing)
-        data(table_commune_adjacentes)
+        table_commune_adjacentes <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"), delim = ";", col_types = cols(.default = col_character()))
 
         res_adj <- tibble()
         res_adj <- foreach (i = unique(ADDRESS_last_tentative$`Refnis code`),
@@ -625,7 +631,7 @@ phaco_geocode <- function(data_to_geocode,
         }
 
       # Ici on crée une liste des adresses en n'important que les arrodissements détectés dans data_to_geocode
-      openaddress_be <- paste0("data/BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
+      openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
                                       unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
                                       ".csv") %>%
         map_dfr(read_delim, delim = ";", col_types = cols(.default = col_character())) %>%
@@ -796,7 +802,9 @@ phaco_geocode <- function(data_to_geocode,
       select(-street_FINAL_detected, street_FINAL_detected = street_FINAL_detected_full)
 
     # On joint les données de région, provinces, communes, quartiers (BXL)... aux secteurs stat
-    data(table_secteurs_prov_commune_quartier)
+
+    table_secteurs_prov_commune_quartier <- read_delim(paste0(path_data," STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", col_types = cols(.default = col_character()))
+
 
     FULL_GEOCODING <- FULL_GEOCODING %>%
       left_join(table_secteurs_prov_commune_quartier, by = "cd_sector")
