@@ -71,8 +71,7 @@ phaco_geocode <- function(data_to_geocode,
   if (preloading_RAM == TRUE){
       start_time <- Sys.time()
     message("Pré-chargement des données openaddress...")
-   table_postal_arrond <- read_delim("home/user/.local/share/phacochr/data_phacochr/BeST/PREPROCESSED/table_postal_arrond.csv", delim = ";", col_types = cols(.default = col_character()))
-    #table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
+    table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
 
     postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
       mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
@@ -144,7 +143,7 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 3. Détection des régions/arrondissements en Belgique =====================================================================================
 
-  table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv", delim = ";", col_types = cols(.default = col_character())))
+  table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character())))
 
   data_to_geocode <- data_to_geocode %>%
     left_join(table_postal_arrond, by = c("code_postal_to_geocode" = "postcode"))
