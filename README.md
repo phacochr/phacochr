@@ -46,18 +46,17 @@ x
 result <-phaco_geocode(data_to_geocode = x,
               colonne_rue= "rue",
               colonne_num_rue= "num",
-              colonne_code_postal="code_postal",
-              preloading_RAM= T
-                )
+              colonne_code_postal="code_postal")
 #> # A tibble: 3 × 13
-#>   Region           Effectifs `Rue détectée (…` `stringdist (m…` `Géocodé (% to…`
-#>   <chr>                <int>             <dbl>            <dbl>            <dbl>
-#> 1 Total (original)         2                NA             NA                 NA
-#> 2 Bruxelles                2               100              0.5              100
-#> 3 Total (final)            2               100              0.5              100
-#> # … with 8 more variables: `Approx (% géocodés)` <dbl>, `Elarg (n)` <int>,
-#> #   `Abrev (n)` <int>, `Rue FR` <dbl>, `Rue NL` <dbl>, `Rue DE` <dbl>,
-#> #   `Coord non valides` <int>, Dupliqués <int>
+#>   Region Effec…¹ Rue d…² strin…³ Géoco…⁴ Appro…⁵ Elarg…⁶ Abrev…⁷ Rue F…⁸ Rue N…⁹
+#>   <chr>    <int>   <dbl>   <dbl>   <dbl>   <dbl>   <int>   <int>   <dbl>   <dbl>
+#> 1 Total…       2      NA    NA        NA      NA      NA      NA      NA      NA
+#> 2 Bruxe…       2     100     0.5     100       0       0       0     100       0
+#> 3 Total…       2     100     0.5     100       0       0       0     100       0
+#> # … with 3 more variables: `Rue DE` <dbl>, `Coord non valides` <int>,
+#> #   Dupliqués <int>, and abbreviated variable names ¹​Effectifs,
+#> #   ²​`Rue détectée (% tot)`, ³​`stringdist (moy)`, ⁴​`Géocodé (% tot)`,
+#> #   ⁵​`Approx (% géocodés)`, ⁶​`Elarg (n)`, ⁷​`Abrev (n)`, ⁸​`Rue FR`, ⁹​`Rue NL`
 result$data_geocoded [,c(1,17:19)] 
 #>   ID_address x_31370 y_31370 cd_sector
 #> 1          1  150373  170090 21004B13-

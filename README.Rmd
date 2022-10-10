@@ -30,6 +30,7 @@ Vous pouvez installer le package phacochr depuis [GitHub](https://github.com/):
 # install.packages("devtools")
 library(devtools)
 devtools::install_github("phacochr/phacochr")
+phacochr::phaco_setup_data()
 ```
 
 ## Example
@@ -48,9 +49,7 @@ x
 result <-phaco_geocode(data_to_geocode = x,
               colonne_rue= "rue",
               colonne_num_rue= "num",
-              colonne_code_postal="code_postal",
-              preloading_RAM= T
-                )
+              colonne_code_postal="code_postal")
 result$data_geocoded [,c(1,17:19)] 
 
 ```
