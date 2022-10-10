@@ -52,7 +52,6 @@ phaco_geocode <- function(data_to_geocode,
   # Définition du chemin ou se trouve les données
 
   path_data<- paste0(user_data_dir("phacochr"),"/data_phacochr/")
-message( paste0("Current directory :", getwd() ))
 
 
   if(exists("colonne_num_rue")){
@@ -72,8 +71,8 @@ message( paste0("Current directory :", getwd() ))
   if (preloading_RAM == TRUE){
       start_time <- Sys.time()
     message("Pré-chargement des données openaddress...")
-   # table_postal_arrond <- read_delim("home/user/.local/share/phacochr/data_phacochr/BeST/PREPROCESSED/table_postal_arrond.csv", delim = ";", col_types = cols(.default = col_character()))
-    table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
+   table_postal_arrond <- read_delim("home/user/.local/share/phacochr/data_phacochr/BeST/PREPROCESSED/table_postal_arrond.csv", delim = ";", col_types = cols(.default = col_character()))
+    #table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
 
     postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
       mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
