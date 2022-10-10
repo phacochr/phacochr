@@ -31,6 +31,7 @@
 #' @import tmap
 #' @import mapsf
 #' @import scales
+#' @import rappdirs
 #'
 #' @export
 #'
