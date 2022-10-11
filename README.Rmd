@@ -61,5 +61,20 @@ result$data_geocoded [,c(1,17:19)]
 
 ```
 
-<img src="man/figures/logo_observatoire_sante_social.png" align="center" height = 150/>
-<img src="man/figures/logo_ulb_igeat.png" align="center" height = 150/>
+
+## Auteurs
+<center>
+<a href="https://www.ccc-ggc.brussels/fr/observatbru/accueil">
+<img src="man/figures/logo_observatoire_sante_social.png" align="center" height = 120/>
+</a>
+<a href="https://cartulb.ulb.be/">
+<img src="man/figures/logo_ulb_igeat.png" align="center" height = 120/>
+</a>
+</center>
+## Partenariat
+<center>
+<a href="https://opendata.bosa.be/">
+<img src="man/figures/bosa.png" align="center" height = 140/>
+</a>
+</center>
+
