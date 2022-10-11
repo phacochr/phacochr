@@ -35,6 +35,10 @@
 #' num=c("71", "30"),
 #' code_postal=c("1040","1000"))
 #'
+#' result <-phaco_geocode(data_to_geocode = x,
+#' colonne_rue= "rue",
+#' colonne_num_rue= "num",
+#' colonne_code_postal="code_postal")
 #'
 phaco_geocode <- function(data_to_geocode,
                           colonne_rue,
@@ -418,9 +422,12 @@ phaco_geocode <- function(data_to_geocode,
 
     # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/
     `%ni%` <- Negate(`%in%`)
-
     # Parametres pour la parallelisation
-    n.cores <- parallel::detectCores() - 1
+    chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+    if (nzchar(chk) && chk == "TRUE") {
+      n.cores <-2L}# limite le nombre de coeurs a 2 pour les tests sur CRAN https://stackoverflow.com/questions/50571325/r-cran-check-fail-when-using-parallel-functions
+    else {
+    n.cores <- parallel::detectCores() - 1}
     my.cluster <- parallel::makeCluster(
       n.cores,
       type = "PSOCK")
@@ -468,7 +475,8 @@ phaco_geocode <- function(data_to_geocode,
                                            by = c("address_join" = "address_join_street"),
                                            method = method_stringdist,
                                            max_dist = error_max,
-                                           distance_col = "distance_FINAL_detected")
+                                           distance_col = "distance_FINAL_detected",
+                                           nthread= n.cores)
                     }
 
     # On ne retient que l'adresse detectee avec la distance minimale
@@ -488,7 +496,7 @@ phaco_geocode <- function(data_to_geocode,
     if(sum(duplicated(res$ID_address)) > 0){
       message("ex-aequos : calcul de la distance Jaro-Winkler pour departager")
       res <- res %>%
-        mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
+        mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
         group_by(ID_address) %>%
         mutate(min_jw = min(distance_jw)) %>%
         filter(distance_jw == min_jw | is.na(distance_jw)) %>%
