@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 # phacochr <img src="man/figures/logo_phacoch-R_1.png" align="right" height = 150/>
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 PhaochR est un géocodeur pour la Belgique. A partir, d'une liste d'adresse, il permet de retrouver les coordonnées X-Y nécessaire à toute analyse spatiale. 

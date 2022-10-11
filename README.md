@@ -2,6 +2,8 @@
 # phacochr <img src="man/figures/logo_phacoch-R_1.png" align="right" height = 150/>
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 PhaochR est un géocodeur pour la Belgique. A partir, d’une liste
@@ -48,15 +50,15 @@ result <-phaco_geocode(data_to_geocode = x,
               colonne_num_rue= "num",
               colonne_code_postal="code_postal")
 #> # A tibble: 3 × 13
-#>   Region Effec…¹ Rue d…² strin…³ Géoco…⁴ Appro…⁵ Elarg…⁶ Abrev…⁷ Rue F…⁸ Rue N…⁹
+#>   Region Effec…¹ Rue d…² strin…³ Geoco…⁴ Appro…⁵ Elarg…⁶ Abrev…⁷ Rue F…⁸ Rue N…⁹
 #>   <chr>    <int>   <dbl>   <dbl>   <dbl>   <dbl>   <int>   <int>   <dbl>   <dbl>
 #> 1 Total…       2      NA    NA        NA      NA      NA      NA      NA      NA
 #> 2 Bruxe…       2     100     0.5     100       0       0       0     100       0
 #> 3 Total…       2     100     0.5     100       0       0       0     100       0
 #> # … with 3 more variables: `Rue DE` <dbl>, `Coord non valides` <int>,
-#> #   Dupliqués <int>, and abbreviated variable names ¹​Effectifs,
-#> #   ²​`Rue détectée (% tot)`, ³​`stringdist (moy)`, ⁴​`Géocodé (% tot)`,
-#> #   ⁵​`Approx (% géocodés)`, ⁶​`Elarg (n)`, ⁷​`Abrev (n)`, ⁸​`Rue FR`, ⁹​`Rue NL`
+#> #   Dupliques <int>, and abbreviated variable names ¹​Effectifs,
+#> #   ²​`Rue detectee (% tot)`, ³​`stringdist (moy)`, ⁴​`Geocode (% tot)`,
+#> #   ⁵​`Approx (% geocodes)`, ⁶​`Elarg (n)`, ⁷​`Abrev (n)`, ⁸​`Rue FR`, ⁹​`Rue NL`
 result$data_geocoded [,c(1,17:19)] 
 #>   ID_address x_31370 y_31370 cd_sector
 #> 1          1  150373  170090 21004B13-
