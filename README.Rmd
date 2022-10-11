@@ -28,6 +28,7 @@ PhaochR est un géocodeur pour la Belgique. A partir, d'une liste d'adresse, il 
 Le logiciel fonctionne à partir des données publiques [BeST Address](https://opendata.bosa.be/) compilées par BOSA à partir des données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne).
 Il réalise des corrections orthographiques préalables (Regex), il fait une jointure inexacte avec les noms de rues (fuzzyjoin) et il trouve le numéro le plus proche et de préférence du même côté de la rue si le numéro n'est pas trouvé.
 
+
 ## Installation
 
 Vous pouvez installer le package phacochr depuis [GitHub](https://github.com/):
@@ -60,3 +61,5 @@ result$data_geocoded [,c(1,17:19)]
 
 ```
 
+<img src="man/figures/logo_observatoire_sante_social.png" align="center" height = 150/>
+<img src="man/figures/logo_ulb_igeat.png" align="center" height = 150/>

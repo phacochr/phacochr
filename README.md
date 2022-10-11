@@ -71,3 +71,6 @@ result$data_geocoded [,c(1,17:19)]
 #> 1          1  150373  170090 21004B13-
 #> 2          2  151105  166831 21004C61-
 ```
+
+<img src="man/figures/logo_observatoire_sante_social.png" align="center" height = 150/>
+<img src="man/figures/logo_ulb_igeat.png" align="center" height = 150/>
