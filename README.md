@@ -3,7 +3,8 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml)
+[![R build
+status](https://github.com/GuangchuangYu/badger/workflows/R-CMD-check/badge.svg)](https://github.com/GuangchuangYu/badger/actions)
 <!-- badges: end -->
 
 PhaochR est un géocodeur pour la Belgique. A partir, d’une liste
