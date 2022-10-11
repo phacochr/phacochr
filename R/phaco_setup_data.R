@@ -12,15 +12,20 @@
 
 phaco_setup_data <- function(){
   # creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
-
+  start_time <- Sys.time()
+  cli_process_start("Importation des données pour PhacochR")
   path_data<- user_data_dir("phacochr")
-  dir.create(path_data)
-  message(paste0("Importation des donnees dans le dossier :", path_data))
-  #dir.create()
+  dir.create(path_data, showWarnings = F)
+  cli_progress_step(paste0("Cr","\u00e9","ation du dossier :", path_data))
   # Telecharger les donnees
-  download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr.zip",paste0(path_data,"/data_phacochr.zip"))
+  cli_progress_step(paste0("T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es"))
+   download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr.zip",paste0(path_data,"/data_phacochr.zip"))
+
   # dezippe et supprimer le fichier zip telecharge
+  cli_progress_step(paste0("D","\u00e9","compression des donn","\u00e9","es ..."))
   unzip(paste0(path_data,"/data_phacochr.zip"),exdir= path_data)
   file.remove(paste0(path_data,"/data_phacochr.zip"))
-  cli_alert_success("Donnees importees")
+  cli_alert_success("")
+
+
 }
