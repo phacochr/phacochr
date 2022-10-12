@@ -26,6 +26,8 @@
 #' @import sf
 #' @import rappdirs
 #' @import cli
+#' @import knitr
+
 #'
 #' @export
 #'
@@ -397,8 +399,6 @@ phaco_geocode <- function(data_to_geocode,
     # II. GEOCODAGE ===========================================================================================================================
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-
-
     ## 0. Parametres/fonctions ================================================================================================================
     # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/
     `%ni%` <- Negate(`%in%`)
@@ -409,7 +409,7 @@ phaco_geocode <- function(data_to_geocode,
     else {
     n.cores <- parallel::detectCores() - 1}
 
-    cli_progress_step(paste0("Param","\u00e8","trage pour utiliser ", n.cores, " coeurs de l'ordinateur..."), spinner = TRUE)
+    cli_progress_step(paste0("Param","\u00e8","trage pour utiliser ", n.cores, " coeurs de l'ordinateur..."))
     cli_h3(paste0("G","\u00e9","ocodage"))
     my.cluster <- parallel::makeCluster(
       n.cores,
@@ -417,11 +417,8 @@ phaco_geocode <- function(data_to_geocode,
     doParallel::registerDoParallel(cl = my.cluster)
     foreach::getDoParRegistered()
 
-
-
     # Parametres pour furrr (si utilise : a priori pas de gain)
     #plan(multisession)
-
 
     ## 1)  Jointure des rues  -----------------------------------------------------------------------------------------------------------------
     cli_progress_step(paste0("D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)..."))
@@ -839,7 +836,16 @@ phaco_geocode <- function(data_to_geocode,
 
   end_time <- Sys.time()
   cli_progress_done()
-  cli_alert_success(paste("Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), "s"))
+  cli_verbatim("------------------------------------------------------------------------")
+  cli_verbatim(knitr::kable(result$summary[2:nrow(result$summary),c(1:3,5)]))
+  cli_verbatim("------------------------------------------------------------------------")
+
+    cli_alert_success(paste("Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), "s"))
+
+  cli_h3(paste0("Plus de r","\u00e9","sultats:"))
+  cli_bullets(c(">" = paste0("$summary [tableau synth","\u00e9","tique]"),
+                ">" = paste0("$data_geocoded [donn","\u00e9","es g","\u00e9","ocod","\u00e9","es]"),
+                ">" = paste0("$data_geocoded_sf [donn","\u00e9","es g","\u00e9","ocod","\u00e9","es en format sf]")))
 
 
   suppressWarnings(rm(my.cluster, n.cores,  data_to_geocode, "%ni%"))
