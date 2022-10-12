@@ -15,7 +15,6 @@ phaco_geocode(
   approx_num = 50,
   elargissement_com_adj = TRUE,
   preloading_RAM = FALSE,
-  benchmarking_time = TRUE,
   lang_encoded = c("FR", "NL", "DE")
 )
 }
@@ -40,15 +39,13 @@ phaco_geocode(
 
 \item{preloading_RAM}{precharhement dans la RAM des l'ensemble des donnees BeST}
 
-\item{benchmarking_time}{affichage du temps ecoule}
-
 \item{lang_encoded}{langue utilisee pour encoder les noms de rue}
 }
 \description{
 phaco_geocode
 }
 \examples{
-x<- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
+x<- data.frame(nom= c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
 rue= c("rue Beilliard","avenue Antoine Depage"),
 num=c("71", "30"),
 code_postal=c("1040","1000"))

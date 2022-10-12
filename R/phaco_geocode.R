@@ -19,14 +19,13 @@
 #' @import purrr
 #' @import doParallel
 #' @importFrom foreach %dopar% foreach getDoParRegistered
-#' @import doSNOW
-#' @import progress
 #' @import readxl
 #' @import lubridate
 #' @import fuzzyjoin
 #' @importFrom stringdist stringdist
 #' @import sf
 #' @import rappdirs
+#' @import cli
 #'
 #' @export
 #'
@@ -55,12 +54,6 @@ phaco_geocode <- function(data_to_geocode,
 
   # Definition du chemin ou se trouve les donnees
   start_time <- Sys.time()
-  end_time <- Sys.time()
-  cli_process_start(msg="Temps de calcul total : ",
-                    msg_done = paste("Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), "s"),
-                    msg_failed = paste0("Interuption du g","\u00e9","codage"))
-
-
 
   path_data<- paste0(user_data_dir("phacochr"),"/data_phacochr/")
 
@@ -81,9 +74,9 @@ phaco_geocode <- function(data_to_geocode,
   if (preloading_RAM == TRUE){
     start_time <- Sys.time()
     cli_progress_step(paste0("Pr","\u00e9","-chargement des donn","\u00e9","es openaddress..."))
-    table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
+    table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
 
-    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
+    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
       mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
 
     if (length(lang_encoded) != 3){
@@ -93,7 +86,7 @@ phaco_geocode <- function(data_to_geocode,
     openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
                              unique(table_postal_arrond$arrond[!is.na(table_postal_arrond$arrond)]),
                              ".csv") %>%
-      map_dfr(read_delim, delim = ";", col_types = cols(.default = col_character())) %>%
+      map_dfr(read_delim, delim = ";", progress= F, col_types = cols(.default = col_character())) %>%
       left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>%
       mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) %>% # @@@@QUESTION : POURQUOI ON FAIT CA ? pour faire l'operation de soustraction pour l'approx
       mutate(address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
@@ -149,7 +142,7 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 3. Detection des regions/arrondissements en Belgique =====================================================================================
 
-  table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", col_types = cols(.default = col_character()))
+  table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
 
   data_to_geocode <- data_to_geocode %>%
     left_join(table_postal_arrond, by = c("code_postal_to_geocode" = "postcode"))
@@ -407,8 +400,6 @@ phaco_geocode <- function(data_to_geocode,
 
 
     ## 0. Parametres/fonctions ================================================================================================================
-
-
     # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/
     `%ni%` <- Negate(`%in%`)
     # Parametres pour la parallelisation
@@ -418,7 +409,7 @@ phaco_geocode <- function(data_to_geocode,
     else {
     n.cores <- parallel::detectCores() - 1}
 
-    cli_progress_step(paste0("Param","\u00e8","trage pour utiliser ", n.cores, " coeurs de l'ordinateur"), spinner = TRUE)
+    cli_progress_step(paste0("Param","\u00e8","trage pour utiliser ", n.cores, " coeurs de l'ordinateur..."), spinner = TRUE)
     cli_h3(paste0("G","\u00e9","ocodage"))
     my.cluster <- parallel::makeCluster(
       n.cores,
@@ -433,12 +424,12 @@ phaco_geocode <- function(data_to_geocode,
 
 
     ## 1)  Jointure des rues  -----------------------------------------------------------------------------------------------------------------
-    cli_progress_step(paste0("D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)..."), spinner = TRUE)
+    cli_progress_step(paste0("D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)..."))
 
     ### i. Preparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
     # J'importe les rues
-    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", col_types = cols(.default = col_character())) %>%
+    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
       mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
 
     if (length(lang_encoded) != 3){
@@ -453,24 +444,12 @@ phaco_geocode <- function(data_to_geocode,
 
     ### ii) Boucle de jointure par commune ----------------------------------------------------------------------------------------------------
 
-    # progress bar https://stackoverflow.com/questions/5423760/how-do-you-create-a-progress-bar-when-using-the-foreach-function-in-r
-    doSNOW::registerDoSNOW(my.cluster)
-    iterations <- length(unique(data_to_geocode$code_postal_to_geocode))
-    pb <- progress_bar$new(total = iterations,
-                           #style = 3,
-                        format= "Détection des rues [:bar] :percent | eta: :eta",
-                         width=60)
-
-
-    progress <- function(n) {pb$tick()}
-    opts <- list(progress = progress)
 
     # /!\ NOTE : la cle de jointure est en minuscule (d'ou les str_to_lower() avant), car stringdist identifie la diff de case comme une diff !
     res <- tibble()
     res <- foreach (i = unique(data_to_geocode$code_postal_to_geocode),
                     .combine = 'bind_rows',
-                    .packages=c("tidyverse","fuzzyjoin"),
-                    .options.snow = opts)  %dopar% {
+                    .packages=c("tidyverse","fuzzyjoin"))  %dopar% {
 
                       data_to_geocode_i <- data_to_geocode %>%
                         filter(code_postal_to_geocode == i)
@@ -502,7 +481,7 @@ phaco_geocode <- function(data_to_geocode,
     }
 
     if(sum(duplicated(res$ID_address)) > 0){
-      cli_progress_step(paste0("Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
+      cli_progress_step(paste0("Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager..."))
       res <- res %>%
         mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
         group_by(ID_address) %>%
@@ -539,7 +518,7 @@ phaco_geocode <- function(data_to_geocode,
       if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
 
         # On charge la table de conversion code postal > code INS recode (voir preprocessing)
-        table_INS_recod_code_postal <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";", col_types = cols(.default = col_character()))
+        table_INS_recod_code_postal <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";",progress= F, col_types = cols(.default = col_character()))
 
         # On ajoute ce code INS recode 1) aux rues et 2) aux adresses non trouvees
         postal_street_adj <- postal_street %>%
@@ -548,7 +527,7 @@ phaco_geocode <- function(data_to_geocode,
           left_join(table_INS_recod_code_postal, by = c("code_postal_to_geocode" = "code_postal"))
 
         # On charge la table des communes (= code INS recodes) adjacentes par commune (voir preprocessing)
-        table_commune_adjacentes <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"), delim = ";", col_types = cols(.default = col_character()))
+        table_commune_adjacentes <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"), progress= F, delim = ";", col_types = cols(.default = col_character()))
 
         res_adj <- tibble()
         res_adj <- foreach (i = unique(ADDRESS_last_tentative$`Refnis code`),
@@ -591,7 +570,7 @@ phaco_geocode <- function(data_to_geocode,
           }
 
           if(sum(duplicated(res_adj$ID_address)) > 0){
-            cli_progress_step(paste0("ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
+            cli_progress_step(paste0("Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager..."))
             res_adj <- res_adj %>%
               mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
               group_by(ID_address) %>%
@@ -633,7 +612,7 @@ phaco_geocode <- function(data_to_geocode,
       openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
                                unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
                                ".csv") %>%
-        map_dfr(read_delim, delim = ";", col_types = cols(.default = col_character())) %>%
+        map_dfr(read_delim, delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
         left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>% # On joint les noms de rue (non contenues dans le fichier openadress par economie de place) via postal_street et la cle de jointure unique "street_id_phaco" (voir preprocessing)
         mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
                address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
@@ -657,7 +636,7 @@ phaco_geocode <- function(data_to_geocode,
     # Ne s'applique que si approx_num > 0
     if (approx_num > 0) {
 
-      cli_progress_step(paste0("Approximation des coordonn","\u00e9","es ", "\u00e0", " + ou - ", approx_num*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es..."))
+      cli_progress_step(paste0("Approximation ", "\u00e0", " + ou - ", approx_num*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es..."))
 
       # On selectionne les lignes pour lesquelles un numero de police a ete encode, on a trouve la rue, mais pour lesquelles on n'a pas trouve de correspondance dans les fichiers openaddress.
       FULL_GEOCODING_APPROX <- FULL_GEOCODING %>%
@@ -779,7 +758,7 @@ phaco_geocode <- function(data_to_geocode,
 
     # On joint les donnees de region, provinces, communes, quartiers (BXL)... aux secteurs stat
 
-    table_secteurs_prov_commune_quartier <- read_delim(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", col_types = cols(.default = col_character()))
+    table_secteurs_prov_commune_quartier <- read_delim(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", progress= F, col_types = cols(.default = col_character()))
 
 
     FULL_GEOCODING <- FULL_GEOCODING %>%
@@ -859,10 +838,11 @@ phaco_geocode <- function(data_to_geocode,
   }
 
   end_time <- Sys.time()
-  cli_alert_success("")
+  cli_progress_done()
+  cli_alert_success(paste("Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), "s"))
 
 
-  suppressWarnings(rm(my.cluster, n.cores, start_time_step, end_time_step, data_to_geocode, "%ni%"))
+  suppressWarnings(rm(my.cluster, n.cores,  data_to_geocode, "%ni%"))
 
   return(result)
 }
