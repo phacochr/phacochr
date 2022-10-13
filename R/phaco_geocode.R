@@ -75,7 +75,7 @@ phaco_geocode <- function(data_to_geocode,
   # ---------------------------------------------------------------------------------------------------
   if (preloading_RAM == TRUE){
     start_time <- Sys.time()
-    #cli_progress_step(paste0("Pr","\u00e9","-chargement des donn","\u00e9","es openaddress..."))
+    cli_alert_info(paste0("Pr","\u00e9","-chargement des donn","\u00e9","es openaddress..."))
     table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
 
     postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
@@ -107,7 +107,7 @@ phaco_geocode <- function(data_to_geocode,
   # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   cli_h3(paste0("Formatage des donn","\u00e9","es"))
 
-  #cli_progress_step(paste0("Preparation et verification des donn","\u00e9","es..."))
+  cli_alert_info(paste0("Preparation et verification des donn","\u00e9","es..."))
 
 
 
@@ -191,7 +191,7 @@ phaco_geocode <- function(data_to_geocode,
     # On cree une nouvelle colonne avec le nom de rue corrige + des colonnes avec TRUE / FALSE pour identifier les familles de changements
     if ((code_postal == "int"|num_rue == "int")|(corrections_REGEX == TRUE & code_postal == "sep" & num_rue == "sep")){
 
-      #cli_progress_step("Correction orthographique des adresses...")
+      cli_alert_info("Correction orthographique des adresses...")
 
       data_to_geocode <- data_to_geocode %>%
         mutate(rue_recoded = paste0(str_trim(rue_to_geocode, "left"),"   "),
@@ -410,7 +410,7 @@ phaco_geocode <- function(data_to_geocode,
       n.cores <- parallel::detectCores() - 1
     }
 
-    #cli_progress_step(paste0("Param","\u00e8","trage pour utiliser ", n.cores, " coeurs de l'ordinateur..."))
+    cli_alert_info(paste0("Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur..."))
     cli_h3(paste0("G","\u00e9","ocodage"))
     my.cluster <- parallel::makeCluster(
       n.cores,
@@ -422,7 +422,7 @@ phaco_geocode <- function(data_to_geocode,
     #plan(multisession)
 
     ## 1)  Jointure des rues  -----------------------------------------------------------------------------------------------------------------
-    #cli_progress_step(paste0("D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)..."))
+    cli_alert_info(paste0("D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)..."))
 
     ### i. Preparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
@@ -479,7 +479,7 @@ phaco_geocode <- function(data_to_geocode,
     }
 
     if(sum(duplicated(res$ID_address)) > 0){
-      #cli_progress_step(paste0("Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager..."))
+      cli_alert_info(paste0("Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager..."))
       res <- res %>%
         mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
         group_by(ID_address) %>%
@@ -504,7 +504,7 @@ phaco_geocode <- function(data_to_geocode,
 
     if (elargissement_com_adj == TRUE) {
 
-      #cli_progress_step(paste0("\u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes..."))
+      cli_alert_info(paste0("\u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes..."))
 
 
       # On ne retient que les adresses dont les rues n'ont pas ete detectees
@@ -568,7 +568,7 @@ phaco_geocode <- function(data_to_geocode,
           }
 
           if(sum(duplicated(res_adj$ID_address)) > 0){
-            #cli_progress_step(paste0("Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager..."))
+            cli_alert_info(paste0("Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager..."))
             res_adj <- res_adj %>%
               mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
               group_by(ID_address) %>%
@@ -604,7 +604,7 @@ phaco_geocode <- function(data_to_geocode,
 
     if (preloading_RAM == FALSE){
 
-      #cli_progress_step("Chargement du fichier openaddress...")
+      cli_alert_info("Chargement du fichier openaddress...")
 
       # Ici on cree une liste des adresses en n'important que les arrodissements detectes dans data_to_geocode
       openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
@@ -621,7 +621,7 @@ phaco_geocode <- function(data_to_geocode,
 
     #### ii. Jointure avec les adresses  ------------------------------------------------------------------------------------------------------
 
-    #cli_progress_step(paste0("Jointure avec les coordonn","\u00e9","es X-Y..."))
+    cli_alert_info(paste0("Jointure avec les coordonn","\u00e9","es X-Y..."))
 
     FULL_GEOCODING <- res %>%
       mutate(address_join_geocoding = paste(num_rue_clean, street_FINAL_detected, code_postal_to_geocode)) %>%
@@ -634,7 +634,7 @@ phaco_geocode <- function(data_to_geocode,
     # Ne s'applique que si approx_num > 0
     if (approx_num > 0) {
 
-      #cli_progress_step(paste0("Approximation ", "\u00e0", " + ou - ", approx_num*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es..."))
+      cli_alert_info(paste0("Approximation ", "\u00e0", " + ou - ", approx_num*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es..."))
 
       # On selectionne les lignes pour lesquelles un numero de police a ete encode, on a trouve la rue, mais pour lesquelles on n'a pas trouve de correspondance dans les fichiers openaddress.
       FULL_GEOCODING_APPROX <- FULL_GEOCODING %>%
@@ -719,7 +719,7 @@ phaco_geocode <- function(data_to_geocode,
 
     # III. FICHIER FINAL  =====================================================================================================================
 
-    #cli_progress_step(paste0("Cr","\u00e9","ation du fichier final et formatage des tables de v","\u00e9","rification..."))
+    cli_alert_info(paste0("Cr","\u00e9","ation du fichier final et formatage des tables de v","\u00e9","rification..."))
     cli_h3(paste0("R","\u00e9","sultats"))
 
 
@@ -841,7 +841,7 @@ phaco_geocode <- function(data_to_geocode,
   cli_verbatim(knitr::kable(result$summary[2:nrow(result$summary),c(1:3,5)]))
   cli_verbatim("------------------------------------------------------------------------")
 
-    cli_alert_success(paste("Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), "s"))
+    cli_alert_info(paste("Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), "s"))
 
   cli_h3(paste0("Plus de r","\u00e9","sultats:"))
   cli_bullets(c(">" = paste0("$summary [tableau synth","\u00e9","tique]"),
