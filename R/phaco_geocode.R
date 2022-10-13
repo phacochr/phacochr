@@ -405,8 +405,9 @@ phaco_geocode <- function(data_to_geocode,
     # Parametres pour la parallelisation
     chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
     if (nzchar(chk) && chk == "TRUE") {
-      n.cores <-2L}# limite le nombre de coeurs a 2 pour les tests sur CRAN https://stackoverflow.com/questions/50571325/r-cran-check-fail-when-using-parallel-functions
-    else {
+      n.cores <-2L
+      # limite le nombre de coeurs a 2 pour les tests sur CRAN https://stackoverflow.com/questions/50571325/r-cran-check-fail-when-using-parallel-functions
+    } else {
     n.cores <- parallel::detectCores() - 1}
 
     cli_progress_step(paste0("Param","\u00e8","trage pour utiliser ", n.cores, " coeurs de l'ordinateur..."))
