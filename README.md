@@ -13,17 +13,17 @@ license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.co
 
 <!-- badges: end -->
 
-PhaochR est un géocodeur pour la Belgique. A partir, d’une liste
-d’adresse, il permet de retrouver les coordonnées X-Y nécessaire à toute
+PhacochR est un géocodeur pour la Belgique. A partir d’une liste
+d’adresse, il permet de retrouver les coordonnées X-Y nécessaires à toute
 analyse spatiale.
 
 Le logiciel fonctionne à partir des données publiques [BeST
 Address](https://opendata.bosa.be/) compilées par BOSA à partir des
 données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région
 flamande) et ICAR (Région wallonne). Il réalise des corrections
-orthographiques préalables (Regex), il fait une jointure inexacte avec
-les noms de rues (fuzzyjoin) et il trouve le numéro le plus proche et de
-préférence du même côté de la rue si le numéro n’est pas trouvé.
+orthographiques préalables (via Regex), il fait une jointure inexacte avec
+les noms de rues (fuzzyjoin) et trouve le numéro le plus proche - de
+préférence du même côté de la rue - si le numéro n’est pas trouvé.
 
 ## Installation
 
