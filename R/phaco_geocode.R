@@ -837,11 +837,11 @@ phaco_geocode <- function(data_to_geocode,
 
   end_time <- Sys.time()
   cli_progress_done()
-  cli_verbatim("------------------------------------------------------------------------")
+  cli_verbatim("------------------------------------------------------------------")
   cli_verbatim(knitr::kable(result$summary[2:nrow(result$summary),c(1:3,5)]))
-  cli_verbatim("------------------------------------------------------------------------")
+  cli_verbatim("------------------------------------------------------------------")
 
-    cli_alert_info(paste("Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), "s"))
+  cli_alert_info(paste("Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), "s"))
 
   cli_h3(paste0("Plus de r","\u00e9","sultats:"))
   cli_bullets(c(">" = paste0("$summary [tableau synth","\u00e9","tique]"),
