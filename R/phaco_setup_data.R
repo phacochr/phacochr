@@ -14,7 +14,7 @@ phaco_setup_data <- function(){
   # creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
   cli_h2(paste0("Chargement des donn","\u00e9","es pour PhacochR"))
   start_time <- Sys.time()
-  path_data<- paste0(user_data_dir("phacochr"),"/data_phacochr")
+  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr"))
   dir.create(path_data, showWarnings = F)
 
 
