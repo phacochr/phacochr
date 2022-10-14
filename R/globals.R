@@ -20,5 +20,5 @@ globalVariables(unique(c(
   "rue_recoded_square", "rue_recoded_steenweg", "rue_recoded_tiret",
   "rue_recoded_virgule", "rue_to_geocode", "street_FINAL_detected",
   "street_FINAL_detected_full", "street_id_phaco", "type_geocoding",
-  "x_31370", "y_31370", "export_table"
+  "x_31370", "y_31370", "export_table", "dist_fuzzy"
 )))
