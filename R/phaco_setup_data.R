@@ -3,7 +3,6 @@
 #' @import rappdirs
 #' @import readr
 #' @import utils
-#' @import cli
 #'
 #' @export
 #'

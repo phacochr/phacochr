@@ -25,7 +25,6 @@
 #' @importFrom stringdist stringdist
 #' @import sf
 #' @import rappdirs
-#' @import cli
 #' @import knitr
 
 #'

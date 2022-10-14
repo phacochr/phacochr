@@ -2,7 +2,6 @@
 
 export(phaco_geocode)
 export(phaco_setup_data)
-import(cli)
 import(doParallel)
 import(dplyr)
 import(fuzzyjoin)
