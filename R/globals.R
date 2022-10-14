@@ -3,7 +3,7 @@
 globalVariables(unique(c(
   # phaco_geocode:
   "address_join", "address_join_geocoding", "address_join_street",
-  "arrond", "cd_sector", "code_postal_to_geocode", "dif",
+  "arrond", "cd_sector", "code_postal_to_geocode", "approx_num",
   "distance_FINAL_detected", "distance_jw", "house_number_sans_lettre",
   "i", "ID_address", "langue_FINAL_detected", "min_jw", "nom_propre_abv",
   "num_rue_clean", "num_rue_text", "num_rue_to_geocode", "postal_id",

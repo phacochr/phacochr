@@ -12,7 +12,7 @@ phaco_geocode(
   method_stringdist = "lcs",
   corrections_REGEX = TRUE,
   error_max = 4,
-  approx_num = 50,
+  approx_num_max = 50,
   elargissement_com_adj = TRUE,
   preloading_RAM = FALSE,
   lang_encoded = c("FR", "NL", "DE")
@@ -33,7 +33,7 @@ phaco_geocode(
 
 \item{error_max}{nombre d'erreurs maximale entre le nom de la rue a trouver et le nom de la rue dans la base de donnee de reference (BeST)}
 
-\item{approx_num}{nombre de numero maximum si le numero n'a pas ete trouve}
+\item{approx_num_max}{nombre de numero maximum si le numero n'a pas ete trouve}
 
 \item{elargissement_com_adj}{elargissement aux communes limitrophes}
 

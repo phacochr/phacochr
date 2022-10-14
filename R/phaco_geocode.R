@@ -7,7 +7,7 @@
 #' @param method_stringdist methode pour la jointure inexacte
 #' @param corrections_REGEX correction orthographiques
 #' @param error_max nombre d'erreurs maximale entre le nom de la rue a trouver et le nom de la rue dans la base de donnee de reference (BeST)
-#' @param approx_num nombre de numero maximum si le numero n'a pas ete trouve
+#' @param approx_num_max nombre de numero maximum si le numero n'a pas ete trouve
 #' @param elargissement_com_adj elargissement aux communes limitrophes
 #' @param preloading_RAM precharhement dans la RAM des l'ensemble des donnees BeST
 #' @param lang_encoded langue utilisee pour encoder les noms de rue
@@ -48,7 +48,7 @@ phaco_geocode <- function(data_to_geocode,
                           method_stringdist = "lcs",
                           corrections_REGEX = TRUE,
                           error_max = 4,
-                          approx_num = 50,
+                          approx_num_max = 50,
                           elargissement_com_adj = TRUE,
                           preloading_RAM = FALSE,
                           lang_encoded = c("FR", "NL", "DE")){
@@ -627,7 +627,7 @@ phaco_geocode <- function(data_to_geocode,
 
     #### ii. Jointure avec les adresses  ------------------------------------------------------------------------------------------------------
 
-    cat(paste0("\n","\u29D7"," Jointure avec les coordonn","\u00e9","es X-."))
+    cat(paste0("\n","\u29D7"," Jointure avec les coordonn","\u00e9","es X-Y."))
 
     FULL_GEOCODING <- res %>%
       mutate(address_join_geocoding = paste(num_rue_clean, street_FINAL_detected, code_postal_to_geocode)) %>%
@@ -638,10 +638,10 @@ phaco_geocode <- function(data_to_geocode,
 
     ### iii. Approximation numero -------------------------------------------------------------------------------------------------------------
 
-    # Ne s'applique que si approx_num > 0
-    if (approx_num > 0) {
+    # Ne s'applique que si approx_num_max > 0
+    if (approx_num_max > 0) {
 
-      cat(paste0("\n","\u29D7"," Approximation ", "\u00e0", " + ou - ", approx_num*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es."))
+      cat(paste0("\n","\u29D7"," Approximation ", "\u00e0", " + ou - ", approx_num_max*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es."))
 
       # On selectionne les lignes pour lesquelles un numero de police a ete encode, on a trouve la rue, mais pour lesquelles on n'a pas trouve de correspondance dans les fichiers openaddress.
       FULL_GEOCODING_APPROX <- FULL_GEOCODING %>%
@@ -705,7 +705,7 @@ phaco_geocode <- function(data_to_geocode,
           FULL_GEOCODING_APPROX <- bind_rows(
             inner_join(FULL_GEOCODING_APPROX, APPROX_1, by= "ID_address"),
             inner_join(FULL_GEOCODING_APPROX, APPROX_2, by= "ID_address")) %>%
-            filter(approx_num <= approx_num*2) %>%
+            filter(approx_num <= approx_num_max*2) %>%
             select(-min)
 
           FULL_GEOCODING <- FULL_GEOCODING %>%
@@ -716,7 +716,7 @@ phaco_geocode <- function(data_to_geocode,
       }
 
       suppressWarnings(rm(FULL_GEOCODING_APPROX, APPROX_1, APPROX_2))
-      cat(paste0("\r","\u2714"," Approximation ", "\u00e0", " + ou - ", approx_num*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es.","\033[K"))
+      cat(paste0("\r","\u2714"," Approximation ", "\u00e0", " + ou - ", approx_num_max*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es.","\033[K"))
 
     }
 
@@ -801,7 +801,7 @@ phaco_geocode <- function(data_to_geocode,
                                "stringdist (moy)" = NA,
                                "Geocode(%)" = NA,
                                #"Approx (% geocodes)" = NA,
-                               "Approx. num (n)"=NA,
+                               "Approx. num(n)"=NA,
                                "Elarg. com.(n)" = NA,
                                "Abrev. noms(n)" = NA,
                                "Rue FR" = NA,
@@ -809,6 +809,7 @@ phaco_geocode <- function(data_to_geocode,
                                "Rue DE" = NA,
                                "Coord non valides" = NA,
                                "Dupliques" = sum(duplicated(data_to_geocode$ID_address)))
+
 
     Summary_full <- bind_rows(Summary_original, Summary_region) %>%
       slice(match(c("Total (original)", "Bruxelles", "Flandre", "Wallonie", NA, "Total"), Region))
@@ -835,7 +836,7 @@ phaco_geocode <- function(data_to_geocode,
     result$data_geocoded <- FULL_GEOCODING
     result$data_geocoded_sf <- FULL_GEOCODING_sf
     # remplacer par 0 les NA (pas très propre)
-    result$summary$`Approx. num (n)`[is.na(result$summary$`Approx. num (n)`)]<-0
+   result$summary$`Approx. num(n)`[is.na(result$summary$`Approx. num(n)`)]<-0
 
 
     # On stoppe la parallelisation
@@ -859,7 +860,8 @@ phaco_geocode <- function(data_to_geocode,
 
   cat(paste0("\n","\u2139", " Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), " s
              "))
-  cat(paste0("\n","/!\\ Avertissements /!\\
+  cat(paste0("\n","/!\\ Toutes les adresses n'ont pas ","\u00e9","t","\u00e9"," trouv","\u00e9","es avec certitude /!\\
+
 - check \'dist_fuzzy\' pour les erreurs dans la jointure sur les noms de rues
 - check \'approx_num\' pour les approximations de num","\u00e9","ro
 - check \'type_geocoding\' pour l'","\u00e9","argissement aux communes adjacentes
