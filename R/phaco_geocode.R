@@ -857,9 +857,6 @@ phaco_geocode <- function(data_to_geocode,
                     align="lrccccc")
   cat("\n",tab, sep="\n" )
 
-
-colnames=c("Region","n","Rue \ndetect.(%)","Approx. num (n)","Elarg. com.(n)" ,"Abrev. noms(n)","Geocode(%)")
-
   cat(paste0("\n","\u2139", " Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), " s
              "))
   cat(paste0("\n","/!\\ Avertissements /!\\
