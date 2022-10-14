@@ -462,7 +462,7 @@ phaco_geocode <- function(data_to_geocode,
                                            by = c("address_join" = "address_join_street"),
                                            method = method_stringdist,
                                            max_dist = error_max,
-                                           distance_col = "distance_FINAL_detected",
+                                           distance_col = "dist_fuzzy",
                                            nthread= n.cores)
                     }
     cat(paste0("\r","\u2714"," D","\u00e9","tection des rues (matching inexact avec fuzzyjoin).", "\033[K"))
@@ -470,8 +470,8 @@ phaco_geocode <- function(data_to_geocode,
     # On ne retient que l'adresse detectee avec la distance minimale
     res <- res %>%
       group_by(ID_address) %>%
-      mutate(min = min(distance_FINAL_detected)) %>%
-      filter(distance_FINAL_detected == min | is.na(distance_FINAL_detected)) %>%
+      mutate(min = min(dist_fuzzy)) %>%
+      filter(dist_fuzzy == min | is.na(dist_fuzzy)) %>%
       select(-min, -postal_id)
 
     # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
@@ -514,9 +514,9 @@ phaco_geocode <- function(data_to_geocode,
 
       # On ne retient que les adresses dont les rues n'ont pas ete detectees
       ADDRESS_last_tentative <- res %>%
-        filter(is.na(distance_FINAL_detected)) %>%
+        filter(is.na(dist_fuzzy)) %>%
         mutate(address_join = paste(str_to_lower(str_trim(rue_recoded)))) %>%
-        select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -distance_FINAL_detected)
+        select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -dist_fuzzy)
 
       if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
 
@@ -553,7 +553,7 @@ phaco_geocode <- function(data_to_geocode,
                                                    by = c("address_join" = "address_join_street"),
                                                    method = method_stringdist,
                                                    max_dist = error_max/2,
-                                                   distance_col = "distance_FINAL_detected")
+                                                   distance_col = "dist_fuzzy")
                             }
 
         # Ce if statement car res_adj peut avoir 0 observations => NOTE : elucider pourquoi ? Pourquoi ca n'arrive pas avec "res" (boucle precedente) ?
@@ -561,8 +561,8 @@ phaco_geocode <- function(data_to_geocode,
           # On ne retient que l'adresse detectee avec la distance minimale
           res_adj <- res_adj %>%
             group_by(ID_address) %>%
-            mutate(min = min(distance_FINAL_detected)) %>%
-            filter(distance_FINAL_detected == min | is.na(distance_FINAL_detected)) %>%
+            mutate(min = min(dist_fuzzy)) %>%
+            filter(dist_fuzzy == min | is.na(dist_fuzzy)) %>%
             select(-min)
 
           # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
@@ -585,7 +585,7 @@ phaco_geocode <- function(data_to_geocode,
           res_adj <- res_adj %>%
             relocate(street_FINAL_detected, .after = recode) %>%
             mutate(type_geocoding = "elargissement_adj") %>%
-            filter(!is.na(distance_FINAL_detected)) %>%
+            filter(!is.na(dist_fuzzy)) %>%
             mutate(code_postal_to_geocode = postal_id) %>%
             select(-postal_id)
 
@@ -634,7 +634,7 @@ phaco_geocode <- function(data_to_geocode,
       mutate(address_join_geocoding = paste(num_rue_clean, street_FINAL_detected, code_postal_to_geocode)) %>%
       left_join(select(openaddress_be, -street_FINAL_detected, -postal_id, -street_id_phaco), by = "address_join_geocoding") %>%
       #select(-house_number) %>%
-      mutate(dif = 0)
+      mutate(approx_num = 0)
     cat(paste0("\r","\u2714"," Jointure avec les coordonn","\u00e9","es X-Y.","\033[K"))
 
     ### iii. Approximation numero -------------------------------------------------------------------------------------------------------------
@@ -647,7 +647,7 @@ phaco_geocode <- function(data_to_geocode,
       # On selectionne les lignes pour lesquelles un numero de police a ete encode, on a trouve la rue, mais pour lesquelles on n'a pas trouve de correspondance dans les fichiers openaddress.
       FULL_GEOCODING_APPROX <- FULL_GEOCODING %>%
         filter(!is.na(street_id_phaco) & !is.na(num_rue_clean) & is.na(house_number_sans_lettre)) %>%
-        select (-address_join_geocoding, -x_31370, -y_31370, -cd_sector, -house_number_sans_lettre, -dif)
+        select (-address_join_geocoding, -x_31370, -y_31370, -cd_sector, -house_number_sans_lettre, -approx_num)
 
       if (nrow(FULL_GEOCODING_APPROX) > 0) { # A partir d'ici, plein de if statement pour eviter d'appliquer les operations sur un tableau vide (possible a chaque etape)
         # On fait une jointure avec openaddress sur base des noms de rue, uniquement du meme cote de la rue
@@ -661,10 +661,10 @@ phaco_geocode <- function(data_to_geocode,
         if (nrow(APPROX_1) > 0){
           # On ne retient que le numero avec la distance minimale
           APPROX_1 <- APPROX_1 %>%
-            mutate(dif = abs(num_rue_clean - house_number_sans_lettre)) %>%
+            mutate(approx_num = abs(num_rue_clean - house_number_sans_lettre)) %>%
             group_by(ID_address) %>%
-            mutate(min = min(dif)) %>%
-            filter(min == dif) %>%  # selection plus proche
+            mutate(min = min(approx_num)) %>%
+            filter(min == approx_num) %>%  # selection plus proche
             sample_n(1) %>%
             select(-street_id_phaco, -num_rue_clean)
 
@@ -687,10 +687,10 @@ phaco_geocode <- function(data_to_geocode,
             # On ne retient que le numero avec la distance minimale
             APPROX_2 <- APPROX_2 %>%
               distinct() %>%
-              mutate(dif = abs(num_rue_clean - house_number_sans_lettre)) %>%
+              mutate(approx_num = abs(num_rue_clean - house_number_sans_lettre)) %>%
               group_by(ID_address) %>%
-              mutate(min = min(dif)) %>%
-              filter(min == dif) %>%  # selection plus proche
+              mutate(min = min(approx_num)) %>%
+              filter(min == approx_num) %>%  # selection plus proche
               sample_n(1) %>%
               select(-street_id_phaco, -num_rue_clean)
 
@@ -706,7 +706,7 @@ phaco_geocode <- function(data_to_geocode,
           FULL_GEOCODING_APPROX <- bind_rows(
             inner_join(FULL_GEOCODING_APPROX, APPROX_1, by= "ID_address"),
             inner_join(FULL_GEOCODING_APPROX, APPROX_2, by= "ID_address")) %>%
-            filter(dif <= approx_num*2) %>%
+            filter(approx_num <= approx_num*2) %>%
             select(-min)
 
           FULL_GEOCODING <- FULL_GEOCODING %>%
@@ -779,16 +779,17 @@ phaco_geocode <- function(data_to_geocode,
 
     Summary_region <- bind_rows(
       FULL_GEOCODING,
-      FULL_GEOCODING %>% mutate(Region = "Total (final)") # Technique tres astucieuse pour ajouter un total au tableau de synthese avec le group_by > summarise!
+      FULL_GEOCODING %>% mutate(Region = "Total") # Technique tres astucieuse pour ajouter un total au tableau de synthese avec le group_by > summarise!
     ) %>%
       group_by(Region) %>%
-      summarise("Effectifs" = n(),
-                "Rue detectee (% tot)" = (sum(!is.na(street_FINAL_detected))/n())*100,
-                "stringdist (moy)" = mean(distance_FINAL_detected, na.rm = T),
-                "Geocode (% tot)" = (sum(!is.na(x_31370))/n())*100,
-                "Approx (% geocodes)" = (sum(dif > 0, na.rm = T)/(sum(!is.na(x_31370))))*100,
-                "Elarg (n)" = (sum(type_geocoding == "elargissement_adj", na.rm = T)),
-                "Abrev (n)" = (sum(nom_propre_abv == 1, na.rm = T)),
+      summarise("n" = n(),
+                "Rue detect.(%)" = round((sum(!is.na(street_FINAL_detected))/n())*100,1),
+                "stringdist (moy)" = mean(dist_fuzzy, na.rm = T),
+                "Geocode(%)" = round((sum(!is.na(x_31370))/n())*100,1),
+                #"Approx (% geocodes)" = (sum(approx_num > 0, na.rm = T)/(sum(!is.na(x_31370))))*100,
+                "Approx. num(n)" = sum(approx_num > 0, na.rm = T),
+                "Elarg. com.(n)" = (sum(type_geocoding == "elargissement_adj", na.rm = T)),
+                "Abrev. noms(n)" = (sum(nom_propre_abv == 1, na.rm = T)),
                 "Rue FR" = (sum(langue_FINAL_detected == "FR", na.rm = T))/sum(!is.na(langue_FINAL_detected))*100,
                 "Rue NL" = (sum(langue_FINAL_detected == "NL", na.rm = T))/sum(!is.na(langue_FINAL_detected))*100,
                 "Rue DE" = (sum(langue_FINAL_detected == "DE", na.rm = T))/sum(!is.na(langue_FINAL_detected))*100,
@@ -796,13 +797,14 @@ phaco_geocode <- function(data_to_geocode,
                 "Dupliques" = sum(duplicated(ID_address)))
 
     Summary_original <- tibble(Region = "Total (original)",
-                               "Effectifs" = nrow(data_to_geocode),
-                               "Rue detectee (% tot)" = NA,
+                               "n" = nrow(data_to_geocode),
+                               "Rue detect.(%)" = NA,
                                "stringdist (moy)" = NA,
-                               "Geocode (% tot)" = NA,
-                               "Approx (% geocodes)" = NA,
-                               "Elarg (n)" = NA,
-                               "Abrev (n)" = NA,
+                               "Geocode(%)" = NA,
+                               #"Approx (% geocodes)" = NA,
+                               "Approx. num (n)"=NA,
+                               "Elarg. com.(n)" = NA,
+                               "Abrev. noms(n)" = NA,
                                "Rue FR" = NA,
                                "Rue NL" = NA,
                                "Rue DE" = NA,
@@ -810,7 +812,7 @@ phaco_geocode <- function(data_to_geocode,
                                "Dupliques" = sum(duplicated(data_to_geocode$ID_address)))
 
     Summary_full <- bind_rows(Summary_original, Summary_region) %>%
-      slice(match(c("Total (original)", "Bruxelles", "Flandre", "Wallonie", NA, "Total (final)"), Region))
+      slice(match(c("Total (original)", "Bruxelles", "Flandre", "Wallonie", NA, "Total"), Region))
    # print(Summary_full)
 
     # J'enleve la region et les arrondissements, car doublon avec jointure dans le point precedent => pas ideal, mais necessaire pour importer les CSV par arrond avec map_dfr, pour le summary et au debut pour detecter les regions et ne pas executer si pas BE => optimiser ?
@@ -833,6 +835,9 @@ phaco_geocode <- function(data_to_geocode,
     result$summary <- Summary_full
     result$data_geocoded <- FULL_GEOCODING
     result$data_geocoded_sf <- FULL_GEOCODING_sf
+    # remplacer par 0 les NA (pas très propre)
+    result$summary$`Approx. num (n)`[is.na(result$summary$`Approx. num (n)`)]<-0
+
 
     # On stoppe la parallelisation
     parallel::stopCluster(cl = my.cluster)
@@ -841,23 +846,36 @@ phaco_geocode <- function(data_to_geocode,
 
   # Dans le cas ou il n'y a pas d'adresses belges/valides
   if (length(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)])) == 0){
-    cli_alert_danger("ERREUR : il n'y a aucun code postal belge dans le fichier (ou erreur d'encodage)")
+    cat(paste0("\u2716","ERREUR : il n'y a aucun code postal belge dans le fichier (ou erreur d'encodage)"))
   }
   cat(paste0("\r","\u2714"," Cr","\u00e9","ation du fichier final et formatage des tables de v","\u00e9","rification.","\033[K"))
+  cat(paste0("\n","\u2714"," G","\u00e9","ocodage termin","\u00e9","\033[K"))
 
   end_time <- Sys.time()
-  #cat("\n","------------------------------------------------------------------")
-  tab<-knitr::kable(result$summary[2:nrow(result$summary),c(1:3,5)])
+
+  tab<-knitr::kable(result$summary[2:nrow(result$summary),c(1:3,6:8,5)],
+                    format = "pipe",
+                    align="lcccccc")
   cat("\n",tab, sep="\n" )
-  #cat("\n","------------------------------------------------------------------")
 
 
-  cat(paste0("\n","\u2139", " Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), " s"))
+colnames=c("Region","n","Rue \ndetect.(%)","Approx. num (n)","Elarg. com.(n)" ,"Abrev. noms(n)","Geocode(%)")
 
-  cat(paste0("\n","---Plus de r","\u00e9","sultats:"))
-  cat(paste0("\n","$summary [tableau synth","\u00e9","tique]",
-             "\n","$data_geocoded [donn","\u00e9","es g","\u00e9","ocod","\u00e9","es]",
-             "\n","$data_geocoded_sf [donn","\u00e9","es g","\u00e9","ocod","\u00e9","es en format sf]"))
+  cat(paste0("\n","\u2139", " Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), " s
+             "))
+  cat(paste0("\n","/!\\ Avertissements /!\\
+- check \'dist_fuzzy\' pour les erreurs dans la jointure sur les noms de rues
+- check \'approx_num\' pour les approximations de num","\u00e9","ro
+- check \'type_geocoding\' pour l'","\u00e9","argissement aux communes adjacentes
+- check \'nom_propre_abv\' pour les abr","\u00e9","viations de noms propres
+"))
+
+
+
+  cat(paste0("\n","--Plus de r","\u00e9","sultats:",
+             "\n",'\u2192'," Tableau synth","\u00e9","tique :","$summary",
+             "\n",'\u2192'," Donn","\u00e9","es g","\u00e9","ocod","\u00e9","es: $data_geocoded",
+             "\n",'\u2192'," Donn","\u00e9","es g","\u00e9","ocod","\u00e9","es en format sf: $data_geocoded_sf"))
 
 
   suppressWarnings(rm(my.cluster, n.cores,  data_to_geocode, "%ni%"))
