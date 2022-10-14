@@ -854,7 +854,7 @@ phaco_geocode <- function(data_to_geocode,
 
   tab<-knitr::kable(result$summary[2:nrow(result$summary),c(1:3,6:8,5)],
                     format = "pipe",
-                    align="lcccccc")
+                    align="lrccccc")
   cat("\n",tab, sep="\n" )
 
 
