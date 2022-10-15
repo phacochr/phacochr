@@ -816,7 +816,7 @@ phaco_geocode <- function(data_to_geocode,
 
   cat(paste0("\n","\u2139", " Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), " s
              "))
-  cat(paste0("\n","/!\\ Toutes les adresses n'ont sans doute pas ","\u00e9","t","\u00e9"," trouv","\u00e9","es avec certitude /!\\
+  cat(paste0("\n","/!\\ Toutes les adresses n'ont pas ","\u00e9","t","\u00e9"," trouv","\u00e9","es avec certitude /!\\
 - check \'dist_fuzzy\' pour les erreurs de reconnaissance des rues
 - check \'approx_num\' pour les approximations de num","\u00e9","ro
 - check \'type_geocoding\' pour l'","\u00e9","argissement aux communes adjacentes
