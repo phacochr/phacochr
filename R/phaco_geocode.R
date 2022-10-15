@@ -31,7 +31,7 @@
 #'
 #' @examples
 #' x<- data.frame(nom= c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
-#' rue= c("rue Beilliard","avenue Antoine Depage"),
+#' rue= c("rue Belliard","avenue Antoine Depage"),
 #' num=c("71", "30"),
 #' code_postal=c("1040","1000"))
 #'
