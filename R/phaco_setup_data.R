@@ -38,5 +38,4 @@ phaco_setup_data <- function(){
 
   cat(paste0("\n","\u2714"," Importation des donn","\u00e9","es OK: PhacochR pr","\u00ea","t ","\u00e0", " g","\u00e9","ocoder."))
 
-
 }
