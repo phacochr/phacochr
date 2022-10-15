@@ -9,7 +9,6 @@
 #' @param error_max nombre d'erreurs maximale entre le nom de la rue a trouver et le nom de la rue dans la base de donnee de reference (BeST)
 #' @param approx_num_max nombre de numero maximum si le numero n'a pas ete trouve
 #' @param elargissement_com_adj elargissement aux communes limitrophes
-#' @param preloading_RAM precharhement dans la RAM des l'ensemble des donnees BeST
 #' @param lang_encoded langue utilisee pour encoder les noms de rue
 #'
 #' @import dplyr
@@ -50,7 +49,6 @@ phaco_geocode <- function(data_to_geocode,
                           error_max = 4,
                           approx_num_max = 50,
                           elargissement_com_adj = TRUE,
-                          preloading_RAM = FALSE,
                           lang_encoded = c("FR", "NL", "DE")){
 
   start_time <- Sys.time()
@@ -70,37 +68,6 @@ phaco_geocode <- function(data_to_geocode,
   } else {
     code_postal <- "int"
   }
-
-  # PRECHARGEMENT DES FICHIERS COMPLETS DES ADRESSES (en prevision d'une utilisation serveur ?)
-  # ---------------------------------------------------------------------------------------------------
-  if (preloading_RAM == TRUE){
-    start_time <- Sys.time()
-
-    cat(paste0("\n","\033[K","\u29D7","Pr","\u00e9","-chargement des donn","\u00e9","es openaddress"))
-
-    table_postal_arrond <- read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
-
-    postal_street <- read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
-      mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
-
-    if (length(lang_encoded) != 3){
-      postal_street <- postal_street %>%
-        filter(langue_FINAL_detected %in% lang_encoded)
-    }
-    openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
-                             unique(table_postal_arrond$arrond[!is.na(table_postal_arrond$arrond)]),
-                             ".csv") %>%
-      map_dfr(read_delim, delim = ";", progress= F, col_types = cols(.default = col_character())) %>%
-      left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>%
-      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) %>% # @@@@QUESTION : POURQUOI ON FAIT CA ? pour faire l'operation de soustraction pour l'approx
-      mutate(address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
-    #select(-street_FINAL_detected, -postal_id, -street_id_phaco)
-
-
-    end_time <- Sys.time()
-    message(paste0(round(difftime(end_time, start_time, units = "secs")[[1]], digits = 2), "sec"))
-  }
-  # ---------------------------------------------------------------------------------------------------
 
   cat("--- PhacochR ---")
 
@@ -576,7 +543,7 @@ phaco_geocode <- function(data_to_geocode,
 
           if(sum(duplicated(res_adj$ID_address)) > 0){
             res_adj <- res_adj %>%
-              mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
+              mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
               group_by(ID_address) %>%
               mutate(min_jw = min(distance_jw)) %>%
               filter(distance_jw == min_jw | is.na(distance_jw)) %>%
@@ -609,21 +576,17 @@ phaco_geocode <- function(data_to_geocode,
 
     #### i. Preparation des fichiers adresses (BeST) ------------------------------------------------------------------------------------------
 
-    if (preloading_RAM == FALSE){
+    cat(paste0("\n","\u29D7"," Chargement du fichier openaddress"))
 
-      cat(paste0("\n","\u29D7"," Chargement du fichier openaddress"))
-
-      # Ici on cree une liste des adresses en n'important que les arrodissements detectes dans data_to_geocode
-      openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
-                               unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
-                               ".csv") %>%
-        map_dfr(read_delim, delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
-        left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>% # On joint les noms de rue (non contenues dans le fichier openadress par economie de place) via postal_street et la cle de jointure unique "street_id_phaco" (voir preprocessing)
-        mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
-               address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
-      #select(-street_FINAL_detected, -postal_id, -street_id_phaco)
-
-    }
+    # Ici on cree une liste des adresses en n'important que les arrodissements detectes dans data_to_geocode
+    openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
+                             unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
+                             ".csv") %>%
+      map_dfr(read_delim, delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
+      left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>% # On joint les noms de rue (non contenues dans le fichier openadress par economie de place) via postal_street et la cle de jointure unique "street_id_phaco" (voir preprocessing)
+      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
+             address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
+    #select(-street_FINAL_detected, -postal_id, -street_id_phaco)
 
     cat(paste0("\r","\u2714"," Chargement du fichier openaddress","\033[K"))
 
