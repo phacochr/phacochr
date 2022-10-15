@@ -14,7 +14,7 @@ license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.co
 <!-- badges: end -->
 
 PhacochR est un géocodeur pour la Belgique. A partir d’une liste
-d’adresse, il permet de retrouver les coordonnées X-Y nécessaires à
+d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à
 toute analyse spatiale.
 
 Le logiciel fonctionne à partir des données publiques [BeST
@@ -22,8 +22,9 @@ Address](https://opendata.bosa.be/) compilées par BOSA à partir des
 données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région
 flamande) et ICAR (Région wallonne). Il réalise des corrections
 orthographiques préalables (via Regex), il fait une jointure inexacte
-avec les noms de rues (fuzzyjoin) et trouve le numéro le plus proche -
-de préférence du même côté de la rue - si le numéro n’est pas trouvé.
+avec les noms de rues (grâce à `fuzzyjoin` et `stringdist`) et trouve le
+numéro le plus proche - de préférence du même côté de la rue - si le
+numéro n’est pas trouvé.
 
 ## Installation
 
@@ -50,12 +51,10 @@ phacochr::phaco_update()
 
 ``` r
 library(phacochr)
-
 x <- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
                 rue= c("rue Belliard","avenue Antoine Depage"),
                 num=c("71", "30"),
                 code_postal=c("1040","1000"))
-
 x
 #>                                     nom                   rue num code_postal
 #> 1 Observatoire de la Santé et du Social          rue Belliard  71        1040
