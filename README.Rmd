@@ -31,13 +31,20 @@ Il réalise des corrections orthographiques préalables (Regex), il fait une joi
 
 ## Installation
 
-Vous pouvez installer le package phacochr depuis [GitHub](https://github.com/):
+Vous pouvez installer le package phacochr depuis [GitHub](https://github.com/) :
 
 ``` r
 # install.packages("devtools")
 library(devtools)
 devtools::install_github("phacochr/phacochr")
+# Pour installer les données
 phacochr::phaco_setup_data()
+```
+
+Il est également possible pour l'utilisateur de mettre à jour lui-même les dernières données [BeST Address](https://opendata.bosa.be/) :
+
+``` r
+phacochr::phaco_update()
 ```
 
 ## Example
@@ -46,7 +53,7 @@ phacochr::phaco_setup_data()
 ```{r example, warning = FALSE, message = FALSE}
 library(phacochr)
 x<- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
-               rue= c("rue Beilliard","avenue Antoine Depage"),
+               rue= c("rue Belliard","avenue Antoine Depage"),
                num=c("71", "30"),
                code_postal=c("1040","1000"))
 x
