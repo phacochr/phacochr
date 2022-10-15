@@ -20,5 +20,18 @@ globalVariables(unique(c(
   "rue_recoded_square", "rue_recoded_steenweg", "rue_recoded_tiret",
   "rue_recoded_virgule", "rue_to_geocode", "street_FINAL_detected",
   "street_FINAL_detected_full", "street_id_phaco", "type_geocoding",
-  "x_31370", "y_31370", "export_table", "dist_fuzzy"
+  "x_31370", "y_31370", "export_table", "dist_fuzzy",
+  # phaco_update:
+  "arrond2", "cd_country", "cd_dstr_refnis", "cd_munty_refnis", "cd_nuts_lvl1",
+  "cd_nuts_lvl2", "cd_nuts_lvl3", "code_postal", "Count", "dt_situation", "geom",
+  "key_street_unique", "King", "Last", "Last_double", "MDRC", "ms_area_ha",
+  "MS_FREQUENCY", "ms_perimeter_m", "NAME_DUT", "NAME_FRE", "postcode",
+  "Saint", "street_FINAL_detected_Origin", "tx_adm_dstr_descr_de", "TX_FST_NAME",
+  "tx_munty_descr_de", "tx_prov_descr_de", "tx_rgn_descr_de", "tx_rgn_descr_fr",
+  "tx_sector_descr_de", "voisin",
+  # phaco_update : extract_street:
+  "key_street_unique",
+  # phaco_update : select_id_street:
+  "house_number", "postcode", "street_name", "streetname_de", "streetname_fr",
+  "streetname_nl"
 )))
