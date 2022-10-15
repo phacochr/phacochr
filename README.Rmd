@@ -23,10 +23,10 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-PhaochR est un géocodeur pour la Belgique. A partir, d'une liste d'adresse, il permet de retrouver les coordonnées X-Y nécessaire à toute analyse spatiale. 
+PhacochR est un géocodeur pour la Belgique. A partir d'une liste d'adresse, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale. 
 
 Le logiciel fonctionne à partir des données publiques [BeST Address](https://opendata.bosa.be/) compilées par BOSA à partir des données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne).
-Il réalise des corrections orthographiques préalables (Regex), il fait une jointure inexacte avec les noms de rues (fuzzyjoin) et il trouve le numéro le plus proche et de préférence du même côté de la rue si le numéro n'est pas trouvé.
+Il réalise des corrections orthographiques préalables (via Regex), il fait une jointure inexacte avec les noms de rues (fuzzyjoin) et trouve le numéro le plus proche - de préférence du même côté de la rue - si le numéro n'est pas trouvé.
 
 
 ## Installation
@@ -41,7 +41,7 @@ devtools::install_github("phacochr/phacochr")
 phacochr::phaco_setup_data()
 ```
 
-Il est également possible pour l'utilisateur de mettre à jour lui-même les dernières données [BeST Address](https://opendata.bosa.be/) :
+Il est également possible pour l'utilisateur de mettre à jour lui-même les données [BeST Address](https://opendata.bosa.be/) vers les dernières mises en ligne :
 
 ``` r
 phacochr::phaco_update()
@@ -52,20 +52,22 @@ phacochr::phaco_update()
 
 ```{r example, warning = FALSE, message = FALSE}
 library(phacochr)
-x<- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
-               rue= c("rue Belliard","avenue Antoine Depage"),
-               num=c("71", "30"),
-               code_postal=c("1040","1000"))
+
+x <- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
+                rue= c("rue Belliard","avenue Antoine Depage"),
+                num=c("71", "30"),
+                code_postal=c("1040","1000"))
+
 x
 ```
 
 ```{r example2, warning = FALSE, message = FALSE}
-result <-phaco_geocode(data_to_geocode = x,
-              colonne_rue= "rue",
-              colonne_num_rue= "num",
-              colonne_code_postal="code_postal")
-result$data_geocoded [,c(1,17:19)] 
+result <- phaco_geocode(data_to_geocode = x,
+                        colonne_rue= "rue",
+                        colonne_num_rue= "num",
+                        colonne_code_postal="code_postal")
 
+result$data_geocoded [,c(1,17:19)]
 ```
 
 
