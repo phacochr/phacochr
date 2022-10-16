@@ -22,9 +22,12 @@ Address](https://opendata.bosa.be/) compilées par BOSA à partir des
 données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région
 flamande) et ICAR (Région wallonne). Il réalise des corrections
 orthographiques préalables (via Regex), il fait une jointure inexacte
-avec les noms de rues (grâce à `fuzzyjoin` et `stringdist`) et trouve le
-numéro le plus proche - de préférence du même côté de la rue - si le
-numéro n’est pas trouvé.
+avec les noms de rues (grâce à
+[`fuzzyjoin`](https://cran.r-project.org/web/packages/fuzzyjoin/index.html)
+et
+[`stringdist`](https://cran.r-project.org/web/packages/stringdist/index.html))
+et trouve le numéro le plus proche - de préférence du même côté de la
+rue - si le numéro n’est pas trouvé.
 
 ## Installation
 
@@ -40,14 +43,17 @@ phacochr::phaco_setup_data()
 ```
 
 Il est également possible pour l’utilisateur de mettre à jour lui-même
-les données [BeST Address](https://opendata.bosa.be/) vers les dernières
-mises en ligne :
+les données [BeST Address](https://opendata.bosa.be/) stockées sur son
+ordinateur vers les dernières données disponibles en ligne avec la
+fonction `phaco_update()` :
 
 ``` r
 phacochr::phaco_update()
 ```
 
-## Example
+## Exemple
+
+Voici un exemple basé sur un data.frame contenant deux adresses :
 
 ``` r
 library(phacochr)
@@ -60,6 +66,13 @@ x
 #> 1 Observatoire de la Santé et du Social          rue Belliard  71        1040
 #> 2                                   ULB avenue Antoine Depage  30        1000
 ```
+
+Le géocodage se lance simplement avec la fonction `phaco_geocode()` sur
+un data.frame. Le numéro de la rue et le code postal sont des
+informations nécessaire mais elles peuvent être intégrées au champ
+adresse - il ne faut alors indiquer que la rue. La performance du
+géocodage sera cependant légèrement meilleure si tous les champs sont
+séparés.
 
 ``` r
 result <- phaco_geocode(data_to_geocode = x,
@@ -86,7 +99,7 @@ result <- phaco_geocode(data_to_geocode = x,
 #> |Bruxelles |  2|      100       |       0        |       0        |       0        |    100     |
 #> |Total     |  2|      100       |       0        |       0        |       0        |    100     |
 #> 
-#> ℹ Temps de calcul total : 15.2 s
+#> ℹ Temps de calcul total : 24.8 s
 #>              
 #> /!\ Toutes les adresses n'ont pas été trouvées avec certitude /!\
 #> - check 'dist_fuzzy' pour les erreurs de reconnaissance des rues
@@ -106,11 +119,14 @@ result$data_geocoded [,c(1,17:19)]
 ```
 
 Le package dispose également d’une fonction `phaco_map_s` de
-cartographie des points géocodés. Il suffit de passer à la fonction
-l’objet `data_geocoded_sf` créé par la fonction de géocodage :
+cartographie des adresses géocodées. Il suffit de passer à la fonction
+l’objet `data_geocoded_sf` créé par la fonction `phaco_geocode`. La
+fonction dessine alors les coordonnées des adresses sur une carte dont
+les frontières administratives sont également affichées. Si les adresses
+se limitent à Bruxelles, la carte se limite à la Région bruxelloise.
 
 ``` r
-phacochr::phaco_map_s(result$data_geocoded_sf)
+phaco_map_s(result$data_geocoded_sf)
 #> Reading layer `BXL_communes_PREPROCESSED' from data source 
 #>   `C:\Users\00104504\AppData\Local\phacochr\phacochr\data_phacochr\STATBEL\PREPROCESSED\BXL_communes_PREPROCESSED.gpkg' 
 #>   using driver `GPKG'
