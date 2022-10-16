@@ -33,5 +33,7 @@ globalVariables(unique(c(
   "key_street_unique",
   # phaco_update : select_id_street:
   "house_number", "postcode", "street_name", "streetname_de", "streetname_fr",
-  "streetname_nl"
+  "streetname_nl",
+  # phaco_map_s:
+  "cd_rgn_refnis"
 )))

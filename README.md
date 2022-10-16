@@ -86,9 +86,9 @@ result <- phaco_geocode(data_to_geocode = x,
 #> |Bruxelles |  2|      100       |       0        |       0        |       0        |    100     |
 #> |Total     |  2|      100       |       0        |       0        |       0        |    100     |
 #> 
-#> ℹ Temps de calcul total : 13.4 s
+#> ℹ Temps de calcul total : 15.2 s
 #>              
-#> /!\ Toutes les adresses n'ont sans doute pas été trouvées avec certitude /!\
+#> /!\ Toutes les adresses n'ont pas été trouvées avec certitude /!\
 #> - check 'dist_fuzzy' pour les erreurs de reconnaissance des rues
 #> - check 'approx_num' pour les approximations de numéro
 #> - check 'type_geocoding' pour l'éargissement aux communes adjacentes
@@ -104,6 +104,42 @@ result$data_geocoded [,c(1,17:19)]
 #> 1          1  150373  170090 21004B13-
 #> 2          2  151105  166831 21004C61-
 ```
+
+Le package dispose également d’une fonction `phaco_map_s` de
+cartographie des points géocodés. Il suffit de passer à la fonction
+l’objet `data_geocoded_sf` créé par la fonction de géocodage :
+
+``` r
+phacochr::phaco_map_s(result$data_geocoded_sf)
+#> Reading layer `BXL_communes_PREPROCESSED' from data source 
+#>   `C:\Users\00104504\AppData\Local\phacochr\phacochr\data_phacochr\STATBEL\PREPROCESSED\BXL_communes_PREPROCESSED.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 19 features and 1 field
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: 141192.6 ymin: 161464.6 xmax: 158003.8 ymax: 178175.7
+#> Projected CRS: Belge 1972 / Belgian Lambert 72
+#> Reading layer `BXL_SS_PREPROCESSED' from data source 
+#>   `C:\Users\00104504\AppData\Local\phacochr\phacochr\data_phacochr\STATBEL\PREPROCESSED\BXL_SS_PREPROCESSED.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 724 features and 31 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: 141192.6 ymin: 161464.6 xmax: 158003.8 ymax: 178175.7
+#> Projected CRS: Belge 1972 / Belgian Lambert 72
+#> Reading layer `BRUXELLES_PREPROCESSED' from data source 
+#>   `C:\Users\00104504\AppData\Local\phacochr\phacochr\data_phacochr\STATBEL\PREPROCESSED\BRUXELLES_PREPROCESSED.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 1 feature and 0 fields
+#> Geometry type: POLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: 141192.6 ymin: 161464.6 xmax: 158003.8 ymax: 178175.7
+#> Projected CRS: Belge 1972 / Belgian Lambert 72
+#> Warning in st_point_on_surface.sf(BXL_communes): st_point_on_surface assumes
+#> attributes are constant over geometries of x
+```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
 ## Auteurs
 

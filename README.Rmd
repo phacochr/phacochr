@@ -68,6 +68,11 @@ result <- phaco_geocode(data_to_geocode = x,
 result$data_geocoded [,c(1,17:19)]
 ```
 
+Le package dispose également d'une fonction `phaco_map_s` de cartographie des points géocodés. Il suffit de passer à la fonction l'objet `data_geocoded_sf` créé par la fonction de géocodage :
+
+```{r}
+phacochr::phaco_map_s(result$data_geocoded_sf)
+```
 
 ## Auteurs
 <center>
@@ -78,6 +83,7 @@ result$data_geocoded [,c(1,17:19)]
 <img src="man/figures/logo_ulb_igeat.png" align="center" height = 120/>
 </a>
 </center>
+
 ## Partenariat
 <center>
 <a href="https://opendata.bosa.be/">
