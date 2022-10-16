@@ -25,25 +25,24 @@
 #' @import sf
 #' @import rappdirs
 #' @import knitr
-
 #'
 #' @export
 #'
 #' @examples
-#' x<- data.frame(nom= c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
-#' rue= c("rue Belliard","avenue Antoine Depage"),
-#' num=c("71", "30"),
-#' code_postal=c("1040","1000"))
+#' x <- data.frame(nom = c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
+#' rue = c("rue Belliard","avenue Antoine Depage"),
+#' num = c("71", "30"),
+#' code_postal = c("1040","1000"))
 #'
-#' result <-phaco_geocode(data_to_geocode = x,
-#' colonne_rue= "rue",
-#' colonne_num_rue= "num",
-#' colonne_code_postal="code_postal")
+#' result <- phaco_geocode(data_to_geocode = x,
+#' colonne_rue = "rue",
+#' colonne_num_rue = "num",
+#' colonne_code_postal = "code_postal")
 #'
 phaco_geocode <- function(data_to_geocode,
                           colonne_rue,
-                          colonne_num_rue,
-                          colonne_code_postal,
+                          colonne_num_rue = NULL,
+                          colonne_code_postal = NULL,
                           method_stringdist = "lcs",
                           corrections_REGEX = TRUE,
                           error_max = 4,
@@ -57,13 +56,13 @@ phaco_geocode <- function(data_to_geocode,
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
 
   # Pour definir si le num de la rue ou le code postal sont integres (necessaire pour la suite du script)
-  if(exists("colonne_num_rue")){
+  if(!is.null(colonne_num_rue)){
     num_rue <- "sep"
   } else {
     num_rue <- "int"
   }
 
-  if(exists("colonne_code_postal")){
+  if(!is.null(colonne_code_postal)){
     code_postal <- "sep"
   } else {
     code_postal <- "int"

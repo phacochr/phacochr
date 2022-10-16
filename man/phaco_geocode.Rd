@@ -7,8 +7,8 @@
 phaco_geocode(
   data_to_geocode,
   colonne_rue,
-  colonne_num_rue,
-  colonne_code_postal,
+  colonne_num_rue = NULL,
+  colonne_code_postal = NULL,
   method_stringdist = "lcs",
   corrections_REGEX = TRUE,
   error_max = 4,
@@ -28,11 +28,11 @@ phaco_geocode(
 
 \item{method_stringdist}{methode pour la jointure inexacte}
 
-\item{corrections_REGEX}{correction orthographiques}
+\item{corrections_REGEX}{correction orthographique}
 
-\item{error_max}{nombre d'erreurs maximale entre le nom de la rue a trouver et le nom de la rue dans la base de donnee de reference (BeST)}
+\item{error_max}{nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnee de reference (BeST)}
 
-\item{approx_num_max}{nombre de numero maximum si le numero n'a pas ete trouve}
+\item{approx_num_max}{nombre de numeros d'ecart maximum si le numero n'a pas ete trouve}
 
 \item{elargissement_com_adj}{elargissement aux communes limitrophes}
 
@@ -42,14 +42,14 @@ phaco_geocode(
 phaco_geocode
 }
 \examples{
-x<- data.frame(nom= c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
-rue= c("rue Belliard","avenue Antoine Depage"),
-num=c("71", "30"),
-code_postal=c("1040","1000"))
+x <- data.frame(nom = c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
+rue = c("rue Belliard","avenue Antoine Depage"),
+num = c("71", "30"),
+code_postal = c("1040","1000"))
 
-result <-phaco_geocode(data_to_geocode = x,
-colonne_rue= "rue",
-colonne_num_rue= "num",
-colonne_code_postal="code_postal")
+result <- phaco_geocode(data_to_geocode = x,
+colonne_rue = "rue",
+colonne_num_rue = "num",
+colonne_code_postal = "code_postal")
 
 }
