@@ -29,15 +29,16 @@ et
 PhacochR dispose également de plusieurs options : il réalise des
 corrections orthographiques préalables (en français et néérlandais) et
 trouve le numéro le plus proche - de préférence du même côté de la rue -
-si les coordonnées du numéro indiqué sont inconnues. Il fonctionne avec
-des adresses en français, néérlandais et allemand.
+si les coordonnées du numéro indiqué sont inconnues. PhacochR est
+compatible avec les 3 langues nationales : il géocode des adresses
+écrites en français, néérlandais et allemand.
 
 ## Installation
 
 Vous pouvez installer le package phacochr depuis
 [GitHub](https://github.com/). Il est nécessaire avant toute utilisation
 d’installer les données nécessaires au géocodage via la fonction
-`phaco_setup_data()`.
+`phaco_setup_data()` :
 
 ``` r
 # install.packages("devtools")
@@ -74,7 +75,7 @@ x
 
 Le géocodage se lance simplement avec la fonction `phaco_geocode()` sur
 ce data.frame. Le numéro de la rue et le code postal sont des
-informations nécessaire mais elles peuvent être intégrées au champ
+informations nécessaires mais elles peuvent être intégrées au champ
 adresse - il ne faut alors indiquer que la rue. La performance du
 géocodage sera cependant légèrement meilleure si tous les champs sont
 séparés.
@@ -104,7 +105,7 @@ result <- phaco_geocode(data_to_geocode = x,
 #> |Bruxelles |  2|      100       |       0        |       0        |       0        |    100     |
 #> |Total     |  2|      100       |       0        |       0        |       0        |    100     |
 #> 
-#> ℹ Temps de calcul total : 16.5 s
+#> ℹ Temps de calcul total : 27.3 s
 #>              
 #> /!\ Toutes les adresses n'ont pas été trouvées avec certitude /!\
 #> - check 'dist_fuzzy' pour les erreurs de reconnaissance des rues
@@ -128,7 +129,8 @@ cartographie des adresses géocodées. Il suffit de passer à la fonction
 l’objet `data_geocoded_sf` créé par la fonction `phaco_geocode`. La
 fonction dessine alors les coordonnées des adresses sur une carte dont
 les frontières administratives sont également affichées. Si les adresses
-se restreignent à Bruxelles, la carte se limite à la Région bruxelloise.
+se restreignent à Bruxelles, la carte se limite automatiquement à la
+Région bruxelloise.
 
 ``` r
 phaco_map_s(result$data_geocoded_sf)
