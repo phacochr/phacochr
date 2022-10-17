@@ -51,7 +51,7 @@ phacochr::phaco_update()
 
 Voici un exemple basé sur un data.frame contenant deux adresses :
 
-```{r example, warning = FALSE, message = FALSE}
+```{r }
 library(phacochr)
 x <- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
                 rue= c("rue Belliard","avenue Antoine Depage"),
@@ -62,18 +62,21 @@ x
 
 Le géocodage se lance simplement avec la fonction `phaco_geocode()` sur ce data.frame. Le numéro de la rue et le code postal sont des informations nécessaires mais elles peuvent être intégrées au champ adresse - il ne faut alors indiquer que la rue. La performance du géocodage sera cependant légèrement meilleure si tous les champs sont séparés.
 
-```{r example2, warning = FALSE, message = FALSE}
+```{r , warning = FALSE, message = FALSE, results='hide'}
 result <- phaco_geocode(data_to_geocode = x,
                         colonne_rue= "rue",
                         colonne_num_rue= "num",
                         colonne_code_postal="code_postal")
+```
+
+```{r , warning = FALSE, message = FALSE}
 
 result$data_geocoded [,c(1,17:19)]
 ```
 
 Le package dispose également d'une fonction `phaco_map_s` de cartographie des adresses géocodées. Il suffit de passer à la fonction l'objet `data_geocoded_sf` créé par la fonction `phaco_geocode`. La fonction dessine alors les coordonnées des adresses sur une carte dont les frontières administratives sont également affichées. Si les adresses se restreignent à Bruxelles, la carte se limite automatiquement à la Région bruxelloise.
 
-```{r}
+```{r , warning=FALSE}
 phaco_map_s(result$data_geocoded_sf)
 ```
 
