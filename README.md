@@ -106,7 +106,7 @@ result <- phaco_geocode(data_to_geocode = x,
 #> |Bruxelles |  2|      100       |       0        |       0        |       0        |    100     |
 #> |Total     |  2|      100       |       0        |       0        |       0        |    100     |
 #> 
-#> ℹ Temps de calcul total : 14.7 s
+#> ℹ Temps de calcul total : 14.9 s
 #>              
 #> /!\ Toutes les adresses n'ont pas été trouvées avec certitude /!\
 #> - check 'dist_fuzzy' pour les erreurs de reconnaissance des rues
