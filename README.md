@@ -22,7 +22,7 @@ Address](https://opendata.bosa.be/) compilées par BOSA à partir des
 données régionales URBIS (Région de Bruxelles-Capitale), CRAB (Région
 flamande) et ICAR (Région wallonne). La logique de phacochR est de
 réaliser une jointure inexacte entre la liste à géocoder et les données
-BeST Address (grâce à
+BeST Address (grâce aux packages R
 [fuzzyjoin](https://cran.r-project.org/web/packages/fuzzyjoin/index.html)
 et
 [stringdist](https://cran.r-project.org/web/packages/stringdist/index.html)).
@@ -36,9 +36,10 @@ compatible avec les 3 langues nationales : il géocode des adresses
 ## Installation
 
 Vous pouvez installer le package phacochr depuis
-[GitHub](https://github.com/). Il est nécessaire avant toute utilisation
-d’installer les données nécessaires au géocodage via la fonction
-`phaco_setup_data()` :
+[GitHub](https://github.com/). Il est indispensable lors de la première
+utilisation d’installer les données nécessaires au géocodage via la
+fonction `phaco_setup_data()`. Ces fichiers sont stockés de manière
+permanente dans un répertoire de travail sur l’ordinateur.
 
 ``` r
 # install.packages("devtools")
@@ -48,10 +49,10 @@ devtools::install_github("phacochr/phacochr")
 phaco_setup_data()
 ```
 
-Il est également possible pour l’utilisateur de mettre à jour lui-même
-les données [BeST Address](https://opendata.bosa.be/) stockées sur son
-ordinateur vers les dernières données disponibles en ligne avec la
-fonction `phaco_update()` :
+Il est possible pour l’utilisateur de mettre à jour lui-même les données
+[BeST Address](https://opendata.bosa.be/) (actualisées de manière
+hebdomadaire par BOSA) vers les dernières données disponibles en ligne
+avec la fonction `phaco_update()` :
 
 ``` r
 phacochr::phaco_update()
@@ -105,7 +106,7 @@ result <- phaco_geocode(data_to_geocode = x,
 #> |Bruxelles |  2|      100       |       0        |       0        |       0        |    100     |
 #> |Total     |  2|      100       |       0        |       0        |       0        |    100     |
 #> 
-#> ℹ Temps de calcul total : 27.3 s
+#> ℹ Temps de calcul total : 14.7 s
 #>              
 #> /!\ Toutes les adresses n'ont pas été trouvées avec certitude /!\
 #> - check 'dist_fuzzy' pour les erreurs de reconnaissance des rues

@@ -25,13 +25,13 @@ knitr::opts_chunk$set(
 
 PhacochR est un géocodeur pour la Belgique sous forme de package R. A partir d'une liste d'adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale. 
 
-Le programme fonctionne à partir des données publiques [BeST Address](https://opendata.bosa.be/) compilées par BOSA à partir des données régionales URBIS (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de phacochR est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address (grâce à [fuzzyjoin](https://cran.r-project.org/web/packages/fuzzyjoin/index.html) et [stringdist](https://cran.r-project.org/web/packages/stringdist/index.html)).
+Le programme fonctionne à partir des données publiques [BeST Address](https://opendata.bosa.be/) compilées par BOSA à partir des données régionales URBIS (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de phacochR est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address (grâce aux packages R [fuzzyjoin](https://cran.r-project.org/web/packages/fuzzyjoin/index.html) et [stringdist](https://cran.r-project.org/web/packages/stringdist/index.html)).
 PhacochR dispose également de plusieurs options : il réalise des corrections orthographiques préalables (en français et néérlandais) et trouve le numéro le plus proche - de préférence du même côté de la rue - si les coordonnées du numéro indiqué sont inconnues. PhacochR est compatible avec les 3 langues nationales : il géocode des adresses écrites en français, néérlandais et allemand.
 
 
 ## Installation
 
-Vous pouvez installer le package phacochr depuis [GitHub](https://github.com/). Il est nécessaire avant toute utilisation d'installer les données nécessaires au géocodage via la fonction `phaco_setup_data()` :
+Vous pouvez installer le package phacochr depuis [GitHub](https://github.com/). Il est indispensable lors de la première utilisation d'installer les données nécessaires au géocodage via la fonction `phaco_setup_data()`. Ces fichiers sont stockés de manière permanente dans un répertoire de travail sur l'ordinateur.
 
 ``` r
 # install.packages("devtools")
@@ -41,7 +41,7 @@ devtools::install_github("phacochr/phacochr")
 phaco_setup_data()
 ```
 
-Il est également possible pour l'utilisateur de mettre à jour lui-même les données [BeST Address](https://opendata.bosa.be/) stockées sur son ordinateur vers les dernières données disponibles en ligne avec la fonction `phaco_update()` :
+Il est possible pour l'utilisateur de mettre à jour lui-même les données [BeST Address](https://opendata.bosa.be/) (actualisées de manière hebdomadaire par BOSA) vers les dernières données disponibles en ligne avec la fonction `phaco_update()` :
 
 ``` r
 phacochr::phaco_update()
@@ -73,7 +73,7 @@ result$data_geocoded [,c(1,17:19)]
 
 Le package dispose également d'une fonction `phaco_map_s` de cartographie des adresses géocodées. Il suffit de passer à la fonction l'objet `data_geocoded_sf` créé par la fonction `phaco_geocode`. La fonction dessine alors les coordonnées des adresses sur une carte dont les frontières administratives sont également affichées. Si les adresses se restreignent à Bruxelles, la carte se limite automatiquement à la Région bruxelloise.
 
-```{r}
+```{r dpi = 300}
 phaco_map_s(result$data_geocoded_sf)
 ```
 
