@@ -13,33 +13,38 @@ license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.co
 
 <!-- badges: end -->
 
-PhacochR est un géocodeur pour la Belgique. A partir d’une liste
-d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à
-toute analyse spatiale.
+PhacochR est un géocodeur pour la Belgique sous forme de package R. A
+partir d’une liste d’adresses, il permet de retrouver les coordonnées
+X-Y nécessaires à toute analyse spatiale.
 
-Le logiciel fonctionne à partir des données publiques [BeST
+Le programme fonctionne à partir des données publiques [BeST
 Address](https://opendata.bosa.be/) compilées par BOSA à partir des
-données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région
-flamande) et ICAR (Région wallonne). Il réalise des corrections
-orthographiques préalables (via Regex), il fait une jointure inexacte
-avec les noms de rues (grâce à
-[`fuzzyjoin`](https://cran.r-project.org/web/packages/fuzzyjoin/index.html)
+données régionales URBIS (Région de Bruxelles-Capitale), CRAB (Région
+flamande) et ICAR (Région wallonne). La logique de phacochR est de
+réaliser une jointure inexacte entre la liste à géocoder et les données
+BeST Address (grâce à
+[fuzzyjoin](https://cran.r-project.org/web/packages/fuzzyjoin/index.html)
 et
-[`stringdist`](https://cran.r-project.org/web/packages/stringdist/index.html))
-et trouve le numéro le plus proche - de préférence du même côté de la
-rue - si le numéro n’est pas trouvé.
+[stringdist](https://cran.r-project.org/web/packages/stringdist/index.html)).
+PhacochR dispose également de plusieurs options : il réalise des
+corrections orthographiques préalables (en français et néérlandais) et
+trouve le numéro le plus proche - de préférence du même côté de la rue -
+si les coordonnées du numéro indiqué sont inconnues. Il fonctionne avec
+des adresses en français, néérlandais et allemand.
 
 ## Installation
 
 Vous pouvez installer le package phacochr depuis
-[GitHub](https://github.com/) :
+[GitHub](https://github.com/). Il est nécessaire avant toute utilisation
+d’installer les données nécessaires au géocodage via la fonction
+`phaco_setup_data()`.
 
 ``` r
 # install.packages("devtools")
 library(devtools)
 devtools::install_github("phacochr/phacochr")
 # Pour installer les données
-phacochr::phaco_setup_data()
+phaco_setup_data()
 ```
 
 Il est également possible pour l’utilisateur de mettre à jour lui-même
@@ -68,7 +73,7 @@ x
 ```
 
 Le géocodage se lance simplement avec la fonction `phaco_geocode()` sur
-un data.frame. Le numéro de la rue et le code postal sont des
+ce data.frame. Le numéro de la rue et le code postal sont des
 informations nécessaire mais elles peuvent être intégrées au champ
 adresse - il ne faut alors indiquer que la rue. La performance du
 géocodage sera cependant légèrement meilleure si tous les champs sont
@@ -99,7 +104,7 @@ result <- phaco_geocode(data_to_geocode = x,
 #> |Bruxelles |  2|      100       |       0        |       0        |       0        |    100     |
 #> |Total     |  2|      100       |       0        |       0        |       0        |    100     |
 #> 
-#> ℹ Temps de calcul total : 24.8 s
+#> ℹ Temps de calcul total : 16.5 s
 #>              
 #> /!\ Toutes les adresses n'ont pas été trouvées avec certitude /!\
 #> - check 'dist_fuzzy' pour les erreurs de reconnaissance des rues
@@ -123,7 +128,7 @@ cartographie des adresses géocodées. Il suffit de passer à la fonction
 l’objet `data_geocoded_sf` créé par la fonction `phaco_geocode`. La
 fonction dessine alors les coordonnées des adresses sur une carte dont
 les frontières administratives sont également affichées. Si les adresses
-se limitent à Bruxelles, la carte se limite à la Région bruxelloise.
+se restreignent à Bruxelles, la carte se limite à la Région bruxelloise.
 
 ``` r
 phaco_map_s(result$data_geocoded_sf)
