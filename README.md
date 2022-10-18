@@ -45,6 +45,8 @@ permanente dans un répertoire de travail sur l’ordinateur.
 # install.packages("devtools")
 library(devtools)
 devtools::install_github("phacochr/phacochr")
+
+library(phacochr)
 # Pour installer les données
 phaco_setup_data()
 ```
@@ -89,7 +91,6 @@ result <- phaco_geocode(data_to_geocode = x,
 ```
 
 ``` r
-
 result$data_geocoded [,c(1,17:19)]
 #>   ID_address x_31370 y_31370 cd_sector
 #> 1          1  150373  170090 21004B13-
