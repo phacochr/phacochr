@@ -1,7 +1,7 @@
 #' phaco_update
 #'
 #' @import rappdirs
-#' @import readr
+#' @import vroom vroom
 #' @import readxl
 #' @import dplyr
 #' @import tidyr
@@ -30,7 +30,7 @@ phaco_update <- function(){
     write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"))
     }
 
-  log <- read_csv2(paste0(path_data, "BeST/openaddress/log.csv"))
+  log <- vroom::vroom2(paste0(path_data, "BeST/openaddress/log.csv"))
   log$update <- as.POSIXct(log$update)
 
   if (max(as.Date(log$update)) + days(7) < Sys.Date()) {
@@ -82,9 +82,9 @@ phaco_update <- function(){
       return(temp)
     }
 
-    Brussels_postal_street <- read_csv(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), col_types = cols(.default = col_character()))
-    Wallonia_postal_street <- read_csv(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), col_types = cols(.default = col_character()))
-    Flanders_postal_street <- read_csv(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), col_types = cols(.default = col_character()))
+    Brussels_postal_street <- vroom::vroom(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), col_types = cols(.default = col_character()))
+    Wallonia_postal_street <- vroom::vroom(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), col_types = cols(.default = col_character()))
+    Flanders_postal_street <- vroom::vroom(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), col_types = cols(.default = col_character()))
 
     belgium_street <- bind_rows(Brussels_postal_street,Wallonia_postal_street, Flanders_postal_street)
     belgium_street <- extract_street(belgium_street)
@@ -138,15 +138,15 @@ phaco_update <- function(){
       select(-cd_dstr_refnis)
 
     # Bruxelles
-    openaddress_bebru <- read_csv(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), col_types = cols(.default = col_character()))
+    openaddress_bebru <- vroom::vroom(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), col_types = cols(.default = col_character()))
     openaddress_bebru <- select_id_street(openaddress_bebru)
     openaddress_bebru <- join_ss_adress(openaddress_bebru)
     # Wallonie
-    openaddress_bewal <- read_csv(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), col_types = cols(.default = col_character()))
+    openaddress_bewal <- vroom::vroom(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), col_types = cols(.default = col_character()))
     openaddress_bewal <- select_id_street(openaddress_bewal)
     openaddress_bewal <- join_ss_adress(openaddress_bewal)
     # Flandres
-    openaddress_bevlg <- read_csv(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), col_types = cols(.default = col_character()))
+    openaddress_bevlg <- vroom::vroom(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), col_types = cols(.default = col_character()))
     openaddress_bevlg <- select_id_street(openaddress_bevlg)
     openaddress_bevlg <- join_ss_adress(openaddress_bevlg)
 
