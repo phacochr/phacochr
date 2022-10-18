@@ -11,7 +11,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, purrr,
     readr, readxl, stringdist, sf, sp, spdep, knitr, 
-    stringr, tidyr, rappdirs, utils, mapsf, scales
+    stringr, tidyr, rappdirs, utils, mapsf, scales, tmap, leaflet
 Depends: 
     R (>= 2.10)
 LazyData: true

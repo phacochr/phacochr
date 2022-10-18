@@ -1,27 +1,24 @@
-#' phaco_map_s
+#' phaco_map_i
 #'
 #' @param FULL_GEOCODING_sf un objet sf a cartographier
 #' @param title_carto le titre de la carte produite
-#' @param colonne_ponderation un poids pour les points a cartographier
 #' @param filter_bxl afficher uniquement bruxelles
 #' @param zoom_geocoded zoomer sur les points
-#' @param nom_admin afficher les noms des entites administratives
 #'
 #' @import dplyr
 #' @import sf
-#' @import mapsf
+#' @import tmap
 #' @import rappdirs
-#' @importFrom scales alpha
 #'
 #' @export
 #'
 #'
-phaco_map_s <- function(FULL_GEOCODING_sf,
-                        colonne_ponderation = NULL,
+phaco_map_i <- function(FULL_GEOCODING_sf,
                         title_carto = paste0("adresses geocodees"),
                         filter_bxl = FALSE,
-                        zoom_geocoded = FALSE,
-                        nom_admin = TRUE){
+                        zoom_geocoded = FALSE) {
+
+  # NOTE : remettre l'id = name_to_show
 
   # Definition du chemin ou se trouve les donnees
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
@@ -47,14 +44,10 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     FULL_GEOCODING_sf_carto <- FULL_GEOCODING_sf
   }
 
-  # Je cree les variables necessaires
-  if (!is.null(colonne_ponderation)) {
-    FULL_GEOCODING_sf_carto <- FULL_GEOCODING_sf_carto %>%
-      mutate(CARTO_weight = as.numeric(FULL_GEOCODING_sf_carto[[colonne_ponderation]]))
-  } else {
-    FULL_GEOCODING_sf_carto <- FULL_GEOCODING_sf_carto %>%
-      mutate(CARTO_weight = 1)
-  }
+  # * Type de carte : "static" ou "interactif"
+  # Les deux types sont programmes dans le script ci-dessous, mais en static tmap produit des resultats differents selon que l'on est sous windows ou linux avec les memes parametres => pas ok
+  # tmap est donc utilise uniquement pour produire des cartes interactives
+  mode_carto <- "interactif"
 
 
   # 1. BRUXELLES ============================================================================================================================
@@ -72,30 +65,31 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
 
     # b) Carto --------------------------------------------------------------------------------------------------------------------------------
 
-    mf_map(x = BXL_SS, col = "white", border = "gray85")
-    mf_map(x = BXL_communes, col = NA, border = "gray40", lwd = 1.5, add = TRUE)
-    mf_map(x = BRUXELLES, col = NA, border = "black", lwd = 2, add = TRUE)
-    mf_map(x = FULL_GEOCODING_sf_carto,
-           col = alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
-           cex = 0.8,
-           pch = 16,
-           add = TRUE)
-    if(nom_admin == TRUE){
-      mf_label(
-       x = st_point_on_surface(BXL_communes),
-       var = "tx_munty_descr_fr",
-       col= "#18707b",
-       halo = TRUE,
-       overlap = FALSE,
-       lines = FALSE
-     )
+    if(zoom_geocoded == FALSE){ # je cree une bbox pour delimiter les limites de la carte
+      bbox_bxl <- st_bbox(BXL_communes)
     }
-    mf_layout(
-      title = paste("Cartographie :", title_carto),
-      credits = "Phacochr\nhttps://github.com/phacochr/phacochr",
-      arrow = FALSE
-    )
-    mf_arrow(pos = "topright")
+    if(zoom_geocoded == TRUE){ # Si je veux un zoom sur les points
+      bbox_bxl <- st_bbox(FULL_GEOCODING_sf_carto)
+    }
+
+    tmap_mode("view") # Le mode dans le cas d'une carte interactive
+    Carto_map <- tm_shape(BXL_communes, bbox = bbox_bxl) +
+      tm_borders("black", lwd = 1, lty = "dashed") +
+      tm_shape(BRUXELLES) +
+      tm_borders("black", lwd = 1.5, lty = "dashed") +
+      tm_shape(FULL_GEOCODING_sf_carto, bbox = bbox_bxl) +
+      tm_dots("#d61d5e",
+              size = 0.01,
+              shape = 16,
+              border.col = "#d61d5e",
+              alpha = 1) +
+      tm_layout(title = paste("Cartographie :", title_carto)) +
+      tm_basemap(leaflet::providers$CartoDB.Positron) +
+      tm_basemap(leaflet::providers$CartoDB.PositronNoLabels) +
+      tm_basemap(leaflet::providers$OpenStreetMap) +
+      tm_view(bbox = bbox_bxl)
+
+    Carto_map
 
 
   # 2. FLANDRE/WALLONIE =====================================================================================================================
@@ -108,49 +102,38 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     BE_communes <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_communes_PREPROCESSED.gpkg"), quiet=T)
     BE_provinces <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_provinces_PREPROCESSED.gpkg"), quiet=T)
     BE_regions <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_regions_PREPROCESSED.gpkg"), quiet=T)
-    #BELGIQUE <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BELGIQUE_PREPROCESSED.gpkg"), quiet=T)
+    BELGIQUE <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BELGIQUE_PREPROCESSED.gpkg"), quiet=T)
 
 
     # b) Carto --------------------------------------------------------------------------------------------------------------------------------
 
-    if(zoom_geocoded == TRUE){
-      mf_init(FULL_GEOCODING_sf_carto) # Pour zoomer sur les points
-      mf_map(x = BE_communes, col = "white", border = "gray92", add = TRUE)
-    } else {
-      mf_map(x = BE_communes, col = "white", border = "gray92")
+    if(zoom_geocoded == FALSE){ # je cree une bbox pour delimiter les limites de la carte
+      bbox_belgique <- st_bbox(BE_regions)
     }
-    mf_map(x = BE_provinces, col = NA, border = "gray60", lwd = 1.5, add = TRUE)
-    mf_map(x = BE_regions, col = NA, border = "black", lwd = 2, add = TRUE)
-    #mf_map(x = BELGIQUE, col = NA, border = "black", lwd = 2.5, add = TRUE)
-    if(zoom_geocoded == TRUE){
-      mf_map(x = FULL_GEOCODING_sf_carto,
-           col = alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
-           cex = 0.8,
-           pch = 16,
-           add = TRUE)
-    } else {
-      mf_map(x = FULL_GEOCODING_sf_carto,
-             col = alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
-             cex = 0.4,
-             pch = 16,
-             add = TRUE)
+    if(zoom_geocoded == TRUE){ # Si je veux un zoom sur les points
+      bbox_belgique <- st_bbox(FULL_GEOCODING_sf_carto)
     }
-    if(nom_admin == TRUE){
-      mf_label(
-       x = st_point_on_surface(BE_provinces),
-       var = "tx_prov_descr_fr",
-       col= "#18707b",
-       halo = TRUE,
-       overlap = FALSE,
-       lines = FALSE
-       )
-    }
-    mf_layout(
-      title = paste("Cartographie :", title_carto),
-      credits = "Phacochr\nhttps://github.com/phacochr/phacochr",
-      arrow = FALSE
-    )
-    mf_arrow(pos = "topright")
-  }
 
+    tmap_mode("view") # Le mode dans le cas d'une carte interactive
+    Carto_map <- tm_shape(BE_provinces, bbox = bbox_belgique) +
+      tm_borders("black", lwd = 1, lty = "dashed") +
+      #tm_shape(BE_regions) +
+      #tm_borders("black", lwd = 1, lty = "dashed") +
+      tm_shape(BELGIQUE) +
+      tm_borders("black", lwd = 1, lty = "dashed") +
+      tm_shape(FULL_GEOCODING_sf_carto, bbox = bbox_belgique) +
+      tm_dots("#d61d5e",
+              size = 0.005,
+              shape = 16,
+              border.col = "#d61d5e",
+              alpha = 1) +
+      tm_basemap(leaflet::providers$CartoDB.Positron) +
+      tm_basemap(leaflet::providers$CartoDB.PositronNoLabels) +
+      tm_basemap(leaflet::providers$OpenStreetMap) +
+      tm_view(bbox = bbox_belgique) +
+      tm_layout(title = paste("Cartographie :", title_carto))
+
+    Carto_map
+
+  }
 }

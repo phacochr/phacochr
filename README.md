@@ -57,7 +57,7 @@ hebdomadaire par BOSA) vers les dernières données disponibles en ligne
 avec la fonction `phaco_update()` :
 
 ``` r
-phacochr::phaco_update()
+phaco_update()
 ```
 
 ## Exemple
@@ -97,19 +97,27 @@ result$data_geocoded [,c(1,17:19)]
 #> 2          2  151105  166831 21004C61-
 ```
 
-Le package dispose également d’une fonction `phaco_map_s` de
-cartographie des adresses géocodées. Il suffit de passer à la fonction
-l’objet `data_geocoded_sf` créé par la fonction `phaco_geocode`. La
-fonction dessine alors les coordonnées des adresses sur une carte dont
-les frontières administratives sont également affichées. Si les adresses
-se restreignent à Bruxelles, la carte se limite automatiquement à la
-Région bruxelloise.
+Le package dispose également de fonctions de cartographie des adresses
+géocodées. `phaco_map_s()` produit des cartes statiques : il suffit de
+passer à la fonction l’objet `data_geocoded_sf` créé par
+`phaco_geocode()`. La fonction dessine alors les coordonnées des
+adresses sur une carte dont les frontières administratives sont
+également affichées. Si les adresses se restreignent à Bruxelles, la
+carte se limite automatiquement à la Région bruxelloise.
 
 ``` r
 phaco_map_s(result$data_geocoded_sf)
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
+La fonction `phaco_map_i()` produit quant à elle des cartes interactives
+:
+
+``` r
+phaco_map_i(result$data_geocoded_sf)
+#> tmap mode set to interactive viewing
+```
 
 ## Auteurs
 
