@@ -9,31 +9,43 @@
 #' phaco_setup_data()
 
 phaco_setup_data <- function(){
-  # creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
+
   cat(paste0(" -- Chargement des donn","\u00e9","es pour PhacochR --"))
   start_time <- Sys.time()
 
+  # creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
+  cat(paste0("\n","\033[K","\u2714", " Cr","\u00e9","ation du dossier : ", path_data))
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr")) # bricolage pour windows
   dir.create(path_data, showWarnings = F)
-  cat(paste0("\n","\033[K","\u2714", " Cr","\u00e9","ation du dossier : ", path_data))
+  if(dir.exists(path_data)) {
+    stop(paste0("\u2716"," le dossier d'installation n'a pas pu", " \u00ea", "tre cr","\u00e9\u00e9", " : v","\u00e9","rifiez vos droits d'","\u00e9","criture sur le disque"))
+  }
 
   # Telecharger les donnees
   cat(paste0("\n","\u29D7"," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es ...","\n"))
-   download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_best.zip",
-                 paste0(path_data,"/phacochr_data_best.zip"))
-   download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_statbel_urbis.zip",
-                 paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
-   cat(paste0("\r","\u2714"," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es"))
+  download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_best.zip",
+                paste0(path_data,"/phacochr_data_best.zip"))
+  download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_statbel_urbis.zip",
+                paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
+  if(sum(
+    file.exists(paste0(path_data,"/phacochr_data_best.zip"),
+                paste0(path_data,"/phacochr_data_statbel_urbis.zip")
+                )
+    ) != 2) {
+    stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre download","\u00e9","s : relancez phaco_setup_data() ou v","\u00e9","rifiez votre connexion"))
+  }
+
+  cat(paste0("\r","\u2714"," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es"))
 
   # dezippe et supprimer le fichier zip telecharge
   cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es ..."))
   unzip(paste0(path_data,"/phacochr_data_best.zip"),exdir= path_data)
   unzip(paste0(path_data,"/phacochr_data_statbel_urbis.zip"),exdir= path_data)
+
   # supression des fichiers .zip
   file.remove(paste0(path_data,"/phacochr_data_best.zip"))
   file.remove(paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
   cat(paste0("\r","\u2714"," D","\u00e9","compression des donn","\u00e9","es."))
-
 
   cat(paste0("\n","\u2714"," Importation des donn","\u00e9","es OK: PhacochR pr","\u00ea","t ","\u00e0", " g","\u00e9","ocoder."))
 

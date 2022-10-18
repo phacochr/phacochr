@@ -23,6 +23,22 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
                         zoom_geocoded = FALSE,
                         nom_admin = TRUE){
 
+  # Definition du chemin ou se trouve les donnees
+  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+
+  # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
+  if(sum(
+    file.exists(paste0(path_data,"STATBEL/PREPROCESSED/BXL_communes_PREPROCESSED.gpkg"),
+                paste0(path_data,"STATBEL/PREPROCESSED/BXL_SS_PREPROCESSED.gpkg"),
+                paste0(path_data,"STATBEL/PREPROCESSED/BRUXELLES_PREPROCESSED.gpkg"),
+                paste0(path_data,"STATBEL/PREPROCESSED/BE_communes_PREPROCESSED.gpkg"),
+                paste0(path_data,"STATBEL/PREPROCESSED/BE_provinces_PREPROCESSED.gpkg"),
+                paste0(path_data,"STATBEL/PREPROCESSED/BE_regions_PREPROCESSED.gpkg")
+    )
+  ) != 6) {
+    stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
+  }
+
   # Filtrer ou pas BXL
   if (filter_bxl == TRUE){
     FULL_GEOCODING_sf_carto <- FULL_GEOCODING_sf %>%
@@ -39,9 +55,6 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     FULL_GEOCODING_sf_carto <- FULL_GEOCODING_sf_carto %>%
       mutate(CARTO_weight = 1)
   }
-
-  # Definition du chemin ou se trouve les donnees
-  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
 
 
   # 1. BRUXELLES ============================================================================================================================

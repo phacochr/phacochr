@@ -16,11 +16,23 @@
 #' @examples
 #' phaco_update()
 
-phaco_update <- function(){
+phaco_update <- function() {
 
   # 0. Mise a jour --------------------------------------------------------------------------------------------------------------------------
 
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+
+  # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
+  if(sum(
+    file.exists(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg"),
+                paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg"),
+                paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"),
+                paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"),
+                paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx")
+    )
+  ) != 5) {
+    stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
+  }
 
   # Mise a jour si pas deja il y a moins de 7 jours
 
@@ -30,7 +42,7 @@ phaco_update <- function(){
     write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"))
     }
 
-  log <- vroom::vroom(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",")
+  log <- read_csv2(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",")
   log$update <- as.POSIXct(log$update)
 
   if (max(as.Date(log$update)) + days(7) < Sys.Date()) {
@@ -44,6 +56,16 @@ phaco_update <- function(){
     download.file("https://opendata.bosa.be/download/best/openaddress-bebru.zip", paste0(path_data, "BeST/openaddress/openaddress-bebru.zip"))
     download.file("https://opendata.bosa.be/download/best/openaddress-bewal.zip", paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"))
 
+    if(sum(
+      file.exists(paste0(path_data,"BeST/openaddress/postalstreets-latest.zip"),
+                  paste0(path_data,"BeST/openaddress/openaddress-bevlg.zip"),
+                  paste0(path_data,"BeST/openaddress/openaddress-bebru.zip"),
+                  paste0(path_data,"BeST/openaddress/openaddress-bewal.zip")
+                  )
+      ) != 4) {
+      stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre download","\u00e9","s : relancez phaco_update() ou v","\u00e9","rifiez votre connexion"))
+    }
+
     unzip(paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"))
 
@@ -55,6 +77,18 @@ phaco_update <- function(){
 
     unzip(paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"))
+
+    if(sum(
+      file.exists(paste0(path_data,"BeST/openaddress/Brussels_postal_street.csv"),
+                  paste0(path_data,"BeST/openaddress/Wallonia_postal_street.csv"),
+                  paste0(path_data,"BeST/openaddress/Flanders_postal_street.csv"),
+                  paste0(path_data,"BeST/openaddress/openaddress-bebru.csv"),
+                  paste0(path_data,"BeST/openaddress/openaddress-bewal.csv"),
+                  paste0(path_data,"BeST/openaddress/openaddress-bevlg.csv")
+      )
+    ) != 6) {
+      stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre d","\u00e9","compress","\u00e9","s : v","\u00e9","rifiez vos droits d'","\u00e9","criture sur le disque"))
+    }
 
     log[nrow(log)+1,] <- Sys.time()
     write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"))
@@ -82,9 +116,9 @@ phaco_update <- function(){
       return(temp)
     }
 
-    Brussels_postal_street <- vroom::vroom(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), col_types = cols(.default = col_character()))
-    Wallonia_postal_street <- vroom::vroom(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), col_types = cols(.default = col_character()))
-    Flanders_postal_street <- vroom::vroom(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), col_types = cols(.default = col_character()))
+    Brussels_postal_street <- read_csv(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), col_types = cols(.default = col_character()))
+    Wallonia_postal_street <- read_csv(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), col_types = cols(.default = col_character()))
+    Flanders_postal_street <- read_csv(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), col_types = cols(.default = col_character()))
 
     belgium_street <- bind_rows(Brussels_postal_street,Wallonia_postal_street, Flanders_postal_street)
     belgium_street <- extract_street(belgium_street)
@@ -138,15 +172,15 @@ phaco_update <- function(){
       select(-cd_dstr_refnis)
 
     # Bruxelles
-    openaddress_bebru <- vroom::vroom(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), col_types = cols(.default = col_character()))
+    openaddress_bebru <- read_csv(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), col_types = cols(.default = col_character()))
     openaddress_bebru <- select_id_street(openaddress_bebru)
     openaddress_bebru <- join_ss_adress(openaddress_bebru)
     # Wallonie
-    openaddress_bewal <- vroom::vroom(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), col_types = cols(.default = col_character()))
+    openaddress_bewal <- read_csv(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), col_types = cols(.default = col_character()))
     openaddress_bewal <- select_id_street(openaddress_bewal)
     openaddress_bewal <- join_ss_adress(openaddress_bewal)
     # Flandres
-    openaddress_bevlg <- vroom::vroom(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), col_types = cols(.default = col_character()))
+    openaddress_bevlg <- read_csv(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), col_types = cols(.default = col_character()))
     openaddress_bevlg <- select_id_street(openaddress_bevlg)
     openaddress_bevlg <- join_ss_adress(openaddress_bevlg)
 
