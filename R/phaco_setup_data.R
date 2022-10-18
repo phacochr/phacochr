@@ -1,7 +1,6 @@
 #' phaco_setup_data
 #'
 #' @import rappdirs
-#' @import readr
 #' @import utils
 #'
 #' @export

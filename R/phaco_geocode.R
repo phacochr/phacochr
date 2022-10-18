@@ -16,7 +16,6 @@
 #' @import readr
 #' @import stringr
 #' @import purrr
-#' @importFrom vroom vroom
 #' @import doParallel
 #' @importFrom foreach %dopar% foreach getDoParRegistered
 #' @import readxl
@@ -113,7 +112,7 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 3. Detection des regions/arrondissements en Belgique =====================================================================================
 
-  table_postal_arrond <- vroom::vroom(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
+  table_postal_arrond <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
 
   data_to_geocode <- data_to_geocode %>%
     left_join(table_postal_arrond, by = c("code_postal_to_geocode" = "postcode"))
@@ -396,7 +395,7 @@ phaco_geocode <- function(data_to_geocode,
     ### i. Preparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
     # J'importe les rues
-    postal_street <- vroom::vroom(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
+    postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
       mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
 
     if (length(lang_encoded) != 3){
@@ -490,7 +489,7 @@ phaco_geocode <- function(data_to_geocode,
       if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
 
         # On charge la table de conversion code postal > code INS recode (voir preprocessing)
-        table_INS_recod_code_postal <- vroom::vroom(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";",progress= F, col_types = cols(.default = col_character()))
+        table_INS_recod_code_postal <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";",progress= F, col_types = cols(.default = col_character()))
 
         # On ajoute ce code INS recode 1) aux rues et 2) aux adresses non trouvees
         postal_street_adj <- postal_street %>%
@@ -499,7 +498,7 @@ phaco_geocode <- function(data_to_geocode,
           left_join(table_INS_recod_code_postal, by = c("code_postal_to_geocode" = "code_postal"))
 
         # On charge la table des communes (= code INS recodes) adjacentes par commune (voir preprocessing)
-        table_commune_adjacentes <- vroom::vroom(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"), progress= F, delim = ";", col_types = cols(.default = col_character()))
+        table_commune_adjacentes <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"), progress= F, delim = ";", col_types = cols(.default = col_character()))
 
         res_adj <- tibble()
         res_adj <- foreach (i = unique(ADDRESS_last_tentative$`Refnis code`),
@@ -581,7 +580,7 @@ phaco_geocode <- function(data_to_geocode,
     openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
                              unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
                              ".csv") %>%
-      vroom::vroom( delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
+      readr::read_delim( delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
       left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>% # On joint les noms de rue (non contenues dans le fichier openadress par economie de place) via postal_street et la cle de jointure unique "street_id_phaco" (voir preprocessing)
       mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
              address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
@@ -724,7 +723,7 @@ phaco_geocode <- function(data_to_geocode,
 
     # On joint les donnees de region, provinces, communes, quartiers (BXL)... aux secteurs stat
 
-    table_secteurs_prov_commune_quartier <- vroom::vroom(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", progress= F, col_types = cols(.default = col_character()))
+    table_secteurs_prov_commune_quartier <- readr::read_delim(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", progress= F, col_types = cols(.default = col_character()))
 
 
     FULL_GEOCODING <- FULL_GEOCODING %>%

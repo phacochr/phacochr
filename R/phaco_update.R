@@ -1,7 +1,7 @@
 #' phaco_update
 #'
 #' @import rappdirs
-#' @importFrom  vroom vroom
+#' @import readr
 #' @import readxl
 #' @import dplyr
 #' @import tidyr
