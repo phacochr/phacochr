@@ -1,7 +1,7 @@
 #' phaco_update
 #'
 #' @import rappdirs
-#' @import vroom vroom
+#' @importFrom  vroom vroom
 #' @import readxl
 #' @import dplyr
 #' @import tidyr
@@ -30,7 +30,7 @@ phaco_update <- function(){
     write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"))
     }
 
-  log <- vroom::vroom2(paste0(path_data, "BeST/openaddress/log.csv"))
+  log <- vroom::vroom(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",")
   log$update <- as.POSIXct(log$update)
 
   if (max(as.Date(log$update)) + days(7) < Sys.Date()) {

@@ -16,7 +16,7 @@
 #' @import readr
 #' @import stringr
 #' @import purrr
-#' @import vroom::vroom
+#' @importFrom vroom vroom
 #' @import doParallel
 #' @importFrom foreach %dopar% foreach getDoParRegistered
 #' @import readxl
