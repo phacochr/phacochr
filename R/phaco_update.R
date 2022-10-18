@@ -42,7 +42,7 @@ phaco_update <- function() {
     write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"))
     }
 
-  log <- read_csv2(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",")
+  log <- read_csv2(paste0(path_data, "BeST/openaddress/log.csv"))
   log$update <- as.POSIXct(log$update)
 
   if (max(as.Date(log$update)) + days(7) < Sys.Date()) {

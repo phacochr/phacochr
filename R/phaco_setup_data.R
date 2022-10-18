@@ -14,10 +14,10 @@ phaco_setup_data <- function(){
   start_time <- Sys.time()
 
   # creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
-  cat(paste0("\n","\033[K","\u2714", " Cr","\u00e9","ation du dossier : ", path_data))
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr")) # bricolage pour windows
+  cat(paste0("\n","\033[K","\u2714", " Cr","\u00e9","ation du dossier : ", path_data))
   dir.create(path_data, showWarnings = F)
-  if(dir.exists(path_data)) {
+  if(!dir.exists(path_data) == TRUE) {
     stop(paste0("\u2716"," le dossier d'installation n'a pas pu", " \u00ea", "tre cr","\u00e9\u00e9", " : v","\u00e9","rifiez vos droits d'","\u00e9","criture sur le disque"))
   }
 
