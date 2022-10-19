@@ -10,6 +10,7 @@
 #' @import sf
 #' @import sp
 #' @import spdep
+#' @importFrom stats quantile
 #'
 #' @export
 #'

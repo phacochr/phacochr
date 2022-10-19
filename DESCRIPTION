@@ -9,12 +9,11 @@ License: GPL (>= 3) + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
-Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, purrr,
+Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, purrr, stats,
     readr, readxl, stringdist, sf, sp, spdep, knitr, 
-    stringr, tidyr, rappdirs, utils, mapsf, scales, tmap, leaflet
+    stringr, tidyr, rappdirs, utils, mapsf, scales
 Depends: 
     R (>= 2.10)
-LazyData: true
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
