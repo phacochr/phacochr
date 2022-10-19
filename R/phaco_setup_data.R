@@ -13,10 +13,12 @@ phaco_setup_data <- function(){
   cat(paste0(" -- Chargement des donn","\u00e9","es pour PhacochR --"))
   start_time <- Sys.time()
 
-  # creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
+  # Creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr")) # bricolage pour windows
   cat(paste0("\n","\033[K","\u2714", " Cr","\u00e9","ation du dossier : ", path_data))
   dir.create(path_data, recursive = T, showWarnings = F)
+
+  # Test si le repertoire a ete cree
   if(dir.exists(path_data) == FALSE) {
     stop(paste0("\u2716"," le dossier d'installation n'a pas pu", " \u00ea", "tre cr","\u00e9\u00e9", " : v","\u00e9","rifiez vos droits d'","\u00e9","criture sur le disque"))
   }
@@ -27,6 +29,8 @@ phaco_setup_data <- function(){
                 paste0(path_data,"/phacochr_data_best.zip"))
   download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_statbel_urbis.zip",
                 paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
+
+  # Test si les donnees ont ete telechargees
   if(sum(
     file.exists(paste0(path_data,"/phacochr_data_best.zip"),
                 paste0(path_data,"/phacochr_data_statbel_urbis.zip")

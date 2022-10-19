@@ -176,7 +176,6 @@ phaco_geocode <- function(data_to_geocode,
 
   # @@@@@@@@@@ Tout le script se lance uniquement s'il y a des codes postaux en Belgique ! @@@@@@@@@@
   # Dans le cas contraire => message d'erreur
-  # Dans le cas ou il n'y a pas d'adresses belges/valides
   if (length(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)])) == 0){
     stop(paste0("\u2716"," il n'y a aucun code postal belge dans le fichier (ou erreur d'encodage)"))
   }

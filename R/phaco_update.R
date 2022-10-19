@@ -57,6 +57,7 @@ phaco_update <- function() {
     download.file("https://opendata.bosa.be/download/best/openaddress-bebru.zip", paste0(path_data, "BeST/openaddress/openaddress-bebru.zip"))
     download.file("https://opendata.bosa.be/download/best/openaddress-bewal.zip", paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"))
 
+    # Test si les donnees ont ete telechargees
     if(sum(
       file.exists(paste0(path_data,"BeST/openaddress/postalstreets-latest.zip"),
                   paste0(path_data,"BeST/openaddress/openaddress-bevlg.zip"),
@@ -79,6 +80,7 @@ phaco_update <- function() {
     unzip(paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"))
 
+    # Test si les donnees ont ete ecrite (plus pour la suite => si ca marche ici ca marchera apres)
     if(sum(
       file.exists(paste0(path_data,"BeST/openaddress/Brussels_postal_street.csv"),
                   paste0(path_data,"BeST/openaddress/Wallonia_postal_street.csv"),
