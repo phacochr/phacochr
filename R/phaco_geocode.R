@@ -633,10 +633,8 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 2)  Jointure des adresses --------------------------------------------------------------------------------------------------------------
 
-<<<<<<< HEAD
   #### i. Preparation des fichiers adresses (BeST) ------------------------------------------------------------------------------------------
   cat(paste0("\n","\u29D7"," Chargement du fichier openaddress"))
-=======
     # Ici on cree une liste des adresses en n'important que les arrodissements detectes dans data_to_geocode
     openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
                              unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
@@ -646,7 +644,6 @@ phaco_geocode <- function(data_to_geocode,
       mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
              address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
     #select(-street_FINAL_detected, -postal_id, -street_id_phaco)
->>>>>>> d4e93f2 (map_dfr comme avant)
 
   # Ici on cree une liste des adresses en n'important que les arrodissements detectes dans data_to_geocode
   openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",

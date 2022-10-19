@@ -42,7 +42,11 @@ phaco_update <- function() {
     write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"))
     }
 
+<<<<<<< HEAD
   log <- read_csv2(paste0(path_data, "BeST/openaddress/log.csv"))
+=======
+  log <- readr::read_delim(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",")
+>>>>>>> a1c3e42 (readr plutôt que vroom, calcul du numero du milieu par rue et code postal)
   log$update <- as.POSIXct(log$update)
 
   if (max(as.Date(log$update)) + days(7) < Sys.Date()) {
@@ -116,9 +120,15 @@ phaco_update <- function() {
       return(temp)
     }
 
+<<<<<<< HEAD
     Brussels_postal_street <- read_csv(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), col_types = cols(.default = col_character()))
     Wallonia_postal_street <- read_csv(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), col_types = cols(.default = col_character()))
     Flanders_postal_street <- read_csv(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), col_types = cols(.default = col_character()))
+=======
+    Brussels_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), col_types = cols(.default = col_character()))
+    Wallonia_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), col_types = cols(.default = col_character()))
+    Flanders_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), col_types = cols(.default = col_character()))
+>>>>>>> a1c3e42 (readr plutôt que vroom, calcul du numero du milieu par rue et code postal)
 
     belgium_street <- bind_rows(Brussels_postal_street,Wallonia_postal_street, Flanders_postal_street)
     belgium_street <- extract_street(belgium_street)
@@ -172,6 +182,7 @@ phaco_update <- function() {
       select(-cd_dstr_refnis)
 
     # Bruxelles
+<<<<<<< HEAD
     openaddress_bebru <- read_csv(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), col_types = cols(.default = col_character()))
     openaddress_bebru <- select_id_street(openaddress_bebru)
     openaddress_bebru <- join_ss_adress(openaddress_bebru)
@@ -181,6 +192,17 @@ phaco_update <- function() {
     openaddress_bewal <- join_ss_adress(openaddress_bewal)
     # Flandres
     openaddress_bevlg <- read_csv(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), col_types = cols(.default = col_character()))
+=======
+    openaddress_bebru <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), col_types = cols(.default = col_character()))
+    openaddress_bebru <- select_id_street(openaddress_bebru)
+    openaddress_bebru <- join_ss_adress(openaddress_bebru)
+    # Wallonie
+    openaddress_bewal <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), col_types = cols(.default = col_character()))
+    openaddress_bewal <- select_id_street(openaddress_bewal)
+    openaddress_bewal <- join_ss_adress(openaddress_bewal)
+    # Flandres
+    openaddress_bevlg <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), col_types = cols(.default = col_character()))
+>>>>>>> a1c3e42 (readr plutôt que vroom, calcul du numero du milieu par rue et code postal)
     openaddress_bevlg <- select_id_street(openaddress_bevlg)
     openaddress_bevlg <- join_ss_adress(openaddress_bevlg)
 
@@ -265,6 +287,31 @@ phaco_update <- function() {
 
     belgium_street_abv <- belgium_street %>%
       bind_rows(belgium_street_abv)
+
+
+
+    as.numeric(quantile(1:5, p = 0.5, type = 3))
+
+
+    # Assigner à chaque rue par code postal les coordonnées du numéro du milieu
+    cat(paste0("\n", "Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
+
+    num_mid <- belgium_street_abv %>%
+      inner_join(openaddress_be, by="street_id_phaco" ) %>% # certaines rues n'ont pas de numéro, on les écartes
+      mutate (house_number_sans_lettre= as.numeric(house_number_sans_lettre)) %>%
+      group_by(street_id_phaco, postal_id) %>% # par rue et code postal
+      filter(house_number_sans_lettre==as.numeric(quantile(house_number_sans_lettre, p = 0.5, type = 3, na.rm=T))) %>% # quantile parce que median() prend la valeur du milieu quand paire, type 3 arrondi vers le bas
+      rename(mid_num = house_number_sans_lettre,
+             mid_x_31370 = x_31370,
+             mid_y_31370= y_31370,
+             mid_postcode= postcode,
+             mid_cd_sector= cd_sector,
+             mid_arrond= arrond) %>%
+      select(-c(3:5)) %>%
+      unique()
+
+    belgium_street_abv<-belgium_street_abv %>%
+      left_join(num_mid, by=c("street_id_phaco", "postal_id"))
 
 
     #write_csv2(belgium_street, paste0(path_data, "BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"))
