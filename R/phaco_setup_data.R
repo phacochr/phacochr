@@ -42,14 +42,14 @@ phaco_setup_data <- function(){
   cat(paste0("\r","\u2714"," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es"))
 
   # dezippe et supprimer le fichier zip telecharge
-  cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es ..."))
+  cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es"))
   unzip(paste0(path_data,"/phacochr_data_best.zip"),exdir= path_data)
   unzip(paste0(path_data,"/phacochr_data_statbel_urbis.zip"),exdir= path_data)
 
   # supression des fichiers .zip
   file.remove(paste0(path_data,"/phacochr_data_best.zip"))
   file.remove(paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
-  cat(paste0("\r","\u2714"," D","\u00e9","compression des donn","\u00e9","es."))
+  cat(paste0("\r","\u2714"," D","\u00e9","compression des donn","\u00e9","es"))
 
   cat(paste0("\n","\u2714"," Importation des donn","\u00e9","es OK: PhacochR pr","\u00ea","t ","\u00e0", " g","\u00e9","ocoder."))
 

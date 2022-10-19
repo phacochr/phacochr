@@ -17,7 +17,7 @@
 #' @examples
 #' phaco_update()
 
-phaco_update <- function() {
+phaco_update <- function(force=FALSE) {
 
   # 0. Mise a jour --------------------------------------------------------------------------------------------------------------------------
 
@@ -36,6 +36,8 @@ phaco_update <- function() {
   }
 
   # Mise a jour si pas deja il y a moins de 7 jours
+  cat(paste0(" -- Mise à jour des donn","\u00e9","es pour PhacochR --"))
+
 
   # Premiere fois
   if (!file.exists(paste0(path_data, "BeST/openaddress/log.csv"))){
@@ -44,10 +46,10 @@ phaco_update <- function() {
     }
 
 
-  log <- readr::read_delim(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",")
+  log <- readr::read_delim(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",", progress= F, show_col_types = FALSE)
   log$update <- as.POSIXct(log$update)
 
-  if (max(as.Date(log$update)) + days(7) < Sys.Date()) {
+  if (max(as.Date(log$update)) + days(7) < Sys.Date()| force==TRUE) {
 
     cat(paste0("\n", "T", "\u00e9", "l", "\u00e9", "chargement des donn", "\u00e9", "es BeST"))
 
@@ -121,9 +123,9 @@ phaco_update <- function() {
     }
 
 
-    Brussels_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), col_types = cols(.default = col_character()))
-    Wallonia_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), col_types = cols(.default = col_character()))
-    Flanders_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), col_types = cols(.default = col_character()))
+    Brussels_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
+    Wallonia_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
+    Flanders_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
 
     belgium_street <- bind_rows(Brussels_postal_street,Wallonia_postal_street, Flanders_postal_street)
     belgium_street <- extract_street(belgium_street)
@@ -177,15 +179,15 @@ phaco_update <- function() {
       select(-cd_dstr_refnis)
 
     # Bruxelles
-    openaddress_bebru <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), col_types = cols(.default = col_character()))
+    openaddress_bebru <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), progress= F, col_types = cols(.default = col_character()))
     openaddress_bebru <- select_id_street(openaddress_bebru)
     openaddress_bebru <- join_ss_adress(openaddress_bebru)
     # Wallonie
-    openaddress_bewal <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), col_types = cols(.default = col_character()))
+    openaddress_bewal <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), progress= F, col_types = cols(.default = col_character()))
     openaddress_bewal <- select_id_street(openaddress_bewal)
     openaddress_bewal <- join_ss_adress(openaddress_bewal)
     # Flandres
-    openaddress_bevlg <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), col_types = cols(.default = col_character()))
+    openaddress_bevlg <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), progress= F, col_types = cols(.default = col_character()))
     openaddress_bevlg <- select_id_street(openaddress_bevlg)
     openaddress_bevlg <- join_ss_adress(openaddress_bevlg)
 
@@ -431,6 +433,6 @@ phaco_update <- function() {
     options(timeout=60)
 
   } else {
-    cat(paste0("\n", "Les fichiers openaddress ont moins d'une semaine : mise", " \u00e0 ", "jour non n", "\u00e9", "cessaire"))
+    cat(paste0("\n", "\u2714"," Les fichiers openaddress ont moins d'une semaine : mise", " \u00e0 ", "jour non n", "\u00e9", "cessaire"))
   }
 }
