@@ -33,6 +33,13 @@ si les coordonnées du numéro indiqué sont inconnues. PhacochR est
 compatible avec les 3 langues nationales : il géocode des adresses
 écrites en français, néérlandais et allemand.
 
+Le package est très rapide (+/- 1min40 pour géocoder 20.000 adresses
+dans les 3 langues et situées dans toute la Belgique) et le taux de
+succès pour le géocodage est élevé (en moyenne 90-95%). Phacochr
+constitue donc une alternative très performante face aux solutions
+existantes tout en reposant entièrement sur des données publiques et des
+procédures libres.
+
 ## Installation
 
 Vous pouvez installer le package phacochr depuis
@@ -65,7 +72,6 @@ phaco_update()
 Voici un exemple basé sur un data.frame contenant deux adresses :
 
 ``` r
-library(phacochr)
 x <- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
                 rue= c("rue Belliard","avenue Antoine Depage"),
                 num=c("71", "30"),
@@ -99,7 +105,7 @@ result$data_geocoded [,c(1,17:19)]
 
 Le package dispose également de fonctions de cartographie des adresses
 géocodées. `phaco_map_s()` produit des cartes statiques : il suffit de
-passer à la fonction l’objet `data_geocoded_sf` créé par
+passer à la fonction l’objet `data_geocoded_sf` créé précédemment par
 `phaco_geocode()`. La fonction dessine alors les coordonnées des
 adresses sur une carte dont les frontières administratives sont
 également affichées. Si les adresses se restreignent à Bruxelles, la
@@ -109,7 +115,7 @@ carte se limite automatiquement à la Région bruxelloise.
 phaco_map_s(result$data_geocoded_sf)
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 La fonction `phaco_map_i()` produit quant à elle des cartes interactives
 :
