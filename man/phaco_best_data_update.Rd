@@ -6,6 +6,9 @@
 \usage{
 phaco_best_data_update(force = FALSE)
 }
+\arguments{
+\item{force}{force le update meme si les donnees sont a jour}
+}
 \description{
 phaco_best_data_update
 }

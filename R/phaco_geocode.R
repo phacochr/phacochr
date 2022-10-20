@@ -180,7 +180,7 @@ phaco_geocode <- function(data_to_geocode,
     stop(paste0("\u2716"," il n'y a aucun code postal belge dans le fichier (ou erreur d'encodage)"))
   }
 
-  cat(paste0("\n","\u2139"," R","\u00e9","gion(s) d","\u00e9","tect","\u00e9","e(s) : ",
+  cat(paste0("\n",colourise("\u2139", fg= "blue")," R","\u00e9","gion(s) d","\u00e9","tect","\u00e9","e(s) : ",
                 paste(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)]),
                       collapse = ', ')))
 
@@ -445,7 +445,7 @@ phaco_geocode <- function(data_to_geocode,
   doParallel::registerDoParallel(cl = my.cluster)
   foreach::getDoParRegistered()
 
-  cat(paste0("\r",colourise("\u2714", fg="green")," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur","\033[K"))
+  cat(paste0("\r",colourise("\u2714", fg="green")," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur"))
 
 
   ## 1)  Jointure des rues  -----------------------------------------------------------------------------------------------------------------
@@ -519,7 +519,7 @@ phaco_geocode <- function(data_to_geocode,
       sample_n(1) %>% # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
       select(-min_jw, -distance_jw, -address_join, -address_join_street)
 
-    cat(paste0("\r",colourise("\u2714", fg="green")," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager","\033[K"))
+    cat(paste0("\r",colourise("\u2714", fg="green")," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
   }
 
   res <- res %>%
@@ -626,7 +626,7 @@ phaco_geocode <- function(data_to_geocode,
       }
     }
 
-    cat(paste0("\r",colourise("\u2714", fg="green")," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes","\033[K"))
+    cat(paste0("\r",colourise("\u2714", fg="green")," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes"))
   }
 
 
@@ -666,7 +666,7 @@ phaco_geocode <- function(data_to_geocode,
     #select(-house_number) %>%
     mutate(approx_num = 0)
 
-  cat(paste0("\r","\u2714"," Jointure avec les coordonn","\u00e9","es X-Y","\033[K"))
+  cat(paste0("\r",colourise("\u2714", fg="green")," Jointure avec les coordonn","\u00e9","es X-Y"))
 
   ### iii. Approximation numero -------------------------------------------------------------------------------------------------------------
 
@@ -747,7 +747,7 @@ phaco_geocode <- function(data_to_geocode,
       }
     }
 
-    cat(paste0("\r","\u2714"," Approximation ", "\u00e0", " + ou - ", approx_num_max*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es","\033[K"))
+    cat(paste0("\r",colourise("\u2714", fg="green")," Approximation ", "\u00e0", " + ou - ", approx_num_max*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es"))
   }
 
 
@@ -863,8 +863,9 @@ phaco_geocode <- function(data_to_geocode,
   # On stoppe la parallelisation
   parallel::stopCluster(cl = my.cluster)
 
-  cat(paste0("\r","\u2714"," Cr","\u00e9","ation du fichier final et formatage des tables de v","\u00e9","rification","\033[K"))
-  cat(paste0("\n","\u2714"," G","\u00e9","ocodage termin","\u00e9","\033[K"))
+  cat(paste0("\r",colourise("\u2714", fg="green")," Cr","\u00e9","ation du fichier final et formatage des tables de v","\u00e9","rification"))
+  cat(paste0("\n",colourise("\u2714", fg="green")," G","\u00e9","ocodage termin","\u00e9"))
+  cat(paste0("\n",colourise("\u2139", fg= "blue")," Statistiques concernant le g","\u00e9","ocodage:"))
 
   end_time <- Sys.time()
 
@@ -873,19 +874,19 @@ phaco_geocode <- function(data_to_geocode,
                     align="lrccccc")
   cat("\n",tab, sep="\n" )
 
-  cat(paste0("\n","\u2139", " Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), " s
+  cat(paste0("\n",colourise("\u2139", fg= "blue"), " Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), " s
              "))
-  cat(paste0("\n","/!\\ Toutes les adresses n'ont pas ","\u00e9","t","\u00e9"," trouv","\u00e9","es avec certitude /!\\
+  cat(paste0("\n",colourise("/!\\", fg="red"), " Toutes les adresses n'ont pas ","\u00e9","t","\u00e9"," trouv","\u00e9","es avec certitude ", colourise("/!\\", fg="red"),"
 - check \'dist_fuzzy\' pour les erreurs de reconnaissance des rues
 - check \'approx_num\' pour les approximations de num","\u00e9","ro
 - check \'type_geocoding\' pour l'","\u00e9","argissement aux communes adjacentes
 - check \'nom_propre_abv\' pour les abr","\u00e9","viations de noms propres
              "))
 
-  cat(paste0("\n","-- Plus de r","\u00e9","sultats:",
-             "\n",'\u2192'," Tableau synth","\u00e9","tique : ","$summary",
-             "\n",'\u2192'," Donn","\u00e9","es g","\u00e9","ocod","\u00e9","es : $data_geocoded",
-             "\n",'\u2192'," Donn","\u00e9","es g","\u00e9","ocod","\u00e9","es en format sf : $data_geocoded_sf"))
+  cat(paste0("\n",colourise(paste0("-- Plus de r","\u00e9","sultats:"), fg= "light cyan"),
+             "\n",colourise('\u2192', fg= "blue")," Tableau synth","\u00e9","tique : ","$summary",
+             "\n",colourise('\u2192', fg= "blue")," Donn","\u00e9","es g","\u00e9","ocod","\u00e9","es : $data_geocoded",
+             "\n",colourise('\u2192', fg= "blue")," Donn","\u00e9","es g","\u00e9","ocod","\u00e9","es en format sf : $data_geocoded_sf"))
 
 
   return(result)

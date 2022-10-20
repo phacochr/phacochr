@@ -321,10 +321,13 @@ phaco_best_data_update <- function(force=FALSE) {
 
     # 4. Table codes postaux > arrondissements ------------------------------------------------------------------------------------------------
 
-    cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion codes postaux > arrondissements (Statbel)"))
+    cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
     code_postal_INS <- read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx")) %>%
       rename("code_postal" = "Postal code")
+
+    cat(paste0("\r", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
+
 
     BE_SS_lite_comm_arrond_rgn <- BE_SS %>%
       as.data.frame() %>%
