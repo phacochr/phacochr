@@ -10,12 +10,12 @@
 
 phaco_setup_data <- function(){
 
-  cat(paste0(" -- Chargement des donn","\u00e9","es pour PhacochR --"))
+  cat(colourise(paste0(" -- Chargement des donn","\u00e9","es pour PhacochR --"), fg="light green" ))
   start_time <- Sys.time()
 
   # Creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr")) # bricolage pour windows
-  cat(paste0("\n","\033[K","\u2714", " Cr","\u00e9","ation du dossier : ", path_data))
+  cat(paste0("\n",colourise("\u2714", fg="green"), " Cr","\u00e9","ation du dossier : ", path_data))
   dir.create(path_data, recursive = T, showWarnings = F)
 
   # Test si le repertoire a ete cree
@@ -39,7 +39,7 @@ phaco_setup_data <- function(){
     stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre download","\u00e9","s : relancez phaco_setup_data() ou v","\u00e9","rifiez votre connexion"))
   }
 
-  cat(paste0("\r","\u2714"," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es"))
+  cat(paste0("\r",colourise("\u2714", fg="green")," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es"))
 
   # dezippe et supprimer le fichier zip telecharge
   cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es"))
@@ -49,8 +49,9 @@ phaco_setup_data <- function(){
   # supression des fichiers .zip
   file.remove(paste0(path_data,"/phacochr_data_best.zip"))
   file.remove(paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
-  cat(paste0("\r","\u2714"," D","\u00e9","compression des donn","\u00e9","es"))
 
-  cat(paste0("\n","\u2714"," Importation des donn","\u00e9","es OK: PhacochR pr","\u00ea","t ","\u00e0", " g","\u00e9","ocoder."))
+  cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","compression des donn","\u00e9","es"))
+
+  cat(paste0("\n",colourise("\u2714", fg="green")," Importation des donn","\u00e9","es OK: PhacochR pr","\u00ea","t ","\u00e0", " g","\u00e9","ocoder."))
 
 }
