@@ -417,7 +417,7 @@ phaco_geocode <- function(data_to_geocode,
 
   #freq(data_to_geocode$recode)
 
-  cat(paste0("\033[K","\r","\u2714"," Correction orthographique des adresses", "\033[K"))
+  cat(paste0("\033[K","\r",colourise("\u2714", fg="green")," Correction orthographique des adresses", "\033[K"))
 
 
   # II. GEOCODAGE ===========================================================================================================================
@@ -445,7 +445,7 @@ phaco_geocode <- function(data_to_geocode,
   doParallel::registerDoParallel(cl = my.cluster)
   foreach::getDoParRegistered()
 
-  cat(paste0("\r","\u2714"," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur","\033[K"))
+  cat(paste0("\r",colourise("\u2714", fg="green")," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur","\033[K"))
 
 
   ## 1)  Jointure des rues  -----------------------------------------------------------------------------------------------------------------
@@ -491,7 +491,7 @@ phaco_geocode <- function(data_to_geocode,
                                          nthread= n.cores)
                   }
 
-  cat(paste0("\r","\u2714"," D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)", "\033[K"))
+  cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)", "\033[K"))
 
   # On ne retient que l'adresse detectee avec la distance minimale
   res <- res %>%
@@ -519,7 +519,7 @@ phaco_geocode <- function(data_to_geocode,
       sample_n(1) %>% # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
       select(-min_jw, -distance_jw, -address_join, -address_join_street)
 
-    cat(paste0("\r","\u2714"," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager","\033[K"))
+    cat(paste0("\r",colourise("\u2714", fg="green")," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager","\033[K"))
   }
 
   res <- res %>%
@@ -626,7 +626,7 @@ phaco_geocode <- function(data_to_geocode,
       }
     }
 
-    cat(paste0("\r","\u2714"," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes","\033[K"))
+    cat(paste0("\r",colourise("\u2714", fg="green")," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes","\033[K"))
   }
 
 
@@ -654,7 +654,7 @@ phaco_geocode <- function(data_to_geocode,
            address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
   #select(-street_FINAL_detected, -postal_id, -street_id_phaco)
 
-  cat(paste0("\r","\u2714"," Chargement du fichier openaddress "))
+  cat(paste0("\r",colourise("\u2714", fg="green")," Chargement du fichier openaddress "))
 
   #### ii. Jointure avec les adresses  ------------------------------------------------------------------------------------------------------
 

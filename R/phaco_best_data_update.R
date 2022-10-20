@@ -1,4 +1,6 @@
-#' phaco_update
+#' phaco_best_data_update
+#'
+#' @param force force le update meme si les donnees sont a jour
 #'
 #' @import rappdirs
 #' @import readr
@@ -15,9 +17,10 @@
 #' @export
 #'
 #' @examples
-#' phaco_update()
+#' phaco_best_data_update()
 
-phaco_update <- function(force=FALSE) {
+phaco_best_data_update <- function(force=FALSE) {
+  options(warn=-1) # supprime les warnings
 
   # 0. Mise a jour --------------------------------------------------------------------------------------------------------------------------
 
@@ -36,13 +39,13 @@ phaco_update <- function(force=FALSE) {
   }
 
   # Mise a jour si pas deja il y a moins de 7 jours
-  cat(paste0(" -- Mise à jour des donn","\u00e9","es pour PhacochR --"))
+  cat(paste0(" -- Mise ","\u00e0", " jour des donn","\u00e9","es BeST pour PhacochR --"))
 
 
   # Premiere fois
   if (!file.exists(paste0(path_data, "BeST/openaddress/log.csv"))){
     log <- data.frame(update = "0001-01-01 00:00:00 UTC")
-    write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"))
+    write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"), progress=F)
     }
 
 
@@ -51,7 +54,7 @@ phaco_update <- function(force=FALSE) {
 
   if (max(as.Date(log$update)) + days(7) < Sys.Date()| force==TRUE) {
 
-    cat(paste0("\n", "T", "\u00e9", "l", "\u00e9", "chargement des donn", "\u00e9", "es BeST"))
+    cat(paste0("\n", "\u29D7"," T", "\u00e9", "l", "\u00e9", "chargement des donn", "\u00e9", "es BeST...","\n"))
 
     options(timeout=300)
 
@@ -70,6 +73,9 @@ phaco_update <- function(force=FALSE) {
       ) != 4) {
       stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre download","\u00e9","s : relancez phaco_update() ou v","\u00e9","rifiez votre connexion"))
     }
+    cat(paste0("\n", colourise("\u2714", fg="green")," T", "\u00e9", "l", "\u00e9", "chargement des donn", "\u00e9", "es BeST"))
+    cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es"))
+
 
     unzip(paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"))
@@ -82,6 +88,7 @@ phaco_update <- function(force=FALSE) {
 
     unzip(paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"))
+
 
     # Test si les donnees ont ete ecrite (plus pour la suite => si ca marche ici ca marchera apres)
     if(sum(
@@ -96,13 +103,16 @@ phaco_update <- function(force=FALSE) {
       stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre d","\u00e9","compress","\u00e9","s : v","\u00e9","rifiez vos droits d'","\u00e9","criture sur le disque"))
     }
 
+
     log[nrow(log)+1,] <- Sys.time()
-    write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"))
+    write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"), progress=F)
+    cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","compression des donn","\u00e9","es"))
+
 
 
     # 1. Fichier rues -------------------------------------------------------------------------------------------------------------------------
 
-    cat(paste0("\n", "Cr", "\u00e9", "ation du fichier des rues BeST"))
+    cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation du fichier des rues BeST"))
 
     # Fonction pour extraire les rues
     extract_street <- function(x) {
@@ -130,10 +140,11 @@ phaco_update <- function(force=FALSE) {
     belgium_street <- bind_rows(Brussels_postal_street,Wallonia_postal_street, Flanders_postal_street)
     belgium_street <- extract_street(belgium_street)
 
+    cat(paste0("\r", colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation du fichier des rues BeST"))
 
     # 2. Fichier adresses ---------------------------------------------------------------------------------------------------------------------
 
-    cat(paste0("\n", "Cr", "\u00e9", "ation du fichier des adresses BeST"))
+    cat(paste0("\n",  "\u29D7"," Cr", "\u00e9", "ation du fichier des adresses BeST (jointure spatiale avec les secteurs statistiques)"))
 
     # Fonction pour selectionner les variables et creer un ID street
     select_id_street <- function(x) {
@@ -169,8 +180,7 @@ phaco_update <- function(force=FALSE) {
     }
 
     # Charger le fichier secteurs statistiques
-    BE_SS <- st_read(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg")) %>%
-      st_set_crs(31370) %>%
+    BE_SS <- st_read(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg"), quiet=T, crs= 31370) %>%
       st_zm(drop = TRUE)
 
     BE_SS_lite_sector_arrond <- BE_SS %>%
@@ -194,10 +204,12 @@ phaco_update <- function(force=FALSE) {
     # Belgique
     openaddress_be <- bind_rows(openaddress_bebru, openaddress_bewal, openaddress_bevlg)
 
+    cat(paste0("\r",  colourise("\u2714", fg="green")," Cr", "\u00e9", "ation du fichier des adresses BeST (jointure spatiale avec les secteurs statistiques)"))
 
     # 3. Export Belgium street ----------------------------------------------------------------------------------------------------------------
 
-    cat(paste0("\n", "Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
+    cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
+
 
     # Fonction utilisee ci-dessous => https://www.r-bloggers.com/2018/07/the-notin-operator/
     `%ni%` <- Negate(`%in%`)
@@ -205,7 +217,10 @@ phaco_update <- function(force=FALSE) {
     # Creer les rues avec abreviations de noms
 
     TA_POP_2018_M <- read_excel(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"))
-    TA_POP_2018_F <- read_excel(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"))
+    cat(paste0("\r", "\u29D7", " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST")) # probleme avec read_excel pas possible enlever les messages
+    TA_POP_2018_F <-read_excel(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"))
+    cat(paste0("\r", "\u29D7", " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
+
 
     prenoms <- bind_rows(TA_POP_2018_M, TA_POP_2018_F) %>%
       select(TX_FST_NAME, MS_FREQUENCY) %>%
@@ -275,11 +290,11 @@ phaco_update <- function(force=FALSE) {
 
 
 
-    as.numeric(quantile(1:5, p = 0.5, type = 3))
+    cat(paste0("\r",  colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
 
 
     # Assigner à chaque rue par code postal les coordonnées du numéro du milieu
-    cat(paste0("\n", "Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
+    cat(paste0("\n", "\u29D7", " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
 
     num_mid <- belgium_street_abv %>%
       inner_join(openaddress_be, by="street_id_phaco" ) %>% # certaines rues n'ont pas de numéro, on les écartes
@@ -300,12 +315,13 @@ phaco_update <- function(force=FALSE) {
 
 
     #write_csv2(belgium_street, paste0(path_data, "BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"))
-    write_csv2(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"))
+    write_csv2(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), progress=F)
+    cat(paste0("\r", colourise("\u2714", fg="green"), " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
 
 
     # 4. Table codes postaux > arrondissements ------------------------------------------------------------------------------------------------
 
-    cat(paste0("\n", "Cr", "\u00e9", "ation de la table de conversion codes postaux > arrondissements (Statbel)"))
+    cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion codes postaux > arrondissements (Statbel)"))
 
     code_postal_INS <- read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx")) %>%
       rename("code_postal" = "Postal code")
@@ -326,12 +342,13 @@ phaco_update <- function(force=FALSE) {
     table_postal_arrond$Region[table_postal_arrond$Region == paste0("R", "\u00e9", "gion wallonne")] <- "Wallonie"
 
 
-    write_csv2(table_postal_arrond, paste0(path_data, "BeST/PREPROCESSED/table_postal_arrond.csv"))
+    write_csv2(table_postal_arrond, paste0(path_data, "BeST/PREPROCESSED/table_postal_arrond.csv"), progress=F)
+    cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
 
     # 5. Table de conversion code postal > communes INS recode --------------------------------------------------------------------------------
 
-    cat(paste0("\n", "Cr", "\u00e9", "ation de la table de conversion codes postaux > communes recod", "\u00e9", "es (Statbel)"))
+    cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion codes postaux > communes recod", "\u00e9", "es (Statbel)"))
 
     table_INS_recod_code_postal <- code_postal_INS %>%
       select(code_postal, "Refnis code") %>%
@@ -341,12 +358,13 @@ phaco_update <- function(force=FALSE) {
       distinct()
 
 
-    write_csv2(table_INS_recod_code_postal, paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.csv"))
+    write_csv2(table_INS_recod_code_postal, paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), progress=F)
+    cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - communes recod", "\u00e9", "es' (Statbel)"))
 
 
     # 6. Export openaddress par arrondissement ------------------------------------------------------------------------------------------------
 
-    cat(paste0("\n", "Export des fichiers BeST par arrondissement"))
+    cat(paste0("\n", "\u29D7"," Export des fichiers BeST par arrondissement"))
 
     openaddress_be <- rename(openaddress_be, "arrond2" = "arrond") %>%
       left_join(select(table_postal_arrond, postcode, arrond), by = "postcode")
@@ -364,18 +382,17 @@ phaco_update <- function(force=FALSE) {
       temp <- openaddress_be %>%
         filter(arrond == i) %>%
         select(-postcode, -arrond)
-      write_csv2(temp, paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".csv"), na = "")
+      write_csv2(temp, paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".csv"), na = "", progress=F)
       }
+    cat(paste0("\r", colourise("\u2714", fg="green")," Export des fichiers BeST par arrondissement"))
 
 
     # 7. Table secteurs - quartiers - communes -  arrond - region -----------------------------------------------------------------------------
 
-    cat(paste0("\n", "Cr", "\u00e9", "ation des informations par secteur statistique (Statbel - Urbis)"))
+    cat(paste0("\n", "\u29D7", " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers Urbis)"))
 
     # Quartiers du monitoring
-    BXL_QUARTIERS_sf <- st_read(paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg")) %>%
-      st_set_crs(31370)
-
+    BXL_QUARTIERS_sf <- st_read(paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg"), quiet=T,crs=31370)
     # jointure spatiale avec le centroid des secteurs statistiques
     BXL_QUARTIERS <- st_join(BXL_QUARTIERS_sf, st_centroid(BE_SS)) %>%
       as.data.frame() %>%
@@ -389,12 +406,13 @@ phaco_update <- function(force=FALSE) {
              -ms_area_ha, -ms_perimeter_m, -dt_situation, -geom, -tx_prov_descr_de) # NOTE : dans BE_SS version gpkg, le champ geometrie = "geom" et non "geometry" => PKOI ?
 
 
-    write_csv2(table_secteurs_prov_commune_quartier, paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), na = "")
+    write_csv2(table_secteurs_prov_commune_quartier, paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), na = "", progress=F)
+    cat(paste0("\r", colourise("\u2714", fg="green"), " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers Urbis)"))
 
 
     # 8. Liste des communes adjacentes par commune --------------------------------------------------------------------------------------------
 
-    cat(paste0("\n", "Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))
+    cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))
 
     # communes adjacentes
     # D'abord un recodage car codes postaux et INS n'ont pas de relation bi-univoque : https://statbel.fgov.be/fr/propos-de-statbel/methodologie/classifications/geographie
@@ -416,12 +434,13 @@ phaco_update <- function(force=FALSE) {
       select(-voisin)
 
 
-    write_csv2(mat, paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.csv"))
+    write_csv2(mat, paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.csv"), progress=F)
 
+    cat(paste0("\r", colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))
 
     # 9. Delete des fichiers openaddress originaux --------------------------------------------------------------------------------------------
 
-    cat(paste0("\n", "Supression des fichiers initiaux BeST sur le disque dur"))
+    cat(paste0("\n", colourise("\u2714", fg="green")," Supression des fichiers initiaux BeST sur le disque dur"))
 
     file.remove(c(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"),
                   paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"),
@@ -431,8 +450,10 @@ phaco_update <- function(force=FALSE) {
     file.remove(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"))
 
     options(timeout=60)
+    cat(paste0("\n", colourise("\u2714", fg="green")," Les donn", "\u00e9", "es BeST sont"," \u00e0"," jour."))
+
 
   } else {
-    cat(paste0("\n", "\u2714"," Les fichiers openaddress ont moins d'une semaine : mise", " \u00e0 ", "jour non n", "\u00e9", "cessaire"))
+    cat(paste0("\n", colourise("\u2714", fg="green")," Les fichiers openaddress ont moins d'une semaine : mise", " \u00e0 ", "jour non n", "\u00e9", "cessaire"))
   }
 }
