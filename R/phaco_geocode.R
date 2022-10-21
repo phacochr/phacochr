@@ -1,15 +1,17 @@
-#' phaco_geocode
+#' phaco_geocode : geocodeur pour la Belgique
+#'
+#' phaco_geocode est la fonction principale du package phacochr.  A partir d’une liste d’adresses, elle permet de retrouver les coordonnees X-Y.
 #'
 #' @param data_to_geocode un dataframe avec les adresses a geocoder
 #' @param colonne_rue nom de la colonne avec les rues
-#' @param colonne_num_rue nom de la colonne avec les numeros
+#' @param colonne_num_rue nom de la colonne avec les numéros
 #' @param colonne_code_postal nom de la colonne avec les codes postaux
-#' @param method_stringdist methode pour la jointure inexacte
-#' @param corrections_REGEX correction orthographique
-#' @param error_max nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnee de reference (BeST)
-#' @param approx_num_max nombre de numeros d'ecart maximum si le numero n'a pas ete trouve
-#' @param elargissement_com_adj elargissement aux communes limitrophes
-#' @param lang_encoded langue utilisee pour encoder les noms de rue
+#' @param method_stringdist Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles: "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw","soundex".
+#' @param corrections_REGEX Correction orthographique. Par défaut: TRUE
+#' @param error_max Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: TRUE
+#' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50
+#' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE
+#' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE")
 #'
 #' @import dplyr
 #' @import tidyr

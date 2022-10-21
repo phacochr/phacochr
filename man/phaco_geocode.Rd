@@ -2,7 +2,7 @@
 % Please edit documentation in R/phaco_geocode.R
 \name{phaco_geocode}
 \alias{phaco_geocode}
-\title{phaco_geocode}
+\title{phaco_geocode : geocodeur pour la Belgique}
 \usage{
 phaco_geocode(
   data_to_geocode,
@@ -22,24 +22,24 @@ phaco_geocode(
 
 \item{colonne_rue}{nom de la colonne avec les rues}
 
-\item{colonne_num_rue}{nom de la colonne avec les numeros}
+\item{colonne_num_rue}{nom de la colonne avec les numéros}
 
 \item{colonne_code_postal}{nom de la colonne avec les codes postaux}
 
-\item{method_stringdist}{methode pour la jointure inexacte}
+\item{method_stringdist}{Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles: "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw","soundex".}
 
-\item{corrections_REGEX}{correction orthographique}
+\item{corrections_REGEX}{Correction orthographique. Par défaut: TRUE}
 
-\item{error_max}{nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnee de reference (BeST)}
+\item{error_max}{Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: TRUE}
 
-\item{approx_num_max}{nombre de numeros d'ecart maximum si le numero n'a pas ete trouve}
+\item{approx_num_max}{Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50}
 
-\item{elargissement_com_adj}{elargissement aux communes limitrophes}
+\item{elargissement_com_adj}{Élargissement aux communes limitrophes. Par défaut: TRUE}
 
-\item{lang_encoded}{langue utilisee pour encoder les noms de rue}
+\item{lang_encoded}{Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE")}
 }
 \description{
-phaco_geocode
+phaco_geocode est la fonction principale du package phacochr.  A partir d’une liste d’adresses, elle permet de retrouver les coordonnees X-Y.
 }
 \examples{
 x <- data.frame(nom = c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
