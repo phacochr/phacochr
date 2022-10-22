@@ -2,13 +2,16 @@
 % Please edit documentation in R/phaco_geocode.R
 \name{phaco_geocode}
 \alias{phaco_geocode}
-\title{phaco_geocode : geocodeur pour la Belgique}
+\title{phaco_geocode : Geocodeur pour la Belgique}
 \usage{
 phaco_geocode(
   data_to_geocode,
   colonne_rue,
-  colonne_num_rue = NULL,
+  colonne_num = NULL,
   colonne_code_postal = NULL,
+  colonne_num_rue = NULL,
+  colonne_num_rue_code_postal = NULL,
+  colonne_rue_code_postal = NULL,
   method_stringdist = "lcs",
   corrections_REGEX = TRUE,
   error_max = 4,
@@ -18,17 +21,23 @@ phaco_geocode(
 )
 }
 \arguments{
-\item{data_to_geocode}{un dataframe avec les adresses a geocoder}
+\item{data_to_geocode}{Un dataframe avec les adresses a geocoder}
 
-\item{colonne_rue}{nom de la colonne avec les rues}
+\item{colonne_rue}{Nom de la colonne avec les rues}
 
-\item{colonne_num_rue}{nom de la colonne avec les numéros}
+\item{colonne_num}{Nom de la colonne avec les numéros}
 
-\item{colonne_code_postal}{nom de la colonne avec les codes postaux}
+\item{colonne_code_postal}{Nom de la colonne avec les codes postaux}
+
+\item{colonne_num_rue}{Nom de la colonne avec numéros et rues ensembles}
+
+\item{colonne_num_rue_code_postal}{Nom de la colonne avec numéros, rues et code postaux ensembles}
+
+\item{colonne_rue_code_postal}{Nom de la colonne avec rues et code postaux ensembles}
 
 \item{method_stringdist}{Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles: "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw","soundex".}
 
-\item{corrections_REGEX}{Correction orthographique. Par défaut: TRUE}
+\item{corrections_REGEX}{Correction orthographique. Par défaut: TRUE. Cette option n'est désactivable que si la rue est contenue dans une colonne séparée, et ne contient ni le numéro ni le code postal.}
 
 \item{error_max}{Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: TRUE}
 
@@ -39,7 +48,7 @@ phaco_geocode(
 \item{lang_encoded}{Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE")}
 }
 \description{
-phaco_geocode est la fonction principale du package phacochr.  A partir d’une liste d’adresses, elle permet de retrouver les coordonnees X-Y.
+Cette fonction est la principale du package phacochr. A partir d’une liste d’adresses, elle permet de retrouver leurs coordonnees X-Y.
 }
 \examples{
 x <- data.frame(nom = c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
@@ -49,7 +58,7 @@ code_postal = c("1040","1000"))
 
 result <- phaco_geocode(data_to_geocode = x,
 colonne_rue = "rue",
-colonne_num_rue = "num",
+colonne_num = "num",
 colonne_code_postal = "code_postal")
 
 }

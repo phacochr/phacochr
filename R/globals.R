@@ -21,6 +21,7 @@ globalVariables(unique(c(
   "rue_recoded_virgule", "rue_to_geocode", "street_FINAL_detected",
   "street_FINAL_detected_full", "street_id_phaco", "type_geocoding",
   "x_31370", "y_31370", "export_table", "dist_fuzzy",
+  "mid_arrond", "mid_cd_sector", "mid_num", "mid_postcode", "mid_x_31370", "mid_y_31370",
   # phaco_update:
   "arrond2", "cd_country", "cd_dstr_refnis", "cd_munty_refnis", "cd_nuts_lvl1",
   "cd_nuts_lvl2", "cd_nuts_lvl3", "code_postal", "Count", "dt_situation", "geom",

@@ -15,9 +15,10 @@ license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.co
 
 PhacochR est un géocodeur pour la Belgique sous forme de package R. A
 partir d’une liste d’adresses, il permet de retrouver les coordonnées
-X-Y nécessaires à toute analyse spatiale.
+X-Y nécessaires à toute analyse spatiale, à un niveau de précision du
+bâtiment.
 
-Le programme fonctionne à partir des données publiques [BeST
+Le programme fonctionne avec les données publiques [BeST
 Address](https://opendata.bosa.be/) compilées par BOSA à partir des
 données régionales URBIS (Région de Bruxelles-Capitale), CRAB (Région
 flamande) et ICAR (Région wallonne). La logique de phacochR est de
@@ -29,9 +30,11 @@ et
 PhacochR dispose également de plusieurs options : il réalise des
 corrections orthographiques préalables (en français et néérlandais) et
 trouve le numéro le plus proche - de préférence du même côté de la rue -
-si les coordonnées du numéro indiqué sont inconnues. PhacochR est
-compatible avec les 3 langues nationales : il géocode des adresses
-écrites en français, néérlandais et allemand.
+si les coordonnées du numéro indiqué sont inconnues. En cas de non
+disponibilité du numéro de la rue, le programme indique les coordonnées
+du milieu de la rue. PhacochR est compatible avec les 3 langues
+nationales : il géocode des adresses écrites en français, néérlandais ou
+allemand.
 
 Le package est très rapide (+/- 1min40 pour géocoder 20.000 adresses
 dans les 3 langues et situées dans toute la Belgique) et le taux de
@@ -83,24 +86,24 @@ x
 ```
 
 Le géocodage se lance simplement avec la fonction `phaco_geocode()` sur
-ce data.frame. Le numéro de la rue et le code postal sont des
-informations nécessaires mais elles peuvent être intégrées au champ
-adresse - il ne faut alors indiquer que la rue. La performance du
-géocodage sera cependant légèrement meilleure si tous les champs sont
-séparés.
+ce data.frame. La performance du géocodage est légèrement meilleure si
+toutes les informations (numéro, rue et code postal) sont indiquées dans
+des colonnes distinctes, mais le programme accepte des adresses ou
+toutes les informations sont dans un seul champ (voir le manuel :
+<https://phacochr.github.io/phacochr/>).
 
 ``` r
 result <- phaco_geocode(data_to_geocode = x,
                         colonne_rue= "rue",
-                        colonne_num_rue= "num",
+                        colonne_num= "num",
                         colonne_code_postal="code_postal")
 ```
 
 ``` r
 result$data_geocoded [,c(1,17:19)]
-#>   ID_address x_31370 y_31370 cd_sector
-#> 1          1  150373  170090 21004B13-
-#> 2          2  151105  166831 21004C61-
+#>   ID_address mid_postcode mid_cd_sector mid_arrond
+#> 1          1         1040     21004B2WJ         21
+#> 2          2         1000     21004C61-         21
 ```
 
 Le package dispose également de fonctions de cartographie des adresses
@@ -116,14 +119,6 @@ phaco_map_s(result$data_geocoded_sf)
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
-
-La fonction `phaco_map_i()` produit quant à elle des cartes interactives
-:
-
-``` r
-phaco_map_i(result$data_geocoded_sf)
-#> tmap mode set to interactive viewing
-```
 
 ## Auteurs
 

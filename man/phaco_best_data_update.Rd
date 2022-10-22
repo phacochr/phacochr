@@ -7,10 +7,10 @@
 phaco_best_data_update(force = FALSE)
 }
 \arguments{
-\item{force}{force le update meme si les donnees sont a jour}
+\item{force}{Force la mise a jour meme si les donnees sont a jour}
 }
 \description{
-phaco_best_data_update
+Cette fonction met a jour les donnees BeST Address vers la derniere version disponible sur le site de BOSA : https://opendata.bosa.be.
 }
 \examples{
 phaco_best_data_update()

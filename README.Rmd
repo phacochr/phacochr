@@ -24,10 +24,10 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-PhacochR est un géocodeur pour la Belgique sous forme de package R. A partir d'une liste d'adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale.
+PhacochR est un géocodeur pour la Belgique sous forme de package R. A partir d'une liste d'adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.
 
-Le programme fonctionne à partir des données publiques [BeST Address](https://opendata.bosa.be/) compilées par BOSA à partir des données régionales URBIS (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de phacochR est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address (grâce aux packages R [fuzzyjoin](https://cran.r-project.org/web/packages/fuzzyjoin/index.html) et [stringdist](https://cran.r-project.org/web/packages/stringdist/index.html)).
-PhacochR dispose également de plusieurs options : il réalise des corrections orthographiques préalables (en français et néérlandais) et trouve le numéro le plus proche - de préférence du même côté de la rue - si les coordonnées du numéro indiqué sont inconnues. PhacochR est compatible avec les 3 langues nationales : il géocode des adresses écrites en français, néérlandais et allemand.
+Le programme fonctionne avec les données publiques [BeST Address](https://opendata.bosa.be/) compilées par BOSA à partir des données régionales URBIS (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de phacochR est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address (grâce aux packages R [fuzzyjoin](https://cran.r-project.org/web/packages/fuzzyjoin/index.html) et [stringdist](https://cran.r-project.org/web/packages/stringdist/index.html)).
+PhacochR dispose également de plusieurs options : il réalise des corrections orthographiques préalables (en français et néérlandais) et trouve le numéro le plus proche - de préférence du même côté de la rue - si les coordonnées du numéro indiqué sont inconnues. En cas de non disponibilité du numéro de la rue, le programme indique les coordonnées du milieu de la rue. PhacochR est compatible avec les 3 langues nationales : il géocode des adresses écrites en français, néérlandais ou allemand.
 
 Le package est très rapide (+/- 1min40 pour géocoder 20.000 adresses dans les 3 langues et situées dans toute la Belgique) et le taux de succès pour le géocodage est élevé (en moyenne 90-95%). Phacochr constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.
 
@@ -69,12 +69,12 @@ x <- data.frame(nom= c("Observatoire de la Santé et du Social", "ULB"),
 x
 ```
 
-Le géocodage se lance simplement avec la fonction `phaco_geocode()` sur ce data.frame. Le numéro de la rue et le code postal sont des informations nécessaires mais elles peuvent être intégrées au champ adresse - il ne faut alors indiquer que la rue. La performance du géocodage sera cependant légèrement meilleure si tous les champs sont séparés.
+Le géocodage se lance simplement avec la fonction `phaco_geocode()` sur ce data.frame. La performance du géocodage est légèrement meilleure si toutes les informations (numéro, rue et code postal) sont indiquées dans des colonnes distinctes, mais le programme accepte des adresses ou toutes les informations sont dans un seul champ (voir le manuel : https://phacochr.github.io/phacochr/).
 
 ```{r , warning = FALSE, message = FALSE,  results='hide'}
 result <- phaco_geocode(data_to_geocode = x,
                         colonne_rue= "rue",
-                        colonne_num_rue= "num",
+                        colonne_num= "num",
                         colonne_code_postal="code_postal")
 ```
 ```{r , warning = FALSE, message = FALSE}
@@ -85,12 +85,6 @@ Le package dispose également de fonctions de cartographie des adresses géocod�
 
 ```{r dpi = 300, warning = FALSE, message = FALSE, results='hide'}
 phaco_map_s(result$data_geocoded_sf)
-```
-
-La fonction `phaco_map_i()` produit quant à elle des cartes interactives :
-
-```{r}
-phaco_map_i(result$data_geocoded_sf)
 ```
 
 ## Auteurs

@@ -1,6 +1,8 @@
 #' phaco_best_data_update
 #'
-#' @param force force le update meme si les donnees sont a jour
+#' Cette fonction met a jour les donnees BeST Address vers la derniere version disponible sur le site de BOSA : https://opendata.bosa.be.
+#'
+#' @param force Force la mise a jour meme si les donnees sont a jour
 #'
 #' @import rappdirs
 #' @import readr
@@ -53,9 +55,7 @@ phaco_best_data_update <- function(force=FALSE) {
   log <- readr::read_delim(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",", progress= F, show_col_types = FALSE)
   log$update <- as.POSIXct(log$update)
 
-  if (max(as.Date(log$update)) + days(7) < Sys.Date()| force==TRUE) {
-
-    cat(paste0("\n", "\u29D7"," T", "\u00e9", "l", "\u00e9", "chargement des donn", "\u00e9", "es BeST...","\n"))
+  if (max(as.Date(log$update)) + days(7) < Sys.Date() | force==TRUE) {
 
     options(timeout=300)
 
@@ -75,7 +75,7 @@ phaco_best_data_update <- function(force=FALSE) {
       stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre download","\u00e9","s : relancez phaco_update() ou v","\u00e9","rifiez votre connexion"))
     }
 
-    cat(paste0("\n", colourise("\u2714", fg="green")," T", "\u00e9", "l", "\u00e9", "chargement des donn", "\u00e9", "es BeST"))
+    cat(paste0(colourise("\u2714", fg="green")," T", "\u00e9", "l", "\u00e9", "chargement des donn", "\u00e9", "es BeST"))
 
     cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es"))
 

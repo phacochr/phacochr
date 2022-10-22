@@ -7,7 +7,7 @@
 phaco_setup_data()
 }
 \description{
-phaco_setup_data
+Cette fonction permet d'installer sur l'ordinateur les fichiers necessaires pour le geocodage des adresses.
 }
 \examples{
 phaco_setup_data()
