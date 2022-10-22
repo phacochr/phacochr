@@ -62,7 +62,7 @@ phaco_geocode <- function(data_to_geocode,
   # Definition du chemin ou se trouve les donnees
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
 
-  # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
+  # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
   if(sum(
     file.exists(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"),
                 paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_11.csv"),
