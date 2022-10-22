@@ -678,28 +678,21 @@ phaco_geocode <- function(data_to_geocode,
   ## 2)  Jointure des adresses --------------------------------------------------------------------------------------------------------------
 
   #### i. Preparation des fichiers adresses (BeST) ------------------------------------------------------------------------------------------
-  cat(paste0("\n","\u29D7"," Chargement du fichier openaddress"))
-    # Ici on cree une liste des adresses en n'important que les arrodissements detectes dans data_to_geocode
-    openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
-                             unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
-                             ".csv") %>%
-      map_dfr(read_delim,delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
-      left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>% # On joint les noms de rue (non contenues dans le fichier openadress par economie de place) via postal_street et la cle de jointure unique "street_id_phaco" (voir preprocessing)
-      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
-             address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
-    #select(-street_FINAL_detected, -postal_id, -street_id_phaco)
 
-  # Ici on cree une liste des adresses en n'important que les arrodissements detectes dans data_to_geocode
+  cat(paste0("\n","\u29D7"," Chargement du fichier openaddress"))
+
+  # Ici on cree une liste des adresses en n'important que les arrondissements detectes dans data_to_geocode
   openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
                            unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
                            ".csv") %>%
-    readr::read_delim( delim = ";",progress= F,  col_types = cols(.default = col_character())) %>%
+    map_dfr(read_delim, delim = ";", progress= F, col_types = cols(.default = col_character())) %>%
     left_join(select(postal_street, street_FINAL_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>% # On joint les noms de rue (non contenues dans le fichier openadress par economie de place) via postal_street et la cle de jointure unique "street_id_phaco" (voir preprocessing)
     mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
            address_join_geocoding = paste(house_number_sans_lettre, street_FINAL_detected, postal_id)) #%>%
   #select(-street_FINAL_detected, -postal_id, -street_id_phaco)
 
   cat(paste0("\r",colourise("\u2714", fg="green")," Chargement du fichier openaddress "))
+
 
   #### ii. Jointure avec les adresses  ------------------------------------------------------------------------------------------------------
 
@@ -712,6 +705,7 @@ phaco_geocode <- function(data_to_geocode,
     mutate(approx_num = 0)
 
   cat(paste0("\r",colourise("\u2714", fg="green")," Jointure avec les coordonn","\u00e9","es X-Y"))
+
 
   ### iii. Approximation numero -------------------------------------------------------------------------------------------------------------
 
