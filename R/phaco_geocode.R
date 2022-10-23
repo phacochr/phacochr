@@ -45,7 +45,7 @@
 #' colonne_code_postal = "code_postal")
 #'
 phaco_geocode <- function(data_to_geocode,
-                          colonne_rue,
+                          colonne_rue = NULL,
                           colonne_num = NULL,
                           colonne_code_postal = NULL,
                           colonne_num_rue = NULL,
