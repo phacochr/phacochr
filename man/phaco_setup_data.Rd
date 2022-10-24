@@ -2,12 +2,12 @@
 % Please edit documentation in R/phaco_setup_data.R
 \name{phaco_setup_data}
 \alias{phaco_setup_data}
-\title{phaco_setup_data}
+\title{phaco_setup_data : Téléchargement et installation des données pour géocoder}
 \usage{
 phaco_setup_data()
 }
 \description{
-Cette fonction permet d'installer sur l'ordinateur les fichiers necessaires pour le geocodage des adresses.
+Cette fonction permet d'installer sur l'ordinateur les fichiers nécessaires pour le geocodage des adresses.
 }
 \examples{
 phaco_setup_data()

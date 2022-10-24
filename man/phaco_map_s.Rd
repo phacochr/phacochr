@@ -2,7 +2,7 @@
 % Please edit documentation in R/phaco_map_s.R
 \name{phaco_map_s}
 \alias{phaco_map_s}
-\title{phaco_map_s}
+\title{phaco_map_s : Carte statique des résultats}
 \usage{
 phaco_map_s(
   FULL_GEOCODING_sf,
@@ -27,5 +27,5 @@ phaco_map_s(
 \item{nom_admin}{Afficher les noms des entites administratives}
 }
 \description{
-Cette fonction produit facilement une carte a partir de l'objet issu du geocodage.
+Cette fonction produit facilement une carte statique a partir de l'objet issu du geocodage.
 }

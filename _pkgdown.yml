@@ -2,3 +2,18 @@ url: https://phacochr.github.io/phacochr/
 template:
   bootstrap: 5
 
+reference:
+- title: "Fonction principale"
+  desc: ""
+  contents:
+  - phaco_geocode
+- title: "Installation et mise à jour"
+  desc: ""
+  contents:
+  - phaco_setup_data
+  - phaco_best_data_update
+- title: "Cartographie des résultats"
+  desc: ""
+  contents:
+  - phaco_map_s
+

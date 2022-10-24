@@ -2,15 +2,15 @@
 % Please edit documentation in R/phaco_best_data_update.R
 \name{phaco_best_data_update}
 \alias{phaco_best_data_update}
-\title{phaco_best_data_update}
+\title{phaco_best_data_update : Mise à jour des données BeST et des fichier connexes}
 \usage{
 phaco_best_data_update(force = FALSE)
 }
 \arguments{
-\item{force}{Force la mise a jour meme si les donnees sont a jour}
+\item{force}{Force la mise à jour même si les données sont à jour. Par défaut: FALSE}
 }
 \description{
-Cette fonction met a jour les donnees BeST Address vers la derniere version disponible sur le site de BOSA : https://opendata.bosa.be.
+Cette fonction met à jour les données BeST Address vers la dernière version disponible sur le site de BOSA : https://opendata.bosa.be ainsi que les fichiers connexes nécessaire au géocodage.
 }
 \examples{
 phaco_best_data_update()

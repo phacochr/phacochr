@@ -1,6 +1,6 @@
-#' phaco_map_s
+#' phaco_map_s : Carte statique des résultats
 #'
-#' Cette fonction produit facilement une carte a partir de l'objet issu du geocodage.
+#' Cette fonction produit facilement une carte statique a partir de l'objet issu du geocodage.
 #'
 #' @param FULL_GEOCODING_sf Un objet sf a cartographier
 #' @param title_carto Le titre de la carte produite

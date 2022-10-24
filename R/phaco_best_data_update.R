@@ -1,8 +1,8 @@
-#' phaco_best_data_update
+#' phaco_best_data_update : Mise à jour des données BeST et des fichier connexes
 #'
-#' Cette fonction met a jour les donnees BeST Address vers la derniere version disponible sur le site de BOSA : https://opendata.bosa.be.
+#' Cette fonction met à jour les données BeST Address vers la dernière version disponible sur le site de BOSA : https://opendata.bosa.be ainsi que les fichiers connexes nécessaire au géocodage.
 #'
-#' @param force Force la mise a jour meme si les donnees sont a jour
+#' @param force Force la mise à jour même si les données sont à jour. Par défaut: FALSE
 #'
 #' @import rappdirs
 #' @import readr

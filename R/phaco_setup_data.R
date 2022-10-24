@@ -1,6 +1,6 @@
-#' phaco_setup_data
+#' phaco_setup_data : Téléchargement et installation des données pour géocoder
 #'
-#' Cette fonction permet d'installer sur l'ordinateur les fichiers necessaires pour le geocodage des adresses.
+#' Cette fonction permet d'installer sur l'ordinateur les fichiers nécessaires pour le geocodage des adresses.
 #'
 #' @import rappdirs
 #' @import utils
