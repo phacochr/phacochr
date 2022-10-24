@@ -1,8 +1,8 @@
-pandoc: 2.17.1.1
+pandoc: '2.18'
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-10-22T21:08Z
+last_built: 2022-10-24T10:10Z
 urls:
   reference: https://phacochr.github.io/phacochr/reference
   article: https://phacochr.github.io/phacochr/articles
