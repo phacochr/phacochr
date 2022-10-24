@@ -2,5 +2,4 @@
 .Rhistory
 .RData
 .Ruserdata
-R/deploy_shiny.R
 inst/doc

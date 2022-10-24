@@ -17,7 +17,8 @@ phaco_geocode(
   error_max = 4,
   approx_num_max = 50,
   elargissement_com_adj = TRUE,
-  lang_encoded = c("FR", "NL", "DE")
+  lang_encoded = c("FR", "NL", "DE"),
+  data_path = NULL
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ phaco_geocode(
 \item{elargissement_com_adj}{Élargissement aux communes limitrophes. Par défaut: TRUE}
 
 \item{lang_encoded}{Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE")}
+
+\item{data_path}{Chemin absolu vers le dossier où se trouve le données. Par défaut phacochr trouve le dossier correspondant.}
 }
 \description{
 Cette fonction est la principale du package phacochr. A partir d’une liste d’adresses, elle permet de retrouver leurs coordonnees X-Y.

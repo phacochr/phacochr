@@ -15,6 +15,7 @@
 #' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50
 #' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE
 #' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE")
+#' @param data_path Chemin absolu vers le dossier où se trouve le données. Par défaut phacochr trouve le dossier correspondant.
 #'
 #' @import dplyr
 #' @import tidyr
@@ -56,12 +57,15 @@ phaco_geocode <- function(data_to_geocode,
                           error_max = 4,
                           approx_num_max = 50,
                           elargissement_com_adj = TRUE,
-                          lang_encoded = c("FR", "NL", "DE")){
+                          lang_encoded = c("FR", "NL", "DE"),
+                          data_path=NULL){
 
   start_time <- Sys.time()
 
   # Definition du chemin ou se trouve les donnees
+  if(data_path==NULL){
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+  }
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
   if(sum(
