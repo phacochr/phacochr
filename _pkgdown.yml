@@ -18,12 +18,13 @@ reference:
   - phaco_map_s
 
 navbar:
-  type: inverse
   left:
   - icon: fa-home
     href: index.html
   - text: Reference
     href: reference/index.html
+  - text: Géocoder
+    href: articles/shiny_app.html
 
   right:
     - icon: fa-github fa-lg
