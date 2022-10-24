@@ -17,3 +17,15 @@ reference:
   contents:
   - phaco_map_s
 
+navbar:
+  type: inverse
+  left:
+  - icon: fa-home
+    href: index.html
+  - text: Reference
+    href: reference/index.html
+
+  right:
+    - icon: fa-github fa-lg
+      text: "github"
+      href: https://github.com/phacochr/
