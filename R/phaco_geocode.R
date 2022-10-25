@@ -617,7 +617,7 @@ phaco_geocode <- function(data_to_geocode,
                           .packages=c("tidyverse","fuzzyjoin"))  %dopar% {
 
                             # On calcule un vecteur reprenant les communes adjacentes par commune i
-                            com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == "21004-21005-21009"]
+                            com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == i]
 
                             ADDRESS_last_tentative_i <- ADDRESS_last_tentative %>%
                               filter(`Refnis code` %in% i) %>%
