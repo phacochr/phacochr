@@ -806,10 +806,15 @@ phaco_geocode <- function(data_to_geocode,
   # On renomme les variables pour etre compatible avec le reste du script
   if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
     FULL_GEOCODING <- res %>%
-      mutate(approx_num = NA) %>%
+      mutate(approx_num = NA,
+             type_geocoding2 = "mid_street") %>%
       rename(cd_sector = mid_cd_sector,
              x_31370 = mid_x_31370,
              y_31370 = mid_y_31370)
+
+    FULL_GEOCODING <- FULL_GEOCODING %>%
+      unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite doit fonctionner en dehors de mutate
+
   }
 
   # On indique le num du milieu de la rue si les coordonnee du batiment ne sont pas trouvee
@@ -821,7 +826,7 @@ phaco_geocode <- function(data_to_geocode,
              )
 
     FULL_GEOCODING <- FULL_GEOCODING %>%
-      unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite fonctionne en dehors des
+      unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite doit fonctionne en dehors de mutate
 
   }
 
@@ -962,7 +967,7 @@ phaco_geocode <- function(data_to_geocode,
   cat(paste0("\n",colourise("/!\\", fg="red"), " Toutes les adresses n'ont pas ","\u00e9","t","\u00e9"," trouv","\u00e9","es avec certitude ", colourise("/!\\", fg="red"),"
 - check \'dist_fuzzy\' pour les erreurs de reconnaissance des rues
 - check \'approx_num\' pour les approximations de num","\u00e9","ro
-- check \'type_geocoding\' pour l'","\u00e9","argissement aux communes adjacentes
+- check \'type_geocoding\' pour l'","\u00e9","argissement aux communes adjacentes et le g","\u00e9","ocodage au milieu de la rue
 - check \'nom_propre_abv\' pour les abr","\u00e9","viations de noms propres
              "))
 
