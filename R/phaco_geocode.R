@@ -807,7 +807,7 @@ phaco_geocode <- function(data_to_geocode,
   if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
     FULL_GEOCODING <- res %>%
       mutate(approx_num = NA,
-             type_geocoding2 = "mid_street") %>%
+             type_geocoding2 = ifelse(!is.na(mid_x_31370), "mid_street", NA)) %>%
       rename(cd_sector = mid_cd_sector,
              x_31370 = mid_x_31370,
              y_31370 = mid_y_31370)
