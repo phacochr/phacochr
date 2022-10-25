@@ -26,6 +26,9 @@ phaco_setup_data <- function(){
   }
 
   # Telecharger les donnees
+
+  options(timeout=300)
+
   cat(paste0("\n","\u29D7"," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es ...","\n"))
   download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_best.zip",
                 paste0(path_data,"/phacochr_data_best.zip"))
@@ -38,6 +41,7 @@ phaco_setup_data <- function(){
                 paste0(path_data,"/phacochr_data_statbel_urbis.zip")
                 )
     ) != 2) {
+    options(timeout=60)
     stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre download","\u00e9","s : relancez phaco_setup_data() ou v","\u00e9","rifiez votre connexion"))
   }
 
@@ -55,5 +59,7 @@ phaco_setup_data <- function(){
   cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","compression des donn","\u00e9","es"))
 
   cat(paste0("\n",colourise("\u2714", fg="green")," Importation des donn","\u00e9","es OK: PhacochR pr","\u00ea","t ","\u00e0", " g","\u00e9","ocoder."))
+
+  options(timeout=60)
 
 }
