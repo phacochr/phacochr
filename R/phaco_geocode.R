@@ -66,7 +66,7 @@ phaco_geocode <- function(data_to_geocode,
   # Definition du chemin ou se trouve les donnees
   if(is.null(path_data)){
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
-  }else(path_data<-path_data)
+  }
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
   if(sum(
