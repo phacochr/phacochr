@@ -135,7 +135,7 @@ phaco_geocode <- function(data_to_geocode,
   #cat(paste0("\n","\u29D7"," Pr","\u00e9","paration et v","\u00e9","rification des donn","\u00e9","es..."))
 
 
-  ## 1. Formatage des donnees =================================================================================================================
+  ## 1. Formatage des donnees -----------------------------------------------------------------------------------------------------------------
 
   # Pour definir la situation de num-rue-code postal
   if(!is.null(colonne_num) & !is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
@@ -204,7 +204,7 @@ phaco_geocode <- function(data_to_geocode,
   }
 
 
-  ## 2. Code postal ===========================================================================================================================
+  ## 2. Code postal ---------------------------------------------------------------------------------------------------------------------------
 
   # Extraction du code postal si interne au champ d'adresse
   if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
@@ -215,7 +215,7 @@ phaco_geocode <- function(data_to_geocode,
   }
 
 
-  ## 3. Detection des regions/arrondissements en Belgique =====================================================================================
+  ## 3. Detection des regions/arrondissements en Belgique -------------------------------------------------------------------------------------
 
   table_postal_arrond <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
 
@@ -233,7 +233,7 @@ phaco_geocode <- function(data_to_geocode,
                       collapse = ', ')))
 
 
-  ## 4. Numero de rue =======================================================================================================================
+  ## 4. Numero de rue -------------------------------------------------------------------------------------------------------------------------
   # Pour creer un numero de rue clean + aller chercher le numero de la rue dans le champ texte de l'adresse (s'il est present)
 
   # Dans le cas ou il y a une colonne separee avec le num de rue
@@ -473,7 +473,7 @@ phaco_geocode <- function(data_to_geocode,
   # II. GEOCODAGE ===========================================================================================================================
   # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-  ## 0. Parametres/fonctions ================================================================================================================
+  ## 0. Parametres/fonctions ----------------------------------------------------------------------------------------------------------------
 
   # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/
   `%ni%` <- Negate(`%in%`)
@@ -799,14 +799,7 @@ phaco_geocode <- function(data_to_geocode,
   }
 
 
-  # III. FICHIER FINAL  =====================================================================================================================
-
-  cat(paste0("\n","-- R","\u00e9","sultats"))
-
-  cat(paste0("\n","\u29D7"," Cr","\u00e9","ation du fichier final et formatage des tables de v","\u00e9","rification"))
-
-
-  ## 1) Jointure ----------------------------------------------------------------------------------------------------------------------------
+  ## 3) Geocodage sans numero ---------------------------------------------------------------------------------------------------------------
 
   # On cree FULLGEOCODING si on est dans le cas d'absence de num (on geocode a la rue) => FULLGEOCODING n'a alors pas encore ete cree
   # On renomme les variables pour etre compatible avec le reste du script
@@ -817,6 +810,30 @@ phaco_geocode <- function(data_to_geocode,
              x_31370 = mid_x_31370,
              y_31370 = mid_y_31370)
   }
+
+  # On indique le num du milieu de la rue si les coordonnee du batiment ne sont pas trouvee
+  if (situation == "num_rue_postal_s"|situation == "num_rue_i_postal_s"|situation == "num_rue_postal_i"){
+    FULL_GEOCODING <- FULL_GEOCODING %>%
+      mutate(type_geocoding2 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), "mid_street", NA),
+             x_31370 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), mid_x_31370, x_31370),
+             y_31370 = ifelse(is.na(y_31370) & !is.na(mid_y_31370), mid_y_31370, y_31370)
+             )
+
+    FULL_GEOCODING <- FULL_GEOCODING %>%
+      unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite fonctionne en dehors des
+
+  }
+
+
+  # III. FICHIER FINAL  =====================================================================================================================
+  # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+  cat(paste0("\n","-- R","\u00e9","sultats"))
+
+  cat(paste0("\n","\u29D7"," Cr","\u00e9","ation du fichier final et formatage des tables de v","\u00e9","rification"))
+
+
+  ## 1) Jointure ----------------------------------------------------------------------------------------------------------------------------
 
   # Il manque potentiellement des lignes par rapport a la BD originale, car pas de code postal, ou qui ne matchent pas avec les donnees BeST => on les recupere par un antijoin(), et les ajoute
   MISSING <- data_to_geocode %>%
@@ -872,9 +889,10 @@ phaco_geocode <- function(data_to_geocode,
               "stringdist (moy)" = mean(dist_fuzzy, na.rm = T),
               "Geocode(%)" = round((sum(!is.na(x_31370))/n())*100, 1),
               #"Approx (% geocodes)" = (sum(approx_num > 0, na.rm = T)/(sum(!is.na(x_31370))))*100,
-              "Approx. num(n)" = sum(approx_num > 0, na.rm = T),
-              "Elarg. com.(n)" = (sum(type_geocoding == "elargissement_adj", na.rm = T)),
-              "Abrev. noms(n)" = (sum(nom_propre_abv == 1, na.rm = T)),
+              "Approx.(n)" = sum(approx_num > 0, na.rm = T),
+              "Elarg.(n)" = (sum(str_detect(type_geocoding, "elargissement_adj"), na.rm = T)),
+              "Mid.(n)" = (sum(str_detect(type_geocoding, "mid_street"), na.rm = T)),
+              "Abrev.(n)" = (sum(nom_propre_abv == 1, na.rm = T)),
               "Rue FR" = (sum(langue_FINAL_detected == "FR", na.rm = T))/sum(!is.na(langue_FINAL_detected))*100,
               "Rue NL" = (sum(langue_FINAL_detected == "NL", na.rm = T))/sum(!is.na(langue_FINAL_detected))*100,
               "Rue DE" = (sum(langue_FINAL_detected == "DE", na.rm = T))/sum(!is.na(langue_FINAL_detected))*100,
@@ -887,9 +905,10 @@ phaco_geocode <- function(data_to_geocode,
                              "stringdist (moy)" = NA,
                              "Geocode(%)" = NA,
                              #"Approx (% geocodes)" = NA,
-                             "Approx. num(n)"=NA,
-                             "Elarg. com.(n)" = NA,
-                             "Abrev. noms(n)" = NA,
+                             "Approx.(n)"=NA,
+                             "Elarg.(n)" = NA,
+                             "Mid.(n)" = NA,
+                             "Abrev.(n)" = NA,
                              "Rue FR" = NA,
                              "Rue NL" = NA,
                              "Rue DE" = NA,
@@ -921,7 +940,7 @@ phaco_geocode <- function(data_to_geocode,
   result$data_geocoded <- FULL_GEOCODING
   result$data_geocoded_sf <- FULL_GEOCODING_sf
   # remplacer par 0 les NA (pas tres propre)
-  result$summary$`Approx. num(n)`[is.na(result$summary$`Approx. num(n)`)]<-0
+  result$summary$`Approx.(n)`[is.na(result$summary$`Approx.(n)`)]<-0
 
   # On stoppe la parallelisation
   parallel::stopCluster(cl = my.cluster)
