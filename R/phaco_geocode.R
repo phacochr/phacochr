@@ -58,13 +58,13 @@ phaco_geocode <- function(data_to_geocode,
                           approx_num_max = 50,
                           elargissement_com_adj = TRUE,
                           lang_encoded = c("FR", "NL", "DE"),
-                          data_path = NULL){
+                          path_data = NULL){
 
 
   start_time <- Sys.time()
 
   # Definition du chemin ou se trouve les donnees
-  if(is.null(data_path)){
+  if(is.null(path_data)){
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
   }else(path_data<-path_data)
 
