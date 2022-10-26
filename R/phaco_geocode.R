@@ -15,7 +15,7 @@
 #' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50
 #' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE
 #' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE")
-#' @param data_path Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier correspondant.
+#' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier correspondant.
 #'
 #' @import dplyr
 #' @import tidyr
