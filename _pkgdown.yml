@@ -25,8 +25,16 @@ navbar:
     href: reference/index.html
   - text: Géocoder
     href: articles/shiny_app.html
-
   right:
     - icon: fa-github fa-lg
       text: "github"
       href: https://github.com/phacochr/
+
+footer:
+  structure:
+    left: developed_by
+    right:
+
+
+
+

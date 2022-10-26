@@ -64,10 +64,10 @@ phaco_setup_data()
 Il est possible pour l’utilisateur de mettre à jour lui-même les données
 [BeST Address](https://opendata.bosa.be/) (actualisées de manière
 hebdomadaire par BOSA) vers les dernières données disponibles en ligne
-avec la fonction `phaco_update()` :
+avec la fonction `phaco_best_data_update()` :
 
 ``` r
-phaco_update()
+phaco_best_data_update()
 ```
 
 ## Exemple
