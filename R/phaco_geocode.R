@@ -624,7 +624,7 @@ phaco_geocode <- function(data_to_geocode,
                               select(-`Refnis code`)
 
                             postal_street_adj_i <- postal_street_adj %>%
-                              filter(`Refnis code` %in% com_adj_i) %>%
+                              filter(`Refnis code` %in% c(i, com_adj_i)) %>% # On inclut i dans c(i, com_adj_i) car le code postal est plus petit que i
                               select(-`Refnis code`)
 
                             stringdist_left_join(ADDRESS_last_tentative_i,
