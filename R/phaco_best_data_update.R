@@ -19,8 +19,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' phaco_best_data_update()}
+#' phaco_best_data_update()
 
 phaco_best_data_update <- function(force=FALSE) {
   options(warn=-1) # supprime les warnings

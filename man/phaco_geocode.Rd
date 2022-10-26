@@ -54,7 +54,6 @@ phaco_geocode(
 Cette fonction est la principale du package phacochr. A partir d’une liste d’adresses, elle permet de retrouver leurs coordonnees X-Y.
 }
 \examples{
-\dontrun{
 x <- data.frame(nom = c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
 rue = c("rue Belliard","avenue Antoine Depage"),
 num = c("71", "30"),
@@ -64,5 +63,4 @@ result <- phaco_geocode(data_to_geocode = x,
 colonne_rue = "rue",
 colonne_num = "num",
 colonne_code_postal = "code_postal")
-}
 }

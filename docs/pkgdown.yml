@@ -3,7 +3,7 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   shiny_app: shiny_app.html
-last_built: 2022-10-26T08:41Z
+last_built: 2022-10-26T11:44Z
 urls:
   reference: https://phacochr.github.io/phacochr/reference
   article: https://phacochr.github.io/phacochr/articles

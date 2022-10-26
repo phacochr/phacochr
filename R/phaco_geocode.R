@@ -34,7 +34,7 @@
 #'
 #' @export
 #'
-#' @examples \dontrun{
+#' @examples
 #' x <- data.frame(nom = c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
 #' rue = c("rue Belliard","avenue Antoine Depage"),
 #' num = c("71", "30"),
@@ -44,7 +44,7 @@
 #' colonne_rue = "rue",
 #' colonne_num = "num",
 #' colonne_code_postal = "code_postal")
-#' }
+
 phaco_geocode <- function(data_to_geocode,
                           colonne_rue = NULL,
                           colonne_num = NULL,
