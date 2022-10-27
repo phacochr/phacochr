@@ -268,7 +268,9 @@ phaco_geocode <- function(data_to_geocode,
     cat(paste0("\n","\u29D7"," Correction orthographique des adresses"))
 
     data_to_geocode <- data_to_geocode %>%
-      mutate(rue_recoded = paste0(str_trim(rue_to_geocode, "left"),"   "),
+      mutate(rue_recoded = ifelse(!is.na(rue_to_geocode),
+                                  paste0(str_trim(rue_to_geocode, "left"),"   "),
+                                  NA),
 
              rue_recoded_virgule = str_detect(rue_recoded, regex("[,]", ignore_case = TRUE)),
              rue_recoded = str_replace_all(rue_recoded, regex("[,]", ignore_case = TRUE), " "),
@@ -484,7 +486,11 @@ phaco_geocode <- function(data_to_geocode,
   if (nzchar(chk) && chk == "TRUE") {
     n.cores <- 2L # limite le nombre de coeurs a 2 pour les tests sur CRAN https://stackoverflow.com/questions/50571325/r-cran-check-fail-when-using-parallel-functions
   } else {
-    n.cores <- parallel::detectCores() - 1
+    if(parallel::detectCores() > 3) {  # on parallelise a n-1 core ssi 3 cores ou plus, sinon 1 core
+      n.cores <- parallel::detectCores() - 1
+    } else {
+      n.cores <- 1
+    }
   }
 
   cat(paste0("\n","-- G","\u00e9","ocodage"))
@@ -507,7 +513,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # J'importe les rues
   postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
-    mutate(address_join_street = paste(str_to_lower(str_trim(street_FINAL_detected))))
+    mutate(address_join_street = str_to_lower(str_trim(street_FINAL_detected)))
 
   if (length(lang_encoded) != 3){
     postal_street <- postal_street %>%
@@ -516,7 +522,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # On filtre + creation d'une cle de jointure
   data_to_geocode <- data_to_geocode %>%
-    mutate(address_join = paste(str_to_lower(str_trim(rue_recoded))))
+    mutate(address_join = str_to_lower(str_trim(rue_recoded)))
 
 
   ### ii) Boucle de jointure par commune ----------------------------------------------------------------------------------------------------
@@ -575,7 +581,8 @@ phaco_geocode <- function(data_to_geocode,
 
   res <- res %>%
     relocate(street_FINAL_detected, .after = recode) %>%
-    mutate(type_geocoding = NA)
+    mutate(type_geocoding = NA,
+           type_geocoding = as.character(type_geocoding)) # pour compatibilite avec res_adj si res = NA
 
   # Verif
   #sum(duplicated(res$ID_address))
@@ -593,7 +600,7 @@ phaco_geocode <- function(data_to_geocode,
     # On ne retient que les adresses dont les rues n'ont pas ete detectees
     ADDRESS_last_tentative <- res %>%
       filter(is.na(dist_fuzzy)) %>%
-      mutate(address_join = paste(str_to_lower(str_trim(rue_recoded)))) %>%
+      mutate(address_join = str_to_lower(str_trim(rue_recoded))) %>%
       select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -dist_fuzzy,
              -mid_num, -mid_x_31370, -mid_y_31370, -mid_postcode, -mid_cd_sector, -mid_arrond)
 
@@ -708,7 +715,7 @@ phaco_geocode <- function(data_to_geocode,
     cat(paste0("\n","\u29D7"," Jointure avec les coordonn","\u00e9","es X-Y"))
 
     FULL_GEOCODING <- res %>%
-      mutate(address_join_geocoding = paste(num_rue_clean, street_FINAL_detected, code_postal_to_geocode)) %>%
+      mutate(address_join_geocoding = str_c(num_rue_clean, street_FINAL_detected, code_postal_to_geocode, sep = " ")) %>%
       left_join(select(openaddress_be, -street_FINAL_detected, -postal_id, -street_id_phaco), by = "address_join_geocoding") %>%
       #select(-house_number) %>%
       mutate(approx_num = 0)
