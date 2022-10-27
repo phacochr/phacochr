@@ -14,6 +14,7 @@
 #' @param error_max Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: TRUE
 #' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50
 #' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE
+#' @param mid_street Indique les coordonnées du milieu de la rue si les coordonnées du numéro ne sont pas trouvée. Par défaut: TRUE
 #' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE")
 #' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier correspondant.
 #'
@@ -57,6 +58,7 @@ phaco_geocode <- function(data_to_geocode,
                           error_max = 4,
                           approx_num_max = 50,
                           elargissement_com_adj = TRUE,
+                          mid_street = TRUE,
                           lang_encoded = c("FR", "NL", "DE"),
                           path_data = NULL){
 
@@ -825,7 +827,7 @@ phaco_geocode <- function(data_to_geocode,
   }
 
   # On indique le num du milieu de la rue si les coordonnee du batiment ne sont pas trouvee
-  if (situation == "num_rue_postal_s"|situation == "num_rue_i_postal_s"|situation == "num_rue_postal_i"){
+  if (mid_street == TRUE &(situation == "num_rue_postal_s"|situation == "num_rue_i_postal_s"|situation == "num_rue_postal_i")){
     FULL_GEOCODING <- FULL_GEOCODING %>%
       mutate(type_geocoding2 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), "mid_street", NA),
              x_31370 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), mid_x_31370, x_31370),
