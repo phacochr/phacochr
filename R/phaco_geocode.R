@@ -234,6 +234,14 @@ phaco_geocode <- function(data_to_geocode,
       mutate(rue_to_geocode = data_to_geocode[[colonne_rue_code_postal]])
   }
 
+  # Un stop() si la colonne contenant la rue ne possede que des NA
+  if(
+    sum(is.na(data_to_geocode$rue_to_geocode))/sum(nrow(data_to_geocode)) == 1
+  ){
+    cat("\n")
+    stop(paste0("\u2716"," La colonne contenant la rue ne contient que des valeurs manquantes"))
+  }
+
   # Code postal (si separe)
   if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "no_num_rue_postal_s") {
     data_to_geocode <- data_to_geocode %>%
