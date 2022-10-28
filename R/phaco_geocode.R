@@ -123,6 +123,7 @@ phaco_geocode <- function(data_to_geocode,
                 )
     ) != 48) {
 
+    cat("\n")
     stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
 
   }
@@ -140,28 +141,62 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 1. Formatage des donnees -----------------------------------------------------------------------------------------------------------------
 
+  # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/
+  `%ni%` <- Negate(`%in%`)
+
   # Pour definir la situation de num-rue-code postal
   if(!is.null(colonne_num) & !is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
     situation <- "num_rue_postal_s"
     cat(colourise(paste0("\n","\u2192"," Champs introduits : num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"), fg="brown"))
+    if(
+      sum(c(colonne_num, colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
+    ){
+      cat("\n")
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+    }
 
   } else if (!is.null(colonne_num_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
     situation <- "num_rue_i_postal_s"
     cat(colourise(paste0("\n","\u2192"," Champs introduits : num","\u00e9","ro et rue int","\u00e9","gr","\u00e9","s + code postal s","\u00e9","par","\u00e9","s"), fg="brown"))
+    if(
+      sum(c(colonne_num_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
+    ){
+      cat("\n")
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+    }
 
   } else if (!is.null(colonne_num_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_rue_code_postal)) {
     situation <- "num_rue_postal_i"
     cat(colourise(paste0("\n","\u2192"," Champs introduits : num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"), fg="brown"))
+    if(
+      sum(c(colonne_num_rue_code_postal) %ni% names(data_to_geocode)) > 0
+    ){
+      cat("\n")
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+    }
 
   } else if (!is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
     situation <- "no_num_rue_postal_s"
     cat(colourise(paste0("\n","\u2192"," Champs introduits : pas de num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"), fg="brown"))
+    if(
+      sum(c(colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
+    ){
+      cat("\n")
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+    }
 
   } else if (!is.null(colonne_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal)) {
     situation <- "no_num_rue_postal_i"
     cat(colourise(paste0("\n","\u2192"," Champs introduits : pas de num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"), fg="brown"))
+    if(
+      sum(c(colonne_rue_code_postal) %ni% names(data_to_geocode)) > 0
+    ){
+      cat("\n")
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+    }
 
   } else {
+    cat("\n")
     stop(paste0("\u2716"," les arguments pour les champs de num","\u00e9","ro, rue et/ou code postal ne sont pas correctent remplis"))
   }
 
@@ -228,6 +263,7 @@ phaco_geocode <- function(data_to_geocode,
   # @@@@@@@@@@ Tout le script se lance uniquement s'il y a des codes postaux en Belgique ! @@@@@@@@@@
   # Dans le cas contraire => message d'erreur
   if (length(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)])) == 0){
+    cat("\n")
     stop(paste0("\u2716"," il n'y a aucun code postal belge dans le fichier (ou erreur d'encodage)"))
   }
 
@@ -479,9 +515,6 @@ phaco_geocode <- function(data_to_geocode,
   # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
   ## 0. Parametres/fonctions ----------------------------------------------------------------------------------------------------------------
-
-  # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/
-  `%ni%` <- Negate(`%in%`)
 
   # Parametres pour la parallelisation
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
