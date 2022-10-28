@@ -306,7 +306,7 @@ phaco_geocode <- function(data_to_geocode,
       mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
       relocate(num_rue_clean, .before = code_postal_to_geocode)}
 
-  # Un stop() si la colonne contenant la rue ne possede que des NA
+  # On force mid_street = TRUE si la colonne contenant la rue ne possede que des NA
   if (mid_street == FALSE & (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i")) {
     if(
       sum(is.na(data_to_geocode$num_rue_clean))/sum(nrow(data_to_geocode)) == 1
