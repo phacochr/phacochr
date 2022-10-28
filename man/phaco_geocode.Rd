@@ -17,6 +17,7 @@ phaco_geocode(
   error_max = 4,
   approx_num_max = 50,
   elargissement_com_adj = TRUE,
+  mid_street = TRUE,
   lang_encoded = c("FR", "NL", "DE"),
   path_data = NULL
 )
@@ -45,6 +46,8 @@ phaco_geocode(
 \item{approx_num_max}{Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50}
 
 \item{elargissement_com_adj}{Élargissement aux communes limitrophes. Par défaut: TRUE}
+
+\item{mid_street}{Indique les coordonnées du milieu de la rue si les coordonnées du numéro ne sont pas trouvée. Par défaut: TRUE}
 
 \item{lang_encoded}{Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE")}
 
