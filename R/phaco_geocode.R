@@ -252,6 +252,12 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 2. Code postal ---------------------------------------------------------------------------------------------------------------------------
 
+  # Je m'assure que le code postal ne comprend pas de texte => je ne garde que les chiffres du code postal
+  if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "no_num_rue_postal_s") {
+    data_to_geocode <- data_to_geocode %>%
+      mutate(code_postal_to_geocode = str_extract(code_postal_to_geocode, regex("[0-9]+", ignore_case = TRUE)))
+  }
+
   # Extraction du code postal si interne au champ d'adresse
   if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
     data_to_geocode <- data_to_geocode %>%
