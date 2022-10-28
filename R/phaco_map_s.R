@@ -38,6 +38,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
                 paste0(path_data,"STATBEL/PREPROCESSED/BE_regions_PREPROCESSED.gpkg")
     )
   ) != 6) {
+    cat("\n")
     stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
   }
 

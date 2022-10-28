@@ -22,6 +22,7 @@ phaco_setup_data <- function(){
 
   # Test si le repertoire a ete cree
   if(dir.exists(path_data) == FALSE) {
+    cat("\n")
     stop(paste0("\u2716"," le dossier d'installation n'a pas pu", " \u00ea", "tre cr","\u00e9\u00e9", " : v","\u00e9","rifiez vos droits d'","\u00e9","criture sur le disque"))
   }
 
@@ -42,6 +43,7 @@ phaco_setup_data <- function(){
                 )
     ) != 2) {
     options(timeout=60)
+    cat("\n")
     stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre download","\u00e9","s : relancez phaco_setup_data() ou v","\u00e9","rifiez votre connexion"))
   }
 

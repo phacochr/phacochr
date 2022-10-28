@@ -38,6 +38,7 @@ phaco_best_data_update <- function(force=FALSE) {
                 paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx")
     )
   ) != 5) {
+    cat("\n")
     stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
   }
 
@@ -72,6 +73,7 @@ phaco_best_data_update <- function(force=FALSE) {
                   paste0(path_data,"BeST/openaddress/openaddress-bewal.zip")
                   )
       ) != 4) {
+      cat("\n")
       stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre download","\u00e9","s : relancez phaco_update() ou v","\u00e9","rifiez votre connexion"))
     }
 
@@ -101,6 +103,7 @@ phaco_best_data_update <- function(force=FALSE) {
                   paste0(path_data,"BeST/openaddress/openaddress-bevlg.csv")
       )
     ) != 6) {
+      cat("\n")
       stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre d","\u00e9","compress","\u00e9","s : v","\u00e9","rifiez vos droits d'","\u00e9","criture sur le disque"))
     }
 
