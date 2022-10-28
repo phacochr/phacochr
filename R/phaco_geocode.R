@@ -239,7 +239,7 @@ phaco_geocode <- function(data_to_geocode,
     sum(is.na(data_to_geocode$rue_to_geocode))/sum(nrow(data_to_geocode)) == 1
   ){
     cat("\n")
-    stop(paste0("\u2716"," La colonne contenant la rue ne contient que des valeurs manquantes"))
+    stop(paste0("\u2716"," La colonne contenant la rue ne contient que des NA"))
   }
 
   # Code postal (si separe)
@@ -286,6 +286,7 @@ phaco_geocode <- function(data_to_geocode,
   # Dans le cas ou il y a une colonne separee avec le num de rue
   if (situation == "num_rue_postal_s") {
     data_to_geocode <- data_to_geocode %>%
+      # /!\ AMELIORATION POSSIBLE /!\ : il est possible que le num existe dans le champ texte et qu'il soit absent de la colonne num, meme si cette derniere existe => cas de figure pas pris en compte dans le premier ifelse ci-dessous => le mid_street limite la casse
       mutate(num_rue_text = ifelse(str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # J'extrait le num du champ texte (ssi il est absent de num_rue)
                                    NA,
                                    str_extract(rue_to_geocode, regex("(?<!(d(es|u) )|(Albert( |))|(L(e|e)opold( |))|(Baudouin( |)))([0-9]+)(?!((e |eme |de )))", ignore_case = TRUE))),
@@ -304,6 +305,16 @@ phaco_geocode <- function(data_to_geocode,
       mutate(num_rue_clean = str_extract(rue_to_geocode, regex("(?<!(d(es|u) )|(Albert( |))|(L(e|e)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(e|e)me |( |)de |( |)er |([a-z]{3,20})))", ignore_case = TRUE))) %>%
       mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
       relocate(num_rue_clean, .before = code_postal_to_geocode)}
+
+  # Un stop() si la colonne contenant la rue ne possede que des NA
+  if (mid_street == FALSE & (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i")) {
+    if(
+      sum(is.na(data_to_geocode$num_rue_clean))/sum(nrow(data_to_geocode)) == 1
+    ){
+      cat(colourise(paste0("\n","\u2192"," La colonne contenant le num","\u00e9","ro ne contient que des NA : switch mid_street = TRUE"), fg="brown"))
+      mid_street <- TRUE
+    }
+  }
 
 
   # I. REGEX adresses (corrections) =========================================================================================================
