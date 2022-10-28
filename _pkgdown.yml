@@ -35,6 +35,8 @@ footer:
     left: developed_by
     right:
 
-
+home:
+  sidebar:
+    structure: [dev,authors, license, citation]
 
 
