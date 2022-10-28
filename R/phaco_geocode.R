@@ -152,7 +152,7 @@ phaco_geocode <- function(data_to_geocode,
       sum(c(colonne_num, colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
     ){
       cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
     }
 
   } else if (!is.null(colonne_num_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
@@ -162,7 +162,7 @@ phaco_geocode <- function(data_to_geocode,
       sum(c(colonne_num_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
     ){
       cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
     }
 
   } else if (!is.null(colonne_num_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_rue_code_postal)) {
@@ -172,7 +172,7 @@ phaco_geocode <- function(data_to_geocode,
       sum(c(colonne_num_rue_code_postal) %ni% names(data_to_geocode)) > 0
     ){
       cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
     }
 
   } else if (!is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
@@ -182,7 +182,7 @@ phaco_geocode <- function(data_to_geocode,
       sum(c(colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
     ){
       cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
     }
 
   } else if (!is.null(colonne_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal)) {
@@ -192,7 +192,7 @@ phaco_geocode <- function(data_to_geocode,
       sum(c(colonne_rue_code_postal) %ni% names(data_to_geocode)) > 0
     ){
       cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existent pas"))
+      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
     }
 
   } else {
