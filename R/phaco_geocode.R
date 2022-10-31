@@ -648,11 +648,6 @@ phaco_geocode <- function(data_to_geocode,
     mutate(type_geocoding = NA,
            type_geocoding = as.character(type_geocoding)) # pour compatibilite avec res_adj si res = NA
 
-  # Verif
-  #sum(duplicated(res$ID_address))
-  # Performance :
-  #sum(!is.na(res$street_FINAL_detected))/nrow(res)
-
 
   ### iii) Elargissement de la boucle aux communes adjacentes -------------------------------------------------------------------------------
   # On supprime la contrainte de recherche de la rue dans la commune, pour augmenter le % de rues detectees
@@ -934,9 +929,6 @@ phaco_geocode <- function(data_to_geocode,
       select(-num_rue_to_geocode)
   }
 
-  # Performance :
-  #sum(!is.na(FULL_GEOCODING$x_31370))/nrow(FULL_GEOCODING)
-
   # On remet les bons noms de rue (ils sont abreges dans le cas des noms propres abreges)
   postal_street_join_final <- postal_street %>%
     filter(is.na(nom_propre_abv)) %>%
@@ -995,7 +987,6 @@ phaco_geocode <- function(data_to_geocode,
 
   Summary_full <- bind_rows(Summary_original, Summary_region) %>%
     slice(match(c("Total (original)", "Bruxelles", "Flandre", "Wallonie", NA, "Total"), Region))
- # print(Summary_full)
 
   # J'enleve la region et les arrondissements, car doublon avec jointure dans le point precedent => pas ideal, mais necessaire pour importer les CSV par arrond avec map_dfr, pour le summary et au debut pour detecter les regions et ne pas executer si pas BE => optimiser ?
   FULL_GEOCODING <- FULL_GEOCODING %>%
