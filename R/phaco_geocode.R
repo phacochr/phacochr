@@ -119,9 +119,10 @@ phaco_geocode <- function(data_to_geocode,
                 paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"),
                 paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"),
                 paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"),
+                paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.csv"),
                 paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv")
                 )
-    ) != 48) {
+    ) != 49) {
 
     cat("\n")
     stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
@@ -261,9 +262,7 @@ phaco_geocode <- function(data_to_geocode,
   # NOTE /!\ le code postal doit IMPERATIVEMENT etre la derniere info du champ /!\
   if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
     data_to_geocode <- data_to_geocode %>%
-      mutate(code_postal_to_geocode = str_extract(rue_to_geocode, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
-             rue_to_geocode = str_replace(rue_to_geocode, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE), " "),
-             code_postal_to_geocode = str_extract(code_postal_to_geocode, regex("[0-9]{4}", ignore_case = TRUE)))
+      mutate(code_postal_to_geocode = str_extract(rue_to_geocode, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)))
   }
 
 
@@ -334,10 +333,38 @@ phaco_geocode <- function(data_to_geocode,
 
     cat(paste0("\n","\u29D7"," Correction orthographique des adresses"))
 
+    table_postal_com_name <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
+
     data_to_geocode <- data_to_geocode %>%
       mutate(rue_recoded = ifelse(!is.na(rue_to_geocode),
                                   paste0(str_trim(rue_to_geocode, "left"),"   "),
                                   NA),
+             rue_recoded_commune = str_detect(
+               rue_recoded,
+               regex(
+                 str_c(
+                   "\\b(?<!\\-)(",
+                   str_c(table_postal_com_name$CP_NAME,
+                         collapse = "|"
+                         ),
+                   ")\\b(?!\\-)"
+                   ), ignore_case = TRUE)
+               ),
+             rue_recoded = str_replace(
+               rue_recoded,
+               regex(
+                 str_c(
+                   "\\b(?<!\\-)(",
+                   str_c(table_postal_com_name$CP_NAME,
+                         collapse = "|"
+                         ),
+                   ")\\b(?!\\-)"
+                   ), ignore_case = TRUE),
+               ""
+               ),
+
+             rue_recoded_code_postal =  str_detect(rue_recoded, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
+             rue_recoded = str_replace(rue_recoded, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE), " "),
 
              rue_recoded_virgule = str_detect(rue_recoded, regex("[,]", ignore_case = TRUE)),
              rue_recoded = str_replace_all(rue_recoded, regex("[,]", ignore_case = TRUE), " "),
@@ -476,7 +503,9 @@ phaco_geocode <- function(data_to_geocode,
       )
 
     data_to_geocode <- data_to_geocode %>%
-      mutate(rue_recoded_virgule = ifelse(rue_recoded_virgule == TRUE, "virgule", NA),
+      mutate(rue_recoded_code_postal = ifelse(rue_recoded_code_postal == TRUE, "code postal", NA),
+             rue_recoded_commune = ifelse(rue_recoded_commune == TRUE, "commune", NA),
+             rue_recoded_virgule = ifelse(rue_recoded_virgule == TRUE, "virgule", NA),
              rue_recoded_parenthese = ifelse(rue_recoded_parenthese == TRUE, "parenthese", NA),
              rue_recoded_boite = ifelse(rue_recoded_boite == TRUE, "boite", NA),
              rue_recoded_num = ifelse(rue_recoded_num == TRUE, "num", NA),

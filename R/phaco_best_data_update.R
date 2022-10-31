@@ -345,8 +345,45 @@ phaco_best_data_update <- function(force=FALSE) {
     cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
 
-    # 5. Table de conversion code postal > communes INS recode --------------------------------------------------------------------------------
+    # 5. Table de conversion code postal > communes (nom + INS recode) ------------------------------------------------------------------------
 
+    # Nom
+    cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table 'codes postaux - nom des communes' (Statbel)"))
+
+    table_postal_com_name <- code_postal_INS %>%
+      mutate(cp_n_fr = paste(code_postal, `Nom commune`),
+             cp_n_nl = paste(code_postal, Gemeentenaam),
+             n_cp_fr = paste(`Nom commune`, code_postal),
+             n_cp_nl = paste(Gemeentenaam, code_postal)) %>%
+      select(cp_n_fr, cp_n_nl, n_cp_fr, n_cp_nl) %>%
+      pivot_longer(cols = c("cp_n_fr", "cp_n_nl", "n_cp_fr", "n_cp_nl"),
+                   values_to = "CP_NAME") %>%
+      select(-name)
+
+    table_postal_com_name_BXL <- code_postal_INS %>%
+      filter(substr(`Refnis code`, 1, 2) == 21) %>%
+      mutate(Gemeentenaam = "Brussel",
+             `Nom commune` = "Bruxelles",
+             cp_n_fr = paste(code_postal, `Nom commune`),
+             cp_n_nl = paste(code_postal, Gemeentenaam),
+             n_cp_fr = paste(`Nom commune`, code_postal),
+             n_cp_nl = paste(Gemeentenaam, code_postal)) %>%
+      select(cp_n_fr, cp_n_nl, n_cp_fr, n_cp_nl) %>%
+      pivot_longer(cols = c("cp_n_fr", "cp_n_nl", "n_cp_fr", "n_cp_nl"),
+                   values_to = "CP_NAME") %>%
+      select(-name)
+
+    table_postal_com_name <- table_postal_com_name %>%
+      bind_rows(table_postal_com_name_BXL) %>%
+      distinct()
+
+
+    write_csv2(table_postal_com_name, paste0(path_data, "BeST/PREPROCESSED/table_postal_com_name.csv"), progress=F)
+
+    cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table 'codes postaux - nom des communes' (Statbel)"))
+
+
+    # INS recode
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion codes postaux > communes recod", "\u00e9", "es (Statbel)"))
 
     table_INS_recod_code_postal <- code_postal_INS %>%
