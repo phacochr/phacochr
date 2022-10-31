@@ -259,7 +259,7 @@ phaco_geocode <- function(data_to_geocode,
   }
 
   # Extraction du code postal si interne au champ d'adresse
-  # NOTE /!\ le code postal doit IMPERATIVEMENT etre la derniere info du champ /!\
+  # NOTE /!\ le code postal doit IMPERATIVEMENT etre la derniere info du champ (souvent le cas) /!\
   if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
     data_to_geocode <- data_to_geocode %>%
       mutate(code_postal_to_geocode = str_extract(rue_to_geocode, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)))
@@ -303,7 +303,7 @@ phaco_geocode <- function(data_to_geocode,
       select(-num_rue_text)}
 
   # Dans le cas ou le num de rue est integre
-  # NOTE /!\ le numero de rue doit IMPERATIVEMENT etre avant le code postal /!\
+  # NOTE /!\ le numero de rue doit IMPERATIVEMENT etre le premier chiffre du champ (souvent le cas) /!\
   if (situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {
     data_to_geocode <- data_to_geocode %>%
       mutate(num_rue_clean = str_extract(rue_to_geocode, regex("(?<!(d(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))) %>%
