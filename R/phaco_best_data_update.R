@@ -79,7 +79,7 @@ phaco_best_data_update <- function(force=FALSE) {
 
     cat(paste0(colourise("\u2714", fg="green")," T", "\u00e9", "l", "\u00e9", "chargement des donn", "\u00e9", "es BeST"))
 
-    cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es"))
+    cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es BeST"))
 
     unzip(paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"))
@@ -110,7 +110,7 @@ phaco_best_data_update <- function(force=FALSE) {
     log[nrow(log)+1,] <- Sys.time()
     write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"), progress=F)
 
-    cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","compression des donn","\u00e9","es"))
+    cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","compression des donn","\u00e9","es BeST"))
 
 
     # 1. Fichier rues -------------------------------------------------------------------------------------------------------------------------
@@ -441,7 +441,7 @@ phaco_best_data_update <- function(force=FALSE) {
 
 
     # On recode les codes INS pour possibilite de l'elargissement aux communes adjacentes (voir phaco_geocode() )
-    cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion codes postaux > communes recod", "\u00e9", "es (Statbel)"))
+    cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - codes INS recod", "\u00e9", "es' (Statbel)"))
 
     table_INS_recod_code_postal <- code_postal_INS %>%
       select(code_postal, "Refnis code") %>%
@@ -453,7 +453,7 @@ phaco_best_data_update <- function(force=FALSE) {
 
     write_csv2(table_INS_recod_code_postal, paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), progress=F)
 
-    cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - communes recod", "\u00e9", "es' (Statbel)"))
+    cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - codes INS recod", "\u00e9", "es' (Statbel)"))
 
 
     # 6. Export openaddress par arrondissement ------------------------------------------------------------------------------------------------
