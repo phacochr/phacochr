@@ -396,6 +396,12 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_Rez = str_detect(rue_recoded, regex("\\sRez\\s", ignore_case = TRUE)),
              rue_recoded = str_replace(rue_recoded, regex("\\sRez\\s", ignore_case = TRUE), " "),
 
+             rue_recoded_Bis = str_detect(rue_recoded, regex("\\sBis\\s", ignore_case = TRUE)),
+             rue_recoded = str_replace(rue_recoded, regex("\\sBis\\s", ignore_case = TRUE), " "),
+
+             rue_recoded_Rdc = str_detect(rue_recoded, regex("\\sRdc\\s", ignore_case = TRUE)),
+             rue_recoded = str_replace(rue_recoded, regex("\\sRdc\\s", ignore_case = TRUE), " "),
+
              rue_recoded_Commandant = str_detect(rue_recoded, regex("(c(m|)dt([.]|)(\\s|))", ignore_case = TRUE)),
              rue_recoded = str_replace(rue_recoded, regex("(c(m|)dt([.]|)(\\s|))", ignore_case = TRUE), "Commandant "),
 
@@ -484,12 +490,6 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_place = str_detect(rue_recoded, regex("^pl\\s", ignore_case = TRUE)),
              rue_recoded = str_replace(rue_recoded, regex("^pl\\s", ignore_case = TRUE), "Place "),
 
-             rue_recoded_Bis = str_detect(rue_recoded, regex("\\sBis\\s", ignore_case = TRUE)),
-             rue_recoded = str_replace(rue_recoded, regex("\\sBis\\s", ignore_case = TRUE), " "),
-
-             rue_recoded_Rdc = str_detect(rue_recoded, regex("\\sRdc\\s", ignore_case = TRUE)),
-             rue_recoded = str_replace(rue_recoded, regex("\\sRdc\\s", ignore_case = TRUE), " "),
-
              rue_recoded = str_squish(rue_recoded), # On fait ca avant le regex "(?<=\\s)[A-Za-z]$" (ci-dessous), pour etre sur qu'il fonctionne (car avec un espace derriere la lettre, il n'agit plus)
 
              rue_recoded_lettre_end = str_detect(rue_recoded, regex("(?<=\\s)[A-Za-z]$", ignore_case = TRUE)),
@@ -520,6 +520,8 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_code_postal = ifelse(rue_recoded_code_postal == TRUE, "code postal", NA),
              rue_recoded_num = ifelse(rue_recoded_num == TRUE, "num", NA),
              rue_recoded_Rez = ifelse(rue_recoded_Rez == TRUE, "Rez", NA),
+             rue_recoded_Bis = ifelse(rue_recoded_Bis == TRUE, "Bis", NA),
+             rue_recoded_Rdc = ifelse(rue_recoded_Rdc == TRUE, "Rdc", NA),
              rue_recoded_Commandant = ifelse(rue_recoded_Commandant == TRUE, "Commandant", NA),
              rue_recoded_Lieutenant = ifelse(rue_recoded_Lieutenant == TRUE, "Lieutenant", NA),
              rue_recoded_Saint = ifelse(rue_recoded_Saint == TRUE, "Saint", NA),
@@ -536,8 +538,6 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_Rue = ifelse(rue_recoded_Rue == TRUE, "Rue", NA),
              rue_recoded_apostrophe = ifelse(rue_recoded_apostrophe == TRUE, "apostrophe", NA),
              rue_recoded_place = ifelse(rue_recoded_place == TRUE, "place", NA),
-             rue_recoded_Bis = ifelse(rue_recoded_Bis == TRUE, "Bis", NA),
-             rue_recoded_Rdc = ifelse(rue_recoded_Rdc == TRUE, "Rdc", NA),
              rue_recoded_lettre_end = ifelse(rue_recoded_lettre_end == TRUE, "lettre_fin", NA),
              rue_recoded_tiret = ifelse(rue_recoded_tiret == TRUE, "tiret", NA)
       )
