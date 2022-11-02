@@ -13,10 +13,4 @@ RoxygenNote: 7.2.1
 Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, purrr, stats,
     readr, readxl, stringdist, sf, sp, spdep, knitr, 
     stringr, tidyr, rappdirs, utils, mapsf, scales
-Depends: 
-    R (>= 2.10)
-Suggests: 
-    rmarkdown,
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
 VignetteBuilder: knitr

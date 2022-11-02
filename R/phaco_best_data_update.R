@@ -292,11 +292,11 @@ phaco_best_data_update <- function(force=FALSE) {
 
     cat(paste0("\r",  colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
 
-    # Assigner à chaque rue par code postal les coordonnées du numéro du milieu
+    # Assigner a chaque rue par code postal les coordonnees du numero du milieu
     cat(paste0("\n", "\u29D7", " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
 
     num_mid <- belgium_street_abv %>%
-      inner_join(openaddress_be, by = "street_id_phaco" ) %>% # certaines rues n'ont pas de numéro, on les écartes
+      inner_join(openaddress_be, by = "street_id_phaco" ) %>% # certaines rues n'ont pas de numero, on les ecartes
       mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) %>%
       group_by(street_id_phaco, postal_id) %>% # par rue et code postal
       filter(house_number_sans_lettre == as.numeric(quantile(house_number_sans_lettre, p = 0.5, type = 3, na.rm=T))) %>% # quantile parce que median() prend la valeur du milieu quand paire, type 3 arrondi vers le bas
@@ -370,13 +370,13 @@ phaco_best_data_update <- function(force=FALSE) {
               `Nom commune` = "Woluwe Saint-Pierre",
               Gemeentenaam = "Sint-Pieters Woluwe") %>%
       add_row(code_postal = "1150",
-              `Nom commune` = "Woluwé Saint Pierre",
+              `Nom commune` = paste0("Woluw", "\u00e9", " Saint Pierre"),
               Gemeentenaam = "Sint Pieters Woluwe") %>%
       add_row(code_postal = "1150",
-              `Nom commune` = "Woluwé Saint-Pierre",
+              `Nom commune` = paste0("Woluw", "\u00e9", " Saint-Pierre"),
               Gemeentenaam = "Sint-Pieters Woluwe") %>%
       add_row(code_postal = "1150",
-              `Nom commune` = "Woluwé-Saint-Pierre",
+              `Nom commune` = paste0("Woluw", "\u00e9", "-Saint-Pierre"),
               Gemeentenaam = "Sint-Pieters-Woluwe") %>%
       add_row(code_postal = "1200",
               `Nom commune` = "Woluwe Saint Lambert",
@@ -385,13 +385,13 @@ phaco_best_data_update <- function(force=FALSE) {
               `Nom commune` = "Woluwe Saint-Lambert",
               Gemeentenaam = "Sint-Pieters Woluwe") %>%
       add_row(code_postal = "1200",
-              `Nom commune` = "Woluwé Saint Lambert",
+              `Nom commune` = paste0("Woluw", "\u00e9", " Saint Lambert"),
               Gemeentenaam = "Sint Pieters Woluwe") %>%
       add_row(code_postal = "1200",
-              `Nom commune` = "Woluwé Saint-Lambert",
+              `Nom commune` = paste0("Woluw", "\u00e9", " Saint-Lambert"),
               Gemeentenaam = "Sint-Pieters Woluwe") %>%
       add_row(code_postal = "1200",
-              `Nom commune` = "Woluwé-Saint-Lambert",
+              `Nom commune` = paste0("Woluw", "\u00e9", "-Saint-Lambert"),
               Gemeentenaam = "Sint-Pieters-Woluwe") %>%
       add_row(code_postal = "1120",
               `Nom commune` = "Neder-Over-Heembeek",
