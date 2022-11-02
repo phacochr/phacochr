@@ -351,6 +351,57 @@ phaco_best_data_update <- function(force=FALSE) {
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table 'codes postaux - nom des communes' (Statbel)"))
 
     table_postal_com_name <- code_postal_INS %>%
+      add_row(code_postal = "1020",
+              Gemeentenaam = "Laken",
+              `Nom commune` = "Laeken") %>%
+      add_row(code_postal = "1060",
+              Gemeentenaam = "Saint Gilles",
+              `Nom commune` = "Sint Gillis") %>%
+      add_row(code_postal = "1170",
+              `Nom commune` = "Watermael Boitsfort",
+              Gemeentenaam = "Watermaal Bosvoorde") %>%
+      add_row(code_postal = "1150",
+              `Nom commune` = "Woluwe Saint Pierre",
+              Gemeentenaam = "Sint Pieters Woluwe") %>%
+      add_row(code_postal = "1150",
+              `Nom commune` = "Woluwe Saint-Pierre",
+              Gemeentenaam = "Sint-Pieters Woluwe") %>%
+      add_row(code_postal = "1150",
+              `Nom commune` = "Woluwé Saint Pierre",
+              Gemeentenaam = "Sint Pieters Woluwe") %>%
+      add_row(code_postal = "1150",
+              `Nom commune` = "Woluwé Saint-Pierre",
+              Gemeentenaam = "Sint-Pieters Woluwe") %>%
+      add_row(code_postal = "1150",
+              `Nom commune` = "Woluwé-Saint-Pierre",
+              Gemeentenaam = "Sint-Pieters-Woluwe") %>%
+      add_row(code_postal = "1200",
+              `Nom commune` = "Woluwe Saint Lambert",
+              Gemeentenaam = "Sint Pieters Woluwe") %>%
+      add_row(code_postal = "1200",
+              `Nom commune` = "Woluwe Saint-Lambert",
+              Gemeentenaam = "Sint-Pieters Woluwe") %>%
+      add_row(code_postal = "1200",
+              `Nom commune` = "Woluwé Saint Lambert",
+              Gemeentenaam = "Sint Pieters Woluwe") %>%
+      add_row(code_postal = "1200",
+              `Nom commune` = "Woluwé Saint-Lambert",
+              Gemeentenaam = "Sint-Pieters Woluwe") %>%
+      add_row(code_postal = "1200",
+              `Nom commune` = "Woluwé-Saint-Lambert",
+              Gemeentenaam = "Sint-Pieters-Woluwe") %>%
+      add_row(code_postal = "1120",
+              `Nom commune` = "Neder-Over-Heembeek",
+              Gemeentenaam = "Neder-Over-Heembeek") %>%
+      add_row(code_postal = "1080",
+              Gemeentenaam = "Molenbeek",
+              `Nom commune` = "Molenbeek") %>%
+      add_row(code_postal = "1080",
+              Gemeentenaam = "Sint Jans Molenbeek",
+              `Nom commune` = "Molenbeek Saint Jean") %>%
+      add_row(code_postal = "1130",
+              Gemeentenaam = "Haren",
+              `Nom commune` = "Haren") %>%
       mutate(cp_n_fr = paste(code_postal, `Nom commune`),
              cp_n_nl = paste(code_postal, Gemeentenaam),
              n_cp_fr = paste(`Nom commune`, code_postal),
@@ -364,12 +415,15 @@ phaco_best_data_update <- function(force=FALSE) {
       filter(substr(`Refnis code`, 1, 2) == 21) %>%
       mutate(Gemeentenaam = "Brussel",
              `Nom commune` = "Bruxelles",
+             name_eng = "Brussels",
              cp_n_fr = paste(code_postal, `Nom commune`),
              cp_n_nl = paste(code_postal, Gemeentenaam),
+             cp_n_eng = paste(code_postal, name_eng),
              n_cp_fr = paste(`Nom commune`, code_postal),
-             n_cp_nl = paste(Gemeentenaam, code_postal)) %>%
-      select(cp_n_fr, cp_n_nl, n_cp_fr, n_cp_nl) %>%
-      pivot_longer(cols = c("cp_n_fr", "cp_n_nl", "n_cp_fr", "n_cp_nl"),
+             n_cp_nl = paste(Gemeentenaam, code_postal),
+             n_cp_eng = paste(name_eng, code_postal)) %>%
+      select(cp_n_fr, cp_n_nl, cp_n_eng, n_cp_fr, n_cp_nl, n_cp_eng) %>%
+      pivot_longer(cols = c("cp_n_fr", "cp_n_nl", "cp_n_eng", "n_cp_fr", "n_cp_nl", "n_cp_eng"),
                    values_to = "CP_NAME") %>%
       select(-name)
 
