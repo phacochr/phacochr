@@ -334,37 +334,52 @@ phaco_geocode <- function(data_to_geocode,
 
     cat(paste0("\n","\u29D7"," Correction orthographique des adresses"))
 
-    table_postal_com_name <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
-
+    # On cree rue_recoded qui contient toutes les corrections et sera l'objet du fuzzy matching apres
     data_to_geocode <- data_to_geocode %>%
       mutate(rue_recoded = ifelse(!is.na(rue_to_geocode),
                                   paste0(str_squish(rue_to_geocode),"   "),
                                   NA),
-             rue_recoded_commune = str_detect(
-               rue_recoded,
-               regex(
-                 str_c(
-                   "\\b(?<!\\-)(",
-                   str_c(table_postal_com_name$CP_NAME,
-                         collapse = "|"
-                         ),
-                   ")\\b(?!\\-)"
-                   ), ignore_case = TRUE)
-               ),
-             rue_recoded = str_replace(
-               rue_recoded,
-               regex(
-                 str_c(
-                   "\\b(?<!\\-)(",
-                   str_c(table_postal_com_name$CP_NAME,
-                         collapse = "|"
-                         ),
-                   ")\\b(?!\\-)"
-                   ), ignore_case = TRUE),
-               ""
-               ),
+             rue_recoded_commune = NA, # Pour la compatibilite avec la suite si le code postal n'est pas integre et supprime
+             rue_recoded_code_postal = NA) # Pour la compatibilite avec la suite si le code postal n'est pas integre et supprime
 
-             rue_recoded_virgule = str_detect(rue_recoded, regex("[,]", ignore_case = TRUE)),
+    # Suppression du code postal ssi interne au champ d'adresse
+    if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
+
+      table_postal_com_name <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
+
+      data_to_geocode <- data_to_geocode %>%
+        mutate(rue_recoded_commune = str_detect(
+                 rue_recoded,
+                 regex(
+                   str_c(
+                     "\\b(?<!\\-)(",
+                     str_c(table_postal_com_name$CP_NAME,
+                           collapse = "|"
+                           ),
+                     ")\\b(?!\\-)"
+                     ), ignore_case = TRUE)
+                 ),
+               rue_recoded = str_replace(
+                 rue_recoded,
+                 regex(
+                   str_c(
+                     "\\b(?<!\\-)(",
+                     str_c(table_postal_com_name$CP_NAME,
+                           collapse = "|"
+                           ),
+                     ")\\b(?!\\-)"
+                     ), ignore_case = TRUE),
+                 " "
+                 ),
+
+               rue_recoded_code_postal =  str_detect(rue_recoded, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
+               rue_recoded = str_replace(rue_recoded, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE), " "),
+               )
+    }
+
+    # Les corrections a proprement parler
+    data_to_geocode <- data_to_geocode %>%
+      mutate(rue_recoded_virgule = str_detect(rue_recoded, regex("[,]", ignore_case = TRUE)),
              rue_recoded = str_replace_all(rue_recoded, regex("[,]", ignore_case = TRUE), " "),
 
              rue_recoded_deux_points = str_detect(rue_recoded, regex("[:]", ignore_case = TRUE)),
@@ -507,6 +522,7 @@ phaco_geocode <- function(data_to_geocode,
 
     data_to_geocode <- data_to_geocode %>%
       mutate(rue_recoded_commune = ifelse(rue_recoded_commune == TRUE, "commune", NA),
+             rue_recoded_code_postal = ifelse(rue_recoded_code_postal == TRUE, "code postal", NA),
              rue_recoded_virgule = ifelse(rue_recoded_virgule == TRUE, "virgule", NA),
              rue_recoded_deux_points = ifelse(rue_recoded_deux_points == TRUE, "deux_points", NA),
              rue_recoded_parenthese = ifelse(rue_recoded_parenthese == TRUE, "parenthese", NA),
@@ -554,7 +570,7 @@ phaco_geocode <- function(data_to_geocode,
 
   }
 
-  # Je vais utiliser rue_recoded dans la suite pour le geocodage, je la cree donc meme si corrections_REGEX == FALSE. Pas tres clean, a modifier ?
+  # On cree rue_recoded meme si corrections_REGEX == FALSE => necessaire car le fuzzy matching se fait sur cette colonne
   if (corrections_REGEX == FALSE & (situation == "num_rue_postal_s"|situation == "no_num_rue_postal_s")) {
     data_to_geocode <- data_to_geocode %>%
       mutate(rue_recoded = str_squish(rue_to_geocode),
