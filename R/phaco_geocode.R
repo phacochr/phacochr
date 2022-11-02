@@ -445,6 +445,9 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_route = str_detect(rue_recoded, regex("^Rte\\s", ignore_case = TRUE)),
              rue_recoded = str_replace(rue_recoded, regex("^Rte\\s", ignore_case = TRUE), "Route "),
 
+             rue_recoded_place = str_detect(rue_recoded, regex("^pl\\s", ignore_case = TRUE)),
+             rue_recoded = str_replace(rue_recoded, regex("^pl\\s", ignore_case = TRUE), "Place "),
+
              # Ici on conditionne la correction au fait qu'il n'y ait pas de mots neerlandais, car correction uniquement francophone
              rue_recoded_Rue = ifelse(str_detect(rue_recoded, regex("(laan|straat|plein|dreef|lei)", ignore_case = TRUE)),
                                       FALSE,
@@ -483,9 +486,6 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded = str_replace(rue_recoded, regex("de\\sl\\s([']|)", ignore_case = TRUE), "de l'"),
              rue_recoded = str_replace(rue_recoded, regex("rue\\sd\\s", ignore_case = TRUE), "Rue d'"),
              rue_recoded = str_replace(rue_recoded, regex("[']\\s", ignore_case = TRUE), "'"),
-
-             rue_recoded_place = str_detect(rue_recoded, regex("^pl\\s", ignore_case = TRUE)),
-             rue_recoded = str_replace(rue_recoded, regex("^pl\\s", ignore_case = TRUE), "Place "),
 
              rue_recoded = str_squish(rue_recoded), # On fait ca avant le regex "(?<=\\s)[A-Za-z]$" (ci-dessous), pour etre sur qu'il fonctionne (car avec un espace derriere la lettre, il n'agit plus)
 
@@ -531,9 +531,9 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_dokter = ifelse(rue_recoded_dokter == TRUE, "Dokter", NA),
              rue_recoded_boulevard = ifelse(rue_recoded_boulevard == TRUE, "boulevard", NA),
              rue_recoded_route = ifelse(rue_recoded_route == TRUE, "route", NA),
+             rue_recoded_place = ifelse(rue_recoded_place == TRUE, "place", NA),
              rue_recoded_Rue = ifelse(rue_recoded_Rue == TRUE, "Rue", NA),
              rue_recoded_apostrophe = ifelse(rue_recoded_apostrophe == TRUE, "apostrophe", NA),
-             rue_recoded_place = ifelse(rue_recoded_place == TRUE, "place", NA),
              rue_recoded_lettre_end = ifelse(rue_recoded_lettre_end == TRUE, "lettre_fin", NA),
              rue_recoded_tiret = ifelse(rue_recoded_tiret == TRUE, "tiret", NA)
       )
