@@ -387,9 +387,6 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_No = str_detect(rue_recoded, regex("n\u00b0|((^|\\s)(num([.]|)|num(\u00e9|e)ro|n(o|)([.]|)|\\sno)(|\\s)[0-9]+)", ignore_case = TRUE)),
              rue_recoded = str_replace(rue_recoded, regex("n\u00b0|((^|\\s)(num([.]|)|num(\u00e9|e)ro|n(o|)([.]|)|\\sno)(|\\s)[0-9]+)", ignore_case = TRUE), " "),
 
-             rue_recoded_code_postal =  str_detect(rue_recoded, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
-             rue_recoded = str_replace(rue_recoded, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE), " "),
-
              rue_recoded_num = str_detect(rue_recoded, regex("((?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( |)er |( ||i)(\u00e8|e)me |( |)de |(-|)[a-z]{3,}))([^ ,0-9]+))|(([^ ,0-9]+)(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |))|([a-z]{3,20}))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er )))|(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE)),
              rue_recoded = str_replace_all(rue_recoded, regex("((?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( |)er |( ||i)(\u00e8|e)me |( |)de |(-|)[a-z]{3,}))([^ ,0-9]+))|(([^ ,0-9]+)(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |))|([a-z]{3,20}))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er )))|(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE), " "),
 
@@ -517,7 +514,6 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_boite = ifelse(rue_recoded_boite == TRUE, "boite", NA),
              rue_recoded_BP_CP = ifelse(rue_recoded_BP_CP == TRUE, "BP_CP", NA),
              rue_recoded_No = ifelse(rue_recoded_No == TRUE, paste0("n", "\u00b0"), NA),
-             rue_recoded_code_postal = ifelse(rue_recoded_code_postal == TRUE, "code postal", NA),
              rue_recoded_num = ifelse(rue_recoded_num == TRUE, "num", NA),
              rue_recoded_Rez = ifelse(rue_recoded_Rez == TRUE, "Rez", NA),
              rue_recoded_Bis = ifelse(rue_recoded_Bis == TRUE, "Bis", NA),
