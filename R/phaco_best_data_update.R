@@ -226,10 +226,11 @@ phaco_best_data_update <- function(force=FALSE) {
       select(TX_FST_NAME, MS_FREQUENCY) %>%
       group_by(TX_FST_NAME) %>%
       summarise(MS_FREQUENCY = sum(MS_FREQUENCY)) %>%
-      filter(MS_FREQUENCY > 500) %>%
-      filter(TX_FST_NAME %ni% c("Prince", "Reine")) %>%
+      filter(MS_FREQUENCY > 500) %>% # On ne prend que les noms dont la frequence est superieure a 500 en Belgique
+      filter(TX_FST_NAME %ni% c("Prince", "Reine")) %>%  # On evite de creer des abreviations pour les rues avec noms de Reine / Prince (on abrege pas communement ces noms)
       mutate(abv = str_remove_all(str_replace(TX_FST_NAME, "-", " "), "(?<!^|[:space:])."))
 
+    # On remplace les noms propres par leur abreviations (y compris noms composes)
     belgium_street_abv <- belgium_street %>%
       mutate(
         detect = str_detect(
@@ -267,6 +268,7 @@ phaco_best_data_update <- function(force=FALSE) {
       select(-key_street_unique, "street_FINAL_detected_Origin" = "street_FINAL_detected", "street_FINAL_detected" = "street_FINAL_detected_abv", nom_propre_abv = detect) %>%
       mutate(nom_propre_abv = 1)
 
+    # On supprime qques abreviations fausses
     belgium_street_abv <- belgium_street_abv %>%
       mutate(Count = str_length(street_FINAL_detected),
              Saint = str_detect(street_FINAL_detected, regex("(Sint-[a-z])|(Saint(|e)-[a-z])", ignore_case = TRUE)),
@@ -319,6 +321,7 @@ phaco_best_data_update <- function(force=FALSE) {
 
     # 4. Table codes postaux > arrondissements ------------------------------------------------------------------------------------------------
 
+    # On cree la table de conversion codes postaux > arrondissements
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
     code_postal_INS <- read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx"), progress= F) %>%
@@ -347,11 +350,11 @@ phaco_best_data_update <- function(force=FALSE) {
 
     # 5. Table de conversion code postal > communes (nom + INS recode) ------------------------------------------------------------------------
 
-    # Nom
+    # On cree une table de toutes les combinaisons CODE_POSTAL-COMMUNE et COMMUNE-CODE_POSTAL
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table 'codes postaux - nom des communes' (Statbel)"))
 
     table_postal_com_name <- code_postal_INS %>%
-      add_row(code_postal = "1020",
+      add_row(code_postal = "1020", # On ajoute qques communes a la main dont l'orthographe a ete detectee dans une base de donnee (pour BXL uniquement) => RENDRE CA PLUS PROPRE ?
               Gemeentenaam = "Laken",
               `Nom commune` = "Laeken") %>%
       add_row(code_postal = "1060",
@@ -437,7 +440,7 @@ phaco_best_data_update <- function(force=FALSE) {
     cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table 'codes postaux - nom des communes' (Statbel)"))
 
 
-    # INS recode
+    # On recode les codes INS pour possibilite de l'elargissement aux communes adjacentes (voir phaco_geocode() )
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion codes postaux > communes recod", "\u00e9", "es (Statbel)"))
 
     table_INS_recod_code_postal <- code_postal_INS %>%
@@ -461,7 +464,7 @@ phaco_best_data_update <- function(force=FALSE) {
       left_join(select(table_postal_arrond, postcode, arrond), by = "postcode")
 
     # Verif = pas toujours convergent ! => On penche plutot pour des erreurs des coordonnees que du code postal
-    # => On garde donc les arrond issus de la jointure CODE POSTAL > ARROND au lieu de partir des arrond definis par localisation geo.
+    # => On garde donc les arrond issus de la jointure CODE POSTAL > ARROND au lieu de partir des arrond definis par localisation geo
     # table(openaddress_be$arrond, openaddress_be$arrond2)
 
     openaddress_be <- openaddress_be %>%
@@ -481,6 +484,7 @@ phaco_best_data_update <- function(force=FALSE) {
 
     # 7. Table secteurs - quartiers - communes -  arrond - region -----------------------------------------------------------------------------
 
+    # On cree une table avec les infos administratives pour jointure a la fin de phaco_geocode()
     cat(paste0("\n", "\u29D7", " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers Urbis)"))
 
     # Quartiers du monitoring
@@ -505,9 +509,9 @@ phaco_best_data_update <- function(force=FALSE) {
 
     # 8. Liste des communes adjacentes par commune --------------------------------------------------------------------------------------------
 
+    # On cree une liste des communes adjacentes par commune (via INS recode)
     cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))
 
-    # communes adjacentes
     # D'abord un recodage car codes postaux et INS n'ont pas de relation bi-univoque : https://statbel.fgov.be/fr/propos-de-statbel/methodologie/classifications/geographie
     BE_communes <- BE_SS %>%
       mutate(cd_munty_refnis = case_when(cd_munty_refnis == "21004" | cd_munty_refnis == "21005" | cd_munty_refnis == "21009" ~ "21004-21005-21009",
