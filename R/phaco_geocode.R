@@ -262,7 +262,7 @@ phaco_geocode <- function(data_to_geocode,
   # NOTE /!\ le code postal doit IMPERATIVEMENT etre la derniere info du champ (souvent le cas) /!\
   if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
     data_to_geocode <- data_to_geocode %>%
-      mutate(code_postal_to_geocode = str_extract(rue_to_geocode, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
+      mutate(code_postal_to_geocode = str_extract(rue_to_geocode, regex("([0-9]{4}\\s[\\p{Letter}-' ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
              code_postal_to_geocode = str_extract(code_postal_to_geocode, regex("[0-9]{4}", ignore_case = TRUE)))
   }
 
@@ -372,8 +372,8 @@ phaco_geocode <- function(data_to_geocode,
                  " "
                  ),
 
-               rue_recoded_code_postal =  str_detect(rue_recoded, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
-               rue_recoded = str_replace(rue_recoded, regex("([0-9]{4}\\s[a-z- ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE), " "),
+               rue_recoded_code_postal =  str_detect(rue_recoded, regex("([0-9]{4}\\s[\\p{Letter}-' ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
+               rue_recoded = str_replace(rue_recoded, regex("([0-9]{4}\\s[\\p{Letter}-' ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE), " "),
                )
     }
 
@@ -554,6 +554,9 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_lettre_end2 = ifelse(rue_recoded_lettre_end == TRUE, "lettre_fin2", NA),
              rue_recoded_tiret = ifelse(rue_recoded_tiret == TRUE, "tiret", NA)
       )
+
+    # Au cas ou la rue serait un espace vide (certains cas possibles) => NA
+    data_to_geocode$rue_recoded[data_to_geocode$rue_recoded == ""] <- NA
 
     # On fusionne toutes les colonnes qui commencent par "rue_recoded_" en une
     data_to_geocode_REGEX <- data_to_geocode %>%
