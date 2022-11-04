@@ -122,7 +122,7 @@ La procédure de géocodage est alors finie. Nous terminons les opérations en j
 
 Nous créons également [un objet `sf`](https://r-spatial.github.io/sf/) - exportable en geopackage ou qui peut être cartographie avec la fonction `phaco_map_s` - et produisons quelques statistiques indiquant la performance du géocodage. Le tableau ci-dessous schématise l'ensemble des opérations réalisées :
 
-![Tableau schématique2](man/figures/phacochr4.png)
+![Tableau schématique2](man/figures/phacochr4.png){width=550px}
 
 ## Contact
 

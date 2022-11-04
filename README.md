@@ -255,7 +255,11 @@ exportable en geopackage ou qui peut être cartographie avec la fonction
 performance du géocodage. Le tableau ci-dessous schématise l’ensemble
 des opérations réalisées :
 
-![Tableau schématique2](man/figures/phacochr4.png)
+<figure>
+<img src="man/figures/phacochr4.png" width="550"
+alt="Tableau schématique2" />
+<figcaption aria-hidden="true">Tableau schématique2</figcaption>
+</figure>
 
 ## Contact
 
