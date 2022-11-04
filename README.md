@@ -291,15 +291,20 @@ trouvées est de 97%. Pour 7 base de données sur les 18 `phacochr`
 trouvent à plus de 98%, pour 6 bases de données entre 96% et 98% et pour
 5 bases de données entre 90% et 96%.
 
+<figure>
 <img src="man/figures/graph_match_rate.png" width="500"
-alt="Graphique du % d’adresses géocodées" /> Ces résultats sur la
-performance sont à nuancer par le fait qu’il y a probablement des “faux
-positifs”. Pour avoir une idée de la qualités des résultats, il est
-conseillé de vérifier quelles corrections orthographiques ont été
-réalisée, quelle distance a été acceptée pour réaliser la jointure
-inexacte, si un élargissement aux communes adjacentes a été nécessaire
-et si un autre numéro que celui renseigné a été choisi (+ ou - x numéro
-ou le milieu de la rue).
+alt="Graphique du % d’adresses géocodées" />
+<figcaption aria-hidden="true">Graphique du % d’adresses
+géocodées</figcaption>
+</figure>
+
+Ces résultats sur la performance sont à nuancer par le fait qu’il y a
+probablement des “faux positifs”. Pour avoir une idée de la qualités des
+résultats, il est conseillé de vérifier quelles corrections
+orthographiques ont été réalisée, quelle distance a été acceptée pour
+réaliser la jointure inexacte, si un élargissement aux communes
+adjacentes a été nécessaire et si un autre numéro que celui renseigné a
+été choisi (+ ou - x numéro ou le milieu de la rue).
 
 ## Contact
 
