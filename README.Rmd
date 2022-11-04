@@ -133,10 +133,12 @@ La vitesse d'exécution par adresse suit une fonction inverse (1/x). `phacochr` 
 
 ![Graphique du temps de calcul nécessaire pour géocoder avec phacochr selon le nombre d'adresses à géocoder](man/figures/graph_temps_calcul.png){width=500px}
 
+
 `phacochr` possède une bonne capacité à trouver les adresses. Sur le même set de 18 base de données, la médiane du pourcentage d'adresses trouvées est de 97%. Pour 7 base de données sur les 18 `phacochr` trouvent à plus de 98%, pour 6 bases de données entre 96% et 98% et pour 5 bases de données entre 90% et 96%. 
 
 
 ![Graphique du % d'adresses géocodées](man/figures/graph_match_rate.png){width=500px}
+
 
 Ces résultats sur la performance sont à nuancer par le fait qu'il y a probablement des "faux positifs". Pour avoir une idée de la qualités des résultats, il est conseillé de vérifier quelles corrections orthographiques ont été réalisée, quelle distance a été acceptée pour réaliser la jointure inexacte, si un élargissement aux communes adjacentes a été nécessaire et si un autre numéro que celui renseigné a été choisi (+ ou - x numéro ou le milieu de la rue).
 
