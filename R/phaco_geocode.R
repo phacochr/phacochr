@@ -145,10 +145,12 @@ phaco_geocode <- function(data_to_geocode,
   # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/
   `%ni%` <- Negate(`%in%`)
 
+  colourise("\u2139", fg= "blue")
+
   # Pour definir la situation de num-rue-code postal
   if(!is.null(colonne_num) & !is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
     situation <- "num_rue_postal_s"
-    cat(colourise(paste0("\n","\u2192"," Champs introduits : num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"), fg="brown"))
+    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"))
     if(
       sum(c(colonne_num, colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
     ){
@@ -158,7 +160,7 @@ phaco_geocode <- function(data_to_geocode,
 
   } else if (!is.null(colonne_num_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
     situation <- "num_rue_i_postal_s"
-    cat(colourise(paste0("\n","\u2192"," Champs introduits : num","\u00e9","ro et rue int","\u00e9","gr","\u00e9","s + code postal s","\u00e9","par","\u00e9","s"), fg="brown"))
+    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro et rue int","\u00e9","gr","\u00e9","s + code postal s","\u00e9","par","\u00e9","s"))
     if(
       sum(c(colonne_num_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
     ){
@@ -168,7 +170,7 @@ phaco_geocode <- function(data_to_geocode,
 
   } else if (!is.null(colonne_num_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_rue_code_postal)) {
     situation <- "num_rue_postal_i"
-    cat(colourise(paste0("\n","\u2192"," Champs introduits : num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"), fg="brown"))
+    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"))
     if(
       sum(c(colonne_num_rue_code_postal) %ni% names(data_to_geocode)) > 0
     ){
@@ -178,7 +180,7 @@ phaco_geocode <- function(data_to_geocode,
 
   } else if (!is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
     situation <- "no_num_rue_postal_s"
-    cat(colourise(paste0("\n","\u2192"," Champs introduits : pas de num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"), fg="brown"))
+    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : pas de num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"))
     if(
       sum(c(colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
     ){
@@ -188,7 +190,7 @@ phaco_geocode <- function(data_to_geocode,
 
   } else if (!is.null(colonne_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal)) {
     situation <- "no_num_rue_postal_i"
-    cat(colourise(paste0("\n","\u2192"," Champs introduits : pas de num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"), fg="brown"))
+    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : pas de num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"))
     if(
       sum(c(colonne_rue_code_postal) %ni% names(data_to_geocode)) > 0
     ){
