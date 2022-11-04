@@ -111,10 +111,10 @@ result <- phaco_geocode(data_to_geocode = x,
 ```
 
 ``` r
-result$data_geocoded [,c(1,17:19)]
-#>   ID_address mid_postcode mid_cd_sector mid_arrond
-#> 1          1         1040     21004B2WJ         21
-#> 2          2         1000     21004C61-         21
+result$data_geocoded [,c("ID_address", "x_31370", "y_31370", "cd_sector")]
+#>   ID_address x_31370 y_31370 cd_sector
+#> 1          1  150373  170090 21004B13-
+#> 2          2  151105  166831 21004C61-
 ```
 
 Le package dispose également d’une fonction de cartographie des adresses
@@ -136,7 +136,7 @@ phaco_map_s(result$data_geocoded_sf,
 
 ## Configurations de géocodage possibles
 
-Cinq configuration de géocodage sont possibles dans `phacochr` :
+Cinq configurations de géocodage sont possibles dans `phacochr` :
 
 1.  **Le numéro de rue, la rue et le code postal sont présents dans des
     colonnes séparées dans les données à géocoder :** il s’agit de la
@@ -144,8 +144,8 @@ Cinq configuration de géocodage sont possibles dans `phacochr` :
     cas, il faut renseigner les arguments `colonne_num`, `colonne_rue`
     et `colonne_code_postal`.
 2.  **Le numéro de rue et la rue sont mélangés dans une colonne, et le
-    code postal séparé dans une autre :** dans ce cas, `phacochr` recrée
-    à l’aide des [expressions régulières
+    code postal seul dans une autre :** dans ce cas, `phacochr` recrée à
+    l’aide des [expressions régulières
     (REGEX)](https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions)
     la rue et le numéro dans des colonnes séparées. Cette procédure
     fonctionne très bien la plupart du temps. Il faut cependant
@@ -164,7 +164,7 @@ Cinq configuration de géocodage sont possibles dans `phacochr` :
     `colonne_num_rue_code_postal`.
 4.  **La rue et le code postal sont présents dans des colonnes séparées
     (sans numéro) :** cette situation ressemble à la première, mais sans
-    que le numéro soit disponible `phacochr` géocode alors non pas à un
+    que le numéro soit disponible. `phacochr` géocode alors non pas à un
     niveau de précision du bâtiment, mais choisi comme coordonnée de
     résultat le batiment disposant du numéro médian de la rue au sein du
     même code postal (certaines rues traversant différents codes
@@ -175,16 +175,17 @@ Cinq configuration de géocodage sont possibles dans `phacochr` :
     colonnes séparées (comme la situation 3). Dans ce cas, le code
     postal doit être en fin de champ. Lorsque ce n’est pas le cas, le
     programme ne fonctionne pas (situation peu courante). Cette
-    configuration demande de renseigner les arguments
+    configuration demande de renseigner l’argument
     `colonne_rue_code_postal`.
 
 Dans chacune de ces configurations, le programme procède à différentes
 corrections pour obtenir les informations nécessaires au géocodage. Le
 tableau ci-dessous schématise les différentes configurations, indique
-différentes exemples à partir d’une même adresse et des notes pour que
+différents exemples à partir d’une même adresse et des notes pour que
 l’utilisateur comprenne ce que fait le programme :
 
-![Tableau schématique1](man/figures/cas_adresses.png)
+![Tableau schématique des configurations
+possibles](man/figures/cas_adresses2.png)
 
 ## Logique de `phacochr`
 
@@ -246,19 +247,20 @@ administratives utiles. Sans être exhaustifs, on y trouve :
 
 -   Les secteurs statistiques (et leurs noms en NL et FR) ;
 -   Les codes INS des communes, arrondissements, provinces et regions
-    (ainsi que leurs noms en FR et NL)
+    (ainsi que leurs noms en FR et NL) ;
 -   Les quartier monitoring pour Bruxelles.
 
 Nous créons également [un objet `sf`](https://r-spatial.github.io/sf/) -
-exportable en geopackage ou qui peut être cartographie avec la fonction
+exportable en geopackage ou qui peut être cartographié avec la fonction
 `phaco_map_s` - et produisons quelques statistiques indiquant la
 performance du géocodage. Le tableau ci-dessous schématise l’ensemble
 des opérations réalisées :
 
 <figure>
-<img src="man/figures/phacochr4.png" width="550"
-alt="Tableau schématique2" />
-<figcaption aria-hidden="true">Tableau schématique2</figcaption>
+<img src="man/figures/phacochr4.png" width="500"
+alt="Tableau schématique du traitement opéré par phacochr" />
+<figcaption aria-hidden="true">Tableau schématique du traitement opéré
+par phacochr</figcaption>
 </figure>
 
 ## Contact
@@ -266,7 +268,7 @@ alt="Tableau schématique2" />
 En cas de bug, n’hésitez surtout pas à nous contacter : nous désirons
 améliorer le programme et sommes preneur de tout retour. Les deux
 auteurs de ce package sont chercheurs en sociologie et en géographie ;
-nous ne sommes pas programmeurs de profession, et sommmes également
+nous ne sommes pas programmeurs de profession, et sommes également
 preneurs de toute proposition d’amélioration !
 
 ## Auteurs

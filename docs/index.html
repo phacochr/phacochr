@@ -124,10 +124,10 @@
 <span>                        colonne_num<span class="op">=</span> <span class="st">"num"</span>,</span>
 <span>                        colonne_code_postal<span class="op">=</span><span class="st">"code_postal"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result</span><span class="op">$</span><span class="va">data_geocoded</span> <span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">17</span><span class="op">:</span><span class="fl">19</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   ID_address mid_postcode mid_cd_sector mid_arrond</span></span>
-<span><span class="co">#&gt; 1          1         1040     21004B2WJ         21</span></span>
-<span><span class="co">#&gt; 2          2         1000     21004C61-         21</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">result</span><span class="op">$</span><span class="va">data_geocoded</span> <span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ID_address"</span>, <span class="st">"x_31370"</span>, <span class="st">"y_31370"</span>, <span class="st">"cd_sector"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;   ID_address x_31370 y_31370 cd_sector</span></span>
+<span><span class="co">#&gt; 1          1  150373  170090 21004B13-</span></span>
+<span><span class="co">#&gt; 2          2  151105  166831 21004C61-</span></span></code></pre></div>
 <p>Le package dispose également d’une fonction de cartographie des adresses géocodées. <code><a href="reference/phaco_map_s.html">phaco_map_s()</a></code> produit des cartes statiques à partir des données géocodées : il suffit de passer à la fonction l’objet <code>data_geocoded_sf</code> créé précédemment par <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code>. La fonction dessine alors les coordonnées des adresses sur une carte dont les frontières administratives sont également affichées. Si les adresses se restreignent à Bruxelles, la carte se limite automatiquement à la Région bruxelloise. Les options de la fonction <a href="https://phacochr.github.io/phacochr/">sont également renseignées dans le manuel</a>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/phaco_map_s.html">phaco_map_s</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">data_geocoded_sf</span>,</span>
@@ -137,22 +137,22 @@
 <div class="section level2">
 <h2 id="configurations-de-géocodage-possibles">Configurations de géocodage possibles<a class="anchor" aria-label="anchor" href="#configurations-de-g%C3%A9ocodage-possibles"></a>
 </h2>
-<p>Cinq configuration de géocodage sont possibles dans <code>phacochr</code> :</p>
+<p>Cinq configurations de géocodage sont possibles dans <code>phacochr</code> :</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Le numéro de rue, la rue et le code postal sont présents dans des colonnes séparées dans les données à géocoder :</strong> il s’agit de la configuration idéale qui rencontrera le meilleur résultat. Dans ce cas, il faut renseigner les arguments <code>colonne_num</code>, <code>colonne_rue</code> et <code>colonne_code_postal</code>.</li>
 <li>
-<strong>Le numéro de rue et la rue sont mélangés dans une colonne, et le code postal séparé dans une autre :</strong> dans ce cas, <code>phacochr</code> recrée à l’aide des <a href="https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions" class="external-link">expressions régulières (REGEX)</a> la rue et le numéro dans des colonnes séparées. Cette procédure fonctionne très bien la plupart du temps. Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans le champ. Un numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas cependant peu courant). Cette configuration demande de renseigner les arguments <code>colonne_num_rue</code> et <code>colonne_code_postal</code>.</li>
+<strong>Le numéro de rue et la rue sont mélangés dans une colonne, et le code postal seul dans une autre :</strong> dans ce cas, <code>phacochr</code> recrée à l’aide des <a href="https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions" class="external-link">expressions régulières (REGEX)</a> la rue et le numéro dans des colonnes séparées. Cette procédure fonctionne très bien la plupart du temps. Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans le champ. Un numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas cependant peu courant). Cette configuration demande de renseigner les arguments <code>colonne_num_rue</code> et <code>colonne_code_postal</code>.</li>
 <li>
 <strong>Le numéro de rue, la rue et le code postal sont intégrés dans la même colonne :</strong> <code>phacochr</code> recrée le numéro de rue, la rue (comme la situation précédente) mais aussi le code postal dans des colonnes séparées. Cette situation fonctionne également très bien, à condition d’observer cette règle : le numéro doit être le premier nombre et le code postal être en fin de champ (situations les plus courantes). Dans ce cas, il faut renseigner l’argument <code>colonne_num_rue_code_postal</code>.</li>
 <li>
-<strong>La rue et le code postal sont présents dans des colonnes séparées (sans numéro) :</strong> cette situation ressemble à la première, mais sans que le numéro soit disponible <code>phacochr</code> géocode alors non pas à un niveau de précision du bâtiment, mais choisi comme coordonnée de résultat le batiment disposant du numéro médian de la rue au sein du même code postal (certaines rues traversant différents codes postaux). Cette configuration demande de renseigner les arguments <code>colonne_rue</code> et <code>colonne_code_postal</code>.</li>
+<strong>La rue et le code postal sont présents dans des colonnes séparées (sans numéro) :</strong> cette situation ressemble à la première, mais sans que le numéro soit disponible. <code>phacochr</code> géocode alors non pas à un niveau de précision du bâtiment, mais choisi comme coordonnée de résultat le batiment disposant du numéro médian de la rue au sein du même code postal (certaines rues traversant différents codes postaux). Cette configuration demande de renseigner les arguments <code>colonne_rue</code> et <code>colonne_code_postal</code>.</li>
 <li>
-<strong>La rue et le code postal sont intégrés dans la même colonne (sans numéro) :</strong> le programme recrée la rue et le code postal dans des colonnes séparées (comme la situation 3). Dans ce cas, le code postal doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (situation peu courante). Cette configuration demande de renseigner les arguments <code>colonne_rue_code_postal</code>.</li>
+<strong>La rue et le code postal sont intégrés dans la même colonne (sans numéro) :</strong> le programme recrée la rue et le code postal dans des colonnes séparées (comme la situation 3). Dans ce cas, le code postal doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (situation peu courante). Cette configuration demande de renseigner l’argument <code>colonne_rue_code_postal</code>.</li>
 </ol>
-<p>Dans chacune de ces configurations, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Le tableau ci-dessous schématise les différentes configurations, indique différentes exemples à partir d’une même adresse et des notes pour que l’utilisateur comprenne ce que fait le programme :</p>
+<p>Dans chacune de ces configurations, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Le tableau ci-dessous schématise les différentes configurations, indique différents exemples à partir d’une même adresse et des notes pour que l’utilisateur comprenne ce que fait le programme :</p>
 <div class="figure">
-<img src="reference/figures/cas_adresses.png" alt=""><p class="caption">Tableau schématique1</p>
+<img src="reference/figures/cas_adresses2.png" alt=""><p class="caption">Tableau schématique des configurations possibles</p>
 </div>
 </div>
 <div class="section level2">
@@ -172,18 +172,18 @@
 <p>La procédure de géocodage est alors finie. Nous terminons les opérations en joignant à chaque adresse trouvée différentes informations administratives utiles. Sans être exhaustifs, on y trouve :</p>
 <ul>
 <li>Les secteurs statistiques (et leurs noms en NL et FR) ;</li>
-<li>Les codes INS des communes, arrondissements, provinces et regions (ainsi que leurs noms en FR et NL)</li>
+<li>Les codes INS des communes, arrondissements, provinces et regions (ainsi que leurs noms en FR et NL) ;</li>
 <li>Les quartier monitoring pour Bruxelles.</li>
 </ul>
-<p>Nous créons également <a href="https://r-spatial.github.io/sf/" class="external-link">un objet <code>sf</code></a> - exportable en geopackage ou qui peut être cartographie avec la fonction <code>phaco_map_s</code> - et produisons quelques statistiques indiquant la performance du géocodage. Le tableau ci-dessous schématise l’ensemble des opérations réalisées :</p>
-<figure><img src="reference/figures/phacochr4.png" width="550" alt="Tableau schématique2"><figcaption aria-hidden="true">
-Tableau schématique2
+<p>Nous créons également <a href="https://r-spatial.github.io/sf/" class="external-link">un objet <code>sf</code></a> - exportable en geopackage ou qui peut être cartographié avec la fonction <code>phaco_map_s</code> - et produisons quelques statistiques indiquant la performance du géocodage. Le tableau ci-dessous schématise l’ensemble des opérations réalisées :</p>
+<figure><img src="reference/figures/phacochr4.png" width="500" alt="Tableau schématique du traitement opéré par phacochr"><figcaption aria-hidden="true">
+Tableau schématique du traitement opéré par phacochr
 </figcaption></figure>
 </div>
 <div class="section level2">
 <h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
 </h2>
-<p>En cas de bug, n’hésitez surtout pas à nous contacter : nous désirons améliorer le programme et sommes preneur de tout retour. Les deux auteurs de ce package sont chercheurs en sociologie et en géographie ; nous ne sommes pas programmeurs de profession, et sommmes également preneurs de toute proposition d’amélioration !</p>
+<p>En cas de bug, n’hésitez surtout pas à nous contacter : nous désirons améliorer le programme et sommes preneur de tout retour. Les deux auteurs de ce package sont chercheurs en sociologie et en géographie ; nous ne sommes pas programmeurs de profession, et sommes également preneurs de toute proposition d’amélioration !</p>
 </div>
 <div class="section level2">
 <h2 id="auteurs">Auteurs<a class="anchor" aria-label="anchor" href="#auteurs"></a>
