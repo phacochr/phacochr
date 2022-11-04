@@ -293,8 +293,8 @@ trouvent à plus de 98%, pour 6 bases de données entre 96% et 98% et pour
 
 <figure>
 <img src="man/figures/graph_match_rate.png" width="500"
-alt="Graphique du % d’adresses géocodées" />
-<figcaption aria-hidden="true">Graphique du % d’adresses
+alt="Graphique du pourcentage d’adresses géocodées" />
+<figcaption aria-hidden="true">Graphique du pourcentage d’adresses
 géocodées</figcaption>
 </figure>
 
