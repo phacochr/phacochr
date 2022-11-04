@@ -39,10 +39,10 @@ néérlandais ou allemand.
 
 Le package est très rapide pour géocoder de longues listes (+/- 1min40
 pour géocoder 20.000 adresses dans les 3 langues et situées dans toute
-la Belgique) et le taux de succès pour le géocodage est élevé (en
-moyenne 95%). `phacochr` constitue donc une alternative très performante
-face aux solutions existantes tout en reposant entièrement sur des
-données publiques et des procédures libres.
+la Belgique) et le taux de succès pour le géocodage est élevé (médiane
+de 97%). `phacochr` constitue donc une alternative très performante face
+aux solutions existantes tout en reposant entièrement sur des données
+publiques et des procédures libres.
 
 ## Installation
 
@@ -134,7 +134,7 @@ phaco_map_s(result$data_geocoded_sf,
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
-## Configurations de géocodage possibles
+## Formatage des adresses à géocoder
 
 Cinq configurations de géocodage sont possibles dans `phacochr` :
 
@@ -263,13 +263,53 @@ alt="Tableau schématique du traitement opéré par phacochr" />
 par phacochr</figcaption>
 </figure>
 
+## Performances de `phacochr`
+
+Nous présentons ici quelques mesures des performances de `phacochr`.
+Nous avons réalisés des tests sur 18 bases de données réelles fournies
+par des collègues (merci à elles et eux).
+
+La vitesse d’exécution par adresse suit une fonction inverse (1/x).
+`phacochr` est beaucoup meilleur avec un nombre conséquent d’adresses.
+Ceci vient entre autre du fait qu’il doit charger des données avant de
+réaliser les traitements. Pour plus de 2000 adresses, la vitesse
+d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses. A
+titre d’exemple, 2 adresses sont trouvées en 16s, 300 adresses prend
+environ 20s, 1000 adresses 25s, 20 000 adresses 140s (1m40).
+
+<figure>
+<img src="man/figures/graph_temps_calcul.png" width="500"
+alt="Graphique du temps de calcul nécessaire pour géocoder avec phacochr selon le nombre d’adresses à géocoder" />
+<figcaption aria-hidden="true">Graphique du temps de calcul nécessaire
+pour géocoder avec phacochr selon le nombre d’adresses à
+géocoder</figcaption>
+</figure>
+
+`phacochr` possède une bonne capacité à trouver les adresses. Sur le
+même set de 18 base de données, la médiane du pourcentage d’adresses
+trouvées est de 97%. Pour 7 base de données sur les 18 `phacochr`
+trouvent à plus de 98%, pour 6 bases de données entre 96% et 98% et pour
+5 bases de données entre 90% et 96%.
+
+<img src="man/figures/graph_match_rate.png" width="500"
+alt="Graphique du % d’adresses géocodées" /> Ces résultats sur la
+performance sont à nuancer par le fait qu’il y a probablement des “faux
+positifs”. Pour avoir une idée de la qualités des résultats, il est
+conseillé de vérifier quelles corrections orthographiques ont été
+réalisée, quelle distance a été acceptée pour réaliser la jointure
+inexacte, si un élargissement aux communes adjacentes a été nécessaire
+et si un autre numéro que celui renseigné a été choisi (+ ou - x numéro
+ou le milieu de la rue).
+
 ## Contact
 
-En cas de bug, n’hésitez surtout pas à nous contacter : nous désirons
+En cas de bug, n’hésitez surtout pas à nous faire part : nous désirons
 améliorer le programme et sommes à l’écoute de tout retour. Les deux
 auteurs de ce package sont chercheurs en sociologie et en géographie ;
 nous ne sommes pas programmeurs de profession, et sommes également
-preneurs de toute proposition d’amélioration !
+preneurs de toute proposition d’amélioration ! Rendez-vous dans la
+section ‘issues’ sur notre
+[Github](https://github.com/phacochr/phacochr/issues).
 
 ## Auteurs
 

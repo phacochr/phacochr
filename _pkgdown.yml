@@ -37,6 +37,6 @@ footer:
 
 home:
   sidebar:
-    structure: [dev,authors, license, citation]
+    structure: [dev,authors, license, citation, toc]
 
 
