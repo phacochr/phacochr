@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Geocodeur belge">
 <meta property="og:description" content="PhacochR est un géocodeur pour la Belgique sous forme de package R. A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.">
@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">phacochr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,39 +82,42 @@
 <!-- badges: start -->
 
 <!-- badges: end -->
-<p>PhacochR est un géocodeur pour la Belgique sous forme de package R. A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.</p>
-<p>Le programme fonctionne avec les données publiques <a href="https://opendata.bosa.be/" class="external-link">BeST Address</a> compilées par BOSA à partir des données régionales URBIS (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de phacochR est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address (grâce aux packages R <a href="https://cran.r-project.org/web/packages/fuzzyjoin/index.html" class="external-link">fuzzyjoin</a> et <a href="https://cran.r-project.org/web/packages/stringdist/index.html" class="external-link">stringdist</a>). PhacochR dispose également de plusieurs options : il réalise des corrections orthographiques préalables (en français et néérlandais) et trouve le numéro le plus proche - de préférence du même côté de la rue - si les coordonnées du numéro indiqué sont inconnues. En cas de non disponibilité du numéro de la rue, le programme indique les coordonnées du milieu de la rue. PhacochR est compatible avec les 3 langues nationales : il géocode des adresses écrites en français, néérlandais ou allemand.</p>
-<p>Le package est très rapide (+/- 1min40 pour géocoder 20.000 adresses dans les 3 langues et situées dans toute la Belgique) et le taux de succès pour le géocodage est élevé (en moyenne 90-95%). Phacochr constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.</p>
+<p><code>phacochr</code> est un géocodeur pour la Belgique sous forme de package R. A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.</p>
+<p>Le programme fonctionne avec les données publiques <a href="https://opendata.bosa.be/" class="external-link">BeST Address</a> compilées par BOSA à partir des données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de <code>phacochr</code> est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address grâce aux fonctions des packages R <a href="https://cran.r-project.org/web/packages/fuzzyjoin/index.html" class="external-link">fuzzyjoin</a> et <a href="https://cran.r-project.org/web/packages/stringdist/index.html" class="external-link">stringdist</a>. <code>phacochr</code> dispose de plusieurs options : il peut notamment réaliser des corrections orthographiques (en français et néérlandais) préalables à la détection des rues ou procéder au géocodage au numéro le plus proche - de préférence du même côté de la rue - si les coordonnées du numéro indiqué sont inconnues (par exemple si l’adresse n’existe plus). En cas de non disponibilité du numéro de la rue, le programme indique les coordonnées du numéro médian de la rue. <code>phacochr</code> est compatible avec les 3 langues nationales : il géocode des adresses écrites en français, néérlandais ou allemand.</p>
+<p>Le package est très rapide pour géocoder de longues listes (+/- 1min40 pour géocoder 20.000 adresses dans les 3 langues et situées dans toute la Belgique) et le taux de succès pour le géocodage est élevé (en moyenne 95%). <code>phacochr</code> constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Vous pouvez installer le package phacochr depuis <a href="https://github.com/" class="external-link">GitHub</a>. Il est indispensable lors de la première utilisation d’installer les données nécessaires au géocodage via la fonction <code><a href="reference/phaco_setup_data.html">phaco_setup_data()</a></code>. Ces fichiers sont stockés de manière permanente dans un répertoire de travail sur l’ordinateur.</p>
+<p>Vous pouvez installer le package <code>phacochr</code> depuis <a href="https://github.com/" class="external-link">GitHub</a>. Il est indispensable lors de la première utilisation d’installer les données nécessaires à son utilisation via la fonction <code><a href="reference/phaco_setup_data.html">phaco_setup_data()</a></code>. Ces fichiers (+/- 265Mo) sont téléchargés et stockés de manière permanente dans un répertoire de travail sur l’ordinateur (dépendant du système d’exploitation et renseigné par la fonction lors de l’installation).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<code class="sourceCode R"><span><span class="co"># Installer devtools si celui-ci n'est pas présent sur votre ordinateur</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"phacochr/phacochr"</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Installer et charger phacochr</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"phacochr/phacochr"</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://phacochr.github.io/phacochr/">phacochr</a></span><span class="op">)</span></span>
-<span><span class="co"># Pour installer les données</span></span>
+<span></span>
+<span><span class="co"># Installer les données nécessaires à phacochr</span></span>
 <span><span class="fu"><a href="reference/phaco_setup_data.html">phaco_setup_data</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>Il est possible pour l’utilisateur de mettre à jour lui-même les données <a href="https://opendata.bosa.be/" class="external-link">BeST Address</a> (actualisées de manière hebdomadaire par BOSA) vers les dernières données disponibles en ligne avec la fonction <code><a href="reference/phaco_best_data_update.html">phaco_best_data_update()</a></code> :</p>
+<p>Il est également possible pour l’utilisateur de mettre à jour lui-même les données <a href="https://opendata.bosa.be/" class="external-link">BeST Address</a> (actualisées de manière hebdomadaire par BOSA) vers les dernières données disponibles en ligne avec la fonction <code><a href="reference/phaco_best_data_update.html">phaco_best_data_update()</a></code> :</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/phaco_best_data_update.html">phaco_best_data_update</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="exemple">Exemple<a class="anchor" aria-label="anchor" href="#exemple"></a>
+<h2 id="exemple-de-géocodage">Exemple de géocodage<a class="anchor" aria-label="anchor" href="#exemple-de-g%C3%A9ocodage"></a>
 </h2>
-<p>Voici un exemple basé sur un data.frame contenant deux adresses :</p>
+<p>Voici un exemple de géocodage d’un data.frame contenant deux adresses :</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>nom<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Observatoire de la Santé et du Social"</span>, <span class="st">"ULB"</span><span class="op">)</span>,</span>
-<span>                rue<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rue Belliard"</span>,<span class="st">"avenue Antoine Depage"</span><span class="op">)</span>,</span>
-<span>                num<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"71"</span>, <span class="st">"30"</span><span class="op">)</span>,</span>
-<span>                code_postal<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1040"</span>,<span class="st">"1000"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>nom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Observatoire de la Santé et du Social"</span>, <span class="st">"ULB"</span><span class="op">)</span>,</span>
+<span>                rue <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rue Belliard"</span>, <span class="st">"avenue Antoine Depage"</span><span class="op">)</span>,</span>
+<span>                num <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"71"</span>, <span class="st">"30"</span><span class="op">)</span>,</span>
+<span>                code_postal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1040"</span>, <span class="st">"1000"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">x</span></span>
 <span><span class="co">#&gt;                                     nom                   rue num code_postal</span></span>
 <span><span class="co">#&gt; 1 Observatoire de la Santé et du Social          rue Belliard  71        1040</span></span>
 <span><span class="co">#&gt; 2                                   ULB avenue Antoine Depage  30        1000</span></span></code></pre></div>
-<p>Le géocodage se lance simplement avec la fonction <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code> sur ce data.frame. La performance du géocodage est légèrement meilleure si toutes les informations (numéro, rue et code postal) sont indiquées dans des colonnes distinctes, mais le programme accepte des adresses ou toutes les informations sont dans un seul champ (voir le manuel : <a href="https://phacochr.github.io/phacochr/" class="uri">https://phacochr.github.io/phacochr/</a>).</p>
+<p>Le géocodage se lance simplement avec la fonction <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code> appliquée à ce data.frame. Nous indiquons dans cet exemple 3 paramètres : les colonnes contenant la rue, le numéro de rue et le code postal, disponibles séparément dans la base de données. Il s’agit de la situation idéale, mais le programme est compatible avec d’autres configurations : celles-ci sont renseignée plus bas au point <strong>Configurations de géocodage possibles</strong>. Mentionnons déjà que le numéro peut ne pas être renseigné ; <code>phacochr</code> trouve alors les coordonnées du numéro médian de la rue au code postal indiqué. La fonction dispose de plusieurs options, voir le manuel : <a href="https://phacochr.github.io/phacochr/" class="uri">https://phacochr.github.io/phacochr/</a>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/phaco_geocode.html">phaco_geocode</a></span><span class="op">(</span>data_to_geocode <span class="op">=</span> <span class="va">x</span>,</span>
 <span>                        colonne_rue<span class="op">=</span> <span class="st">"rue"</span>,</span>
@@ -125,10 +128,62 @@
 <span><span class="co">#&gt;   ID_address mid_postcode mid_cd_sector mid_arrond</span></span>
 <span><span class="co">#&gt; 1          1         1040     21004B2WJ         21</span></span>
 <span><span class="co">#&gt; 2          2         1000     21004C61-         21</span></span></code></pre></div>
-<p>Le package dispose également de fonctions de cartographie des adresses géocodées. <code><a href="reference/phaco_map_s.html">phaco_map_s()</a></code> produit des cartes statiques : il suffit de passer à la fonction l’objet <code>data_geocoded_sf</code> créé précédemment par <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code>. La fonction dessine alors les coordonnées des adresses sur une carte dont les frontières administratives sont également affichées. Si les adresses se restreignent à Bruxelles, la carte se limite automatiquement à la Région bruxelloise.</p>
+<p>Le package dispose également d’une fonction de cartographie des adresses géocodées. <code><a href="reference/phaco_map_s.html">phaco_map_s()</a></code> produit des cartes statiques à partir des données géocodées : il suffit de passer à la fonction l’objet <code>data_geocoded_sf</code> créé précédemment par <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code>. La fonction dessine alors les coordonnées des adresses sur une carte dont les frontières administratives sont également affichées. Si les adresses se restreignent à Bruxelles, la carte se limite automatiquement à la Région bruxelloise. Les options de la fonction <a href="https://phacochr.github.io/phacochr/">sont également renseignées dans le manuel</a>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/phaco_map_s.html">phaco_map_s</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">data_geocoded_sf</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/phaco_map_s.html">phaco_map_s</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">data_geocoded_sf</span>,</span>
+<span>            title_carto <span class="op">=</span> <span class="st">"Institutions des auteurs"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
+</div>
+<div class="section level2">
+<h2 id="configurations-de-géocodage-possibles">Configurations de géocodage possibles<a class="anchor" aria-label="anchor" href="#configurations-de-g%C3%A9ocodage-possibles"></a>
+</h2>
+<p>Cinq configuration de géocodage sont possibles dans <code>phacochr</code> :</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Le numéro de rue, la rue et le code postal sont présents dans des colonnes séparées dans les données à géocoder :</strong> il s’agit de la configuration idéale qui rencontrera le meilleur résultat. Dans ce cas, il faut renseigner les arguments <code>colonne_num</code>, <code>colonne_rue</code> et <code>colonne_code_postal</code>.</li>
+<li>
+<strong>Le numéro de rue et la rue sont mélangés dans une colonne, et le code postal séparé dans une autre :</strong> dans ce cas, <code>phacochr</code> recrée à l’aide des <a href="https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions" class="external-link">expressions régulières (REGEX)</a> la rue et le numéro dans des colonnes séparées. Cette procédure fonctionne très bien la plupart du temps. Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans le champ. Un numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas cependant peu courant). Cette configuration demande de renseigner les arguments <code>colonne_num_rue</code> et <code>colonne_code_postal</code>.</li>
+<li>
+<strong>Le numéro de rue, la rue et le code postal sont intégrés dans la même colonne :</strong> <code>phacochr</code> recrée le numéro de rue, la rue (comme la situation précédente) mais aussi le code postal dans des colonnes séparées. Cette situation fonctionne également très bien, à condition d’observer cette règle : le numéro doit être le premier nombre et le code postal être en fin de champ (situations les plus courantes). Dans ce cas, il faut renseigner l’argument <code>colonne_num_rue_code_postal</code>.</li>
+<li>
+<strong>La rue et le code postal sont présents dans des colonnes séparées (sans numéro) :</strong> cette situation ressemble à la première, mais sans que le numéro soit disponible <code>phacochr</code> géocode alors non pas à un niveau de précision du bâtiment, mais choisi comme coordonnée de résultat le batiment disposant du numéro médian de la rue au sein du même code postal (certaines rues traversant différents codes postaux). Cette configuration demande de renseigner les arguments <code>colonne_rue</code> et <code>colonne_code_postal</code>.</li>
+<li>
+<strong>La rue et le code postal sont intégrés dans la même colonne (sans numéro) :</strong> le programme recrée la rue et le code postal dans des colonnes séparées (comme la situation 3). Dans ce cas, le code postal doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (situation peu courante). Cette configuration demande de renseigner les arguments <code>colonne_rue_code_postal</code>.</li>
+</ol>
+<p>Dans chacune de ces configurations, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Le tableau ci-dessous schématise les différentes configurations, indique différentes exemples à partir d’une même adresse et des notes pour que l’utilisateur comprenne ce que fait le programme :</p>
+<div class="figure">
+<img src="reference/figures/cas_adresses.png" alt=""><p class="caption">Tableau schématique1</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="logique-de-phacochr">Logique de <code>phacochr</code>
+<a class="anchor" aria-label="anchor" href="#logique-de-phacochr"></a>
+</h2>
+<p>Nous expliquons ici avec plus de détail la logique du traitement réalisé par <code>phacochr</code>. Celui-ci repose sur les données BeST Address, que nous avons largement reformatées pour optimiser le traitement. Nous avons également utilisé des données produites par Statbel et Urbis dans ce reformatage. Nous ne rentrons pas dans l’explication de ces modifications ici, et renvoyons les curieux au <a href="https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R" class="external-link">code de la fonction <code>phaco_best_data_update()</code> disponible sur Github</a>.</p>
+<p>Nous nous concentrons ici sur les opérations réalisées par la fonction <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code>, fonction de géocodage à proprement parler. Si l’on schématise, ces opérations se classent en trois grandes familles :</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Formatage des données :</strong> le programme détecte d’abord la configuration des données à géocoder, et créé les colonnes nettoyées de numéro de rue (si disponible, ce qui est souvent le cas), de rue et de code postal. Des corrections sont faites pour chacun de ces champs, afin de maximiser les chances de trouver l’adresse dans la suite des opérations.</li>
+<li>
+<strong>Détection des rues :</strong> <code>phacochr</code> procède alors à une <em>jointure inexacte</em> entre chacune des rue (nettoyées au point précédent) et l’ensemble des rue de BeST Address <em>au sein du code postal indiqué</em>. La procédure est réalisée en calcul parallélisé avec n-1 cores afin d’augmenter sa vitesse. Le paramètre <code>error_max</code> permet d’indiquer l’erreur acceptable par l’utilisateur. Celle-ci est réglée par défaut à 4, ce qui permet de trouver des rues mal orthographiées, sans les confondre avec d’autres, avec un très bon taux de succès. Augmenter ce paramètre augmentera le pourcentage de rues trouvées, mais aussi d’erreurs réalisées. Dans le cas où la langue dans laquelle les adresses sont inscrites est connue, elle peut être renseignée via l’argument <code>lang_encoded</code>, ce qui augmente la vitesse et la fiabilité du processus. Si la rue n’est pas trouvée, le programme étend sa recherche à la commune entière et à toutes les communes limitrophes. Cette procédure optionnelle peut être désactivée avec le paramètre <code>elargissement_com_adj = FALSE</code>.</li>
+<li>
+<strong>Jointure avec les coordonnées géographiques :</strong> une fois la rue trouvée, il est désormais possible de réaliser une <em>jointure exacte</em> avec les données BeST au niveau du numéro, celles-ci comprenant les coordonnées X-Y de l’ensemble des adresses en Belgique. Pour ce faire, seuls les arrondissements dans lesquels sont présents les codes postaux sont chargés en RAM, pour augmenter la vitesse et soulager l’ordinateur. Les coordonnées des adresses qui ne sont pas trouvées sont approximées en trouvant les coordonnées connues de l’adresse la plus proche du même côté de la rue. L’amplitude maximale de cette approximation est réglabe avec le paramètre <code>approx_num_max</code> (à régler à 0 pour la désactiver). Dans le cas où les coordonnées ne sont pas trouvées, ce sont celles du numéro médian de la rue (proxy du milieu de la rue) qui sont indiquées (désactivable avec l’argument <code>mid_street = FALSE</code>). Si les données ne possèdent pas de numéro, c’est cette information qui est indiquée comme résultat du géocodage.</li>
+</ol>
+<p>La procédure de géocodage est alors finie. Nous terminons les opérations en joignant à chaque adresse trouvée différentes informations administratives utiles. Sans être exhaustifs, on y trouve :</p>
+<ul>
+<li>Les secteurs statistiques (et leurs noms en NL et FR) ;</li>
+<li>Les codes INS des communes, arrondissements, provinces et regions (ainsi que leurs noms en FR et NL)</li>
+<li>Les quartier monitoring pour Bruxelles.</li>
+</ul>
+<p>Nous créons également <a href="https://r-spatial.github.io/sf/" class="external-link">un objet <code>sf</code></a> - exportable en geopackage ou qui peut être cartographie avec la fonction <code>phaco_map_s</code> - et produisons quelques statistiques indiquant la performance du géocodage. Le tableau ci-dessous schématise l’ensemble des opérations réalisées :</p>
+<div class="figure">
+<img src="reference/figures/phacochr4.png" alt=""><p class="caption">Tableau schématique2</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
+</h2>
+<p>En cas de bug, n’hésitez surtout pas à nous contacter : nous désirons améliorer le programme et sommes preneur de tout retour. Les deux auteurs de ce package sont chercheurs en sociologie et en géographie ; nous ne sommes pas programmeurs de profession, et sommmes également preneurs de toute proposition d’amélioration !</p>
 </div>
 <div class="section level2">
 <h2 id="auteurs">Auteurs<a class="anchor" aria-label="anchor" href="#auteurs"></a>
