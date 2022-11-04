@@ -150,7 +150,7 @@
 <li>
 <strong>La rue et le code postal sont intégrés dans la même colonne (sans numéro) :</strong> le programme reconstitue la rue et le code postal dans des colonnes séparées (comme la situation 3). Dans ce cas, le code postal doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (situation peu courante). Ce format demande de renseigner l’argument <code>colonne_rue_code_postal</code>.</li>
 </ol>
-<p>Dans chacune de ces configurations, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Le tableau ci-dessous schématise les différentes configurations, indique différents exemples à partir d’une même adresse et mentionne des notes pour que l’utilisateur comprenne ce que fait le programme :</p>
+<p>Dans chacun de ces formats, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Le tableau ci-dessous schématise les différentes configurations envisageables, indique différents exemples à partir d’une même adresse (le <em>71 rue Belliard, 1040 Bruxelles</em>) et mentionne des notes pour que l’utilisateur comprenne ce que fait le programme :</p>
 <div class="figure">
 <img src="reference/figures/cas_adresses2.png" alt=""><p class="caption">Tableau schématique des formats possibles</p>
 </div>
@@ -171,9 +171,9 @@
 </ol>
 <p>La procédure de géocodage est alors finie. Nous terminons les opérations en joignant à chaque adresse trouvée différentes informations administratives utiles. Sans être exhaustif, on y trouve :</p>
 <ul>
-<li>Les secteurs statistiques (et leurs noms en NL et FR) ;</li>
-<li>Les codes INS des communes, arrondissements, provinces et regions (ainsi que leurs noms en FR et NL) ;</li>
-<li>Les quartiers monitoring pour Bruxelles.</li>
+<li>Les secteurs statistiques (colonne <code>cd_sector</code> et leurs noms en NL et FR <code>tx_sector_descr_nl</code> et <code>tx_sector_descr_fr</code>) ;</li>
+<li>Les quartiers monitoring pour Bruxelles (colonne <code>MDRC</code> et leurs noms en NL et FR <code>NAME_DUT</code> et <code>NAME_FRE</code> ) ;</li>
+<li>Les codes INS des communes, arrondissements, provinces et regions (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les appelations classiques de Statbel.</li>
 </ul>
 <p>Nous créons également <a href="https://r-spatial.github.io/sf/" class="external-link">un objet <code>sf</code></a> - exportable en geopackage ou qui peut être cartographié avec la fonction <code>phaco_map_s</code> - et produisons quelques statistiques indiquant la performance du géocodage. Le tableau ci-dessous schématise l’ensemble des opérations réalisées et expliquées précédemment :</p>
 <figure><img src="reference/figures/phacochr4.png" width="500" alt="Tableau schématique du traitement opéré par phacochr"><figcaption aria-hidden="true">
@@ -191,7 +191,14 @@ Graphique du temps de calcul nécessaire pour géocoder avec phacochr selon le n
 </figcaption></figure><p><code>phacochr</code> possède une bonne capacité à trouver les adresses. Sur le même set de 18 bases de données, la médiane du pourcentage d’adresses trouvées est de 97%. Pour 7 bases de données sur les 18, <code>phacochr</code> trouve les coordonnées à plus de 98%, pour 6 bases de données entre 96% et 98% et pour 5 bases de données entre 90% et 96%.</p>
 <figure><img src="reference/figures/graph_match_rate.png" width="500" alt="Graphique du pourcentage d’adresses géocodées"><figcaption aria-hidden="true">
 Graphique du pourcentage d’adresses géocodées
-</figcaption></figure><p>Ces résultats sur la performance sont à nuancer par le fait qu’il y a probablement des “faux positifs”. Pour avoir une idée de la qualités des résultats, il est conseillé de vérifier quelles corrections orthographiques ont été réalisées, quelle distance a été acceptée pour réaliser la jointure inexacte, si un élargissement aux communes adjacentes a été nécessaire et si un autre numéro que celui renseigné a été choisi (+ ou - x numéro ou le milieu de la rue).</p>
+</figcaption></figure><p>Ces résultats sur la performance sont à nuancer par le fait qu’il y a probablement des “faux positifs” (normalement peu nombreux avec les réglages par défaut). Pour avoir une idée de la qualité des résultats, il est conseillé de vérifier plusieurs éléments :</p>
+<ul>
+<li>Vérifier globalement que les corrections orthographiques ont bien fonctionné (la colonne <code>rue_recoded</code> comprend la rue nettoyée et corrigée, et <code>recode</code> indique les types de corrections réalisées) ;</li>
+<li>Comparer les rues détectées par <code>phacochr</code> (la colonne <code>street_FINAL_detected</code>) avec les rues d’origine pour les erreurs les plus élevées dans la jointure inexacte (la colonne <code>dist_fuzzy</code> indique le nombre d’erreurs nécessaires pour faire la jointure avec les données BeST. 0 signifie que le matching est exact) ;</li>
+<li>Procéder à la même comparaison pour les rues dont la détection a nécessité un élargissement aux communes adjacentes (colonne <code>type_geocoding == elargissement_adj</code>). Une rue au même nom aurait pu être trouvée dans une commune voisine ;</li>
+<li>Vérifier la proportion des adresses qui ont nécessité une localisation géographique à un autre numéro si celui renseigné n’a pas été trouvé, ainsi que l’ampleur de cette approximation (colonne <code>approx_num</code>) ;</li>
+<li>Vérifier la proportion des adresses qui ont demandé une localisation au numéro médian de la rue au code postal indiqué si aucune autre localisation plus précise n’a plus être réalisée (colonne <code>type_geocoding == mid_street</code>).</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>

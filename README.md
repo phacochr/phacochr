@@ -180,11 +180,12 @@ géocoder :
     programme ne fonctionne pas (situation peu courante). Ce format
     demande de renseigner l’argument `colonne_rue_code_postal`.
 
-Dans chacune de ces configurations, le programme procède à différentes
+Dans chacun de ces formats, le programme procède à différentes
 corrections pour obtenir les informations nécessaires au géocodage. Le
-tableau ci-dessous schématise les différentes configurations, indique
-différents exemples à partir d’une même adresse et mentionne des notes
-pour que l’utilisateur comprenne ce que fait le programme :
+tableau ci-dessous schématise les différentes configurations
+envisageables, indique différents exemples à partir d’une même adresse
+(le *71 rue Belliard, 1040 Bruxelles*) et mentionne des notes pour que
+l’utilisateur comprenne ce que fait le programme :
 
 ![Tableau schématique des formats
 possibles](man/figures/cas_adresses2.png)
@@ -248,10 +249,13 @@ La procédure de géocodage est alors finie. Nous terminons les opérations
 en joignant à chaque adresse trouvée différentes informations
 administratives utiles. Sans être exhaustif, on y trouve :
 
--   Les secteurs statistiques (et leurs noms en NL et FR) ;
+-   Les secteurs statistiques (colonne `cd_sector` et leurs noms en NL
+    et FR `tx_sector_descr_nl` et `tx_sector_descr_fr`) ;
+-   Les quartiers monitoring pour Bruxelles (colonne `MDRC` et leurs
+    noms en NL et FR `NAME_DUT` et `NAME_FRE` ) ;
 -   Les codes INS des communes, arrondissements, provinces et regions
-    (ainsi que leurs noms en FR et NL) ;
--   Les quartiers monitoring pour Bruxelles.
+    (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les
+    appelations classiques de Statbel.
 
 Nous créons également [un objet `sf`](https://r-spatial.github.io/sf/) -
 exportable en geopackage ou qui peut être cartographié avec la fonction
@@ -304,12 +308,30 @@ géocodées</figcaption>
 </figure>
 
 Ces résultats sur la performance sont à nuancer par le fait qu’il y a
-probablement des “faux positifs”. Pour avoir une idée de la qualités des
-résultats, il est conseillé de vérifier quelles corrections
-orthographiques ont été réalisées, quelle distance a été acceptée pour
-réaliser la jointure inexacte, si un élargissement aux communes
-adjacentes a été nécessaire et si un autre numéro que celui renseigné a
-été choisi (+ ou - x numéro ou le milieu de la rue).
+probablement des “faux positifs” (normalement peu nombreux avec les
+réglages par défaut). Pour avoir une idée de la qualité des résultats,
+il est conseillé de vérifier plusieurs éléments :
+
+-   Vérifier globalement que les corrections orthographiques ont bien
+    fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et
+    corrigée, et `recode` indique les types de corrections réalisées) ;
+-   Comparer les rues détectées par `phacochr` (la colonne
+    `street_FINAL_detected`) avec les rues d’origine pour les erreurs
+    les plus élevées dans la jointure inexacte (la colonne `dist_fuzzy`
+    indique le nombre d’erreurs nécessaires pour faire la jointure avec
+    les données BeST. 0 signifie que le matching est exact) ;
+-   Procéder à la même comparaison pour les rues dont la détection a
+    nécessité un élargissement aux communes adjacentes (colonne
+    `type_geocoding == elargissement_adj`). Une rue au même nom aurait
+    pu être trouvée dans une commune voisine ;
+-   Vérifier la proportion des adresses qui ont nécessité une
+    localisation géographique à un autre numéro si celui renseigné n’a
+    pas été trouvé, ainsi que l’ampleur de cette approximation (colonne
+    `approx_num`) ;
+-   Vérifier la proportion des adresses qui ont demandé une localisation
+    au numéro médian de la rue au code postal indiqué si aucune autre
+    localisation plus précise n’a plus être réalisée (colonne
+    `type_geocoding == mid_street`).
 
 ## Contact
 
