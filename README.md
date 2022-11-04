@@ -37,12 +37,13 @@ coordonnées du numéro médian de la rue. `phacochr` est compatible avec
 les 3 langues nationales : il géocode des adresses écrites en français,
 néérlandais ou allemand.
 
-Le package est très rapide pour géocoder de longues listes (+/- 1min40
-pour géocoder 20.000 adresses dans les 3 langues et situées dans toute
-la Belgique) et le taux de succès pour le géocodage est élevé (médiane
-de 97%). `phacochr` constitue donc une alternative très performante face
-aux solutions existantes tout en reposant entièrement sur des données
-publiques et des procédures libres.
+Le package est très rapide pour géocoder de longues listes (la vitesse
+d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses) et le
+taux de succès pour le géocodage est élevé (médiane de 97%). Voir plus
+bas le point **Performances de `phacochr`** pour le détail des
+performances. `phacochr` constitue donc une alternative très performante
+face aux solutions existantes tout en reposant entièrement sur des
+données publiques et des procédures libres.
 
 ## Installation
 
@@ -55,7 +56,7 @@ l’ordinateur (dépendant du système d’exploitation et renseigné par la
 fonction lors de l’installation).
 
 ``` r
-# Installer devtools si celui-ci n'est pas présent sur votre ordinateur
+# Installer devtools si celui-ci n'est pas installé
 install.packages("devtools")
 library(devtools)
 
@@ -144,8 +145,8 @@ Cinq configurations de géocodage sont possibles dans `phacochr` :
     cas, il faut renseigner les arguments `colonne_num`, `colonne_rue`
     et `colonne_code_postal`.
 2.  **Le numéro de rue et la rue sont mélangés dans une colonne, et le
-    code postal seul dans une autre :** dans ce cas, `phacochr` recrée à
-    l’aide des [expressions régulières
+    code postal est seul dans une autre :** dans ce cas, `phacochr`
+    recrée à l’aide des [expressions régulières
     (REGEX)](https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions)
     la rue et le numéro dans des colonnes séparées. Cette procédure
     fonctionne très bien la plupart du temps. Il faut cependant
@@ -155,9 +156,9 @@ Cinq configurations de géocodage sont possibles dans `phacochr` :
     cependant peu courant). Cette configuration demande de renseigner
     les arguments `colonne_num_rue` et `colonne_code_postal`.
 3.  **Le numéro de rue, la rue et le code postal sont intégrés dans la
-    même colonne :** `phacochr` recrée le numéro de rue, la rue (comme
-    la situation précédente) mais aussi le code postal dans des colonnes
-    séparées. Cette situation fonctionne également très bien, à
+    même colonne :** `phacochr` reconstitue le numéro de rue, la rue
+    (comme la situation précédente) mais aussi le code postal dans des
+    colonnes séparées. Cette situation fonctionne également très bien, à
     condition d’observer cette règle : le numéro doit être le premier
     nombre et le code postal être en fin de champ (situations les plus
     courantes). Dans ce cas, il faut renseigner l’argument
@@ -165,8 +166,8 @@ Cinq configurations de géocodage sont possibles dans `phacochr` :
 4.  **La rue et le code postal sont présents dans des colonnes séparées
     (sans numéro) :** cette situation ressemble à la première, mais sans
     que le numéro soit disponible. `phacochr` géocode alors non pas à un
-    niveau de précision du bâtiment, mais choisi comme coordonnée de
-    résultat le batiment disposant du numéro médian de la rue au sein du
+    niveau de précision du bâtiment, mais choisi comme coordonnées de
+    résultat le bâtiment disposant du numéro médian de la rue au sein du
     même code postal (certaines rues traversant différents codes
     postaux). Cette configuration demande de renseigner les arguments
     `colonne_rue` et `colonne_code_postal`.
@@ -181,8 +182,8 @@ Cinq configurations de géocodage sont possibles dans `phacochr` :
 Dans chacune de ces configurations, le programme procède à différentes
 corrections pour obtenir les informations nécessaires au géocodage. Le
 tableau ci-dessous schématise les différentes configurations, indique
-différents exemples à partir d’une même adresse et des notes pour que
-l’utilisateur comprenne ce que fait le programme :
+différents exemples à partir d’une même adresse et mentionne des notes
+pour que l’utilisateur comprenne ce que fait le programme :
 
 ![Tableau schématique des configurations
 possibles](man/figures/cas_adresses2.png)
@@ -209,7 +210,7 @@ schématise, ces opérations se classent en trois grandes familles :
     champs, afin de maximiser les chances de trouver l’adresse dans la
     suite des opérations.
 2)  **Détection des rues :** `phacochr` procède alors à une *jointure
-    inexacte* entre chacune des rue (nettoyées au point précédent) et
+    inexacte* entre chacune des rues (nettoyées au point précédent) et
     l’ensemble des rue de BeST Address *au sein du code postal indiqué*.
     La procédure est réalisée en calcul parallélisé avec n-1 cores afin
     d’augmenter sa vitesse. Le paramètre `error_max` permet d’indiquer
@@ -224,37 +225,38 @@ schématise, ces opérations se classent en trois grandes familles :
     programme étend sa recherche à la commune entière et à toutes les
     communes limitrophes. Cette procédure optionnelle peut être
     désactivée avec le paramètre `elargissement_com_adj = FALSE`.
-3)  **Jointure avec les coordonnées géographiques :** une fois la rue
-    trouvée, il est désormais possible de réaliser une *jointure exacte*
-    avec les données BeST au niveau du numéro, celles-ci comprenant les
-    coordonnées X-Y de l’ensemble des adresses en Belgique. Pour ce
-    faire, seuls les arrondissements dans lesquels sont présents les
-    codes postaux sont chargés en RAM, pour augmenter la vitesse et
-    soulager l’ordinateur. Les coordonnées des adresses qui ne sont pas
-    trouvées sont approximées en trouvant les coordonnées connues de
-    l’adresse la plus proche du même côté de la rue. L’amplitude
-    maximale de cette approximation est réglabe avec le paramètre
-    `approx_num_max` (à régler à 0 pour la désactiver). Dans le cas où
-    les coordonnées ne sont pas trouvées, ce sont celles du numéro
-    médian de la rue (proxy du milieu de la rue) qui sont indiquées
-    (désactivable avec l’argument `mid_street = FALSE`). Si les données
-    ne possèdent pas de numéro, c’est cette information qui est indiquée
-    comme résultat du géocodage.
+3)  **Jointure avec les coordonnées géographiques :** une fois les rues
+    trouvées, il est désormais possible de réaliser une *jointure
+    exacte* avec les données BeST au niveau du numéro, celles-ci
+    comprenant les coordonnées X-Y de l’ensemble des adresses en
+    Belgique. Pour ce faire, seuls les arrondissements dans lesquels
+    sont présents les codes postaux des doonées à géocoder sont chargés
+    en RAM, pour augmenter la vitesse du traitement et soulager
+    l’ordinateur. Les coordonnées des adresses qui ne sont pas trouvées
+    sont approximées en trouvant les coordonnées connues de l’adresse la
+    plus proche du même côté de la rue. L’amplitude maximale de cette
+    approximation est réglable avec le paramètre `approx_num_max` (à
+    régler à 0 pour la désactiver). Dans le cas où les coordonnées ne
+    sont pas trouvées, ce sont celles du numéro médian de la rue (proxy
+    du milieu de la rue) qui sont indiquées (désactivable avec
+    l’argument `mid_street = FALSE`). Si les données ne possèdent pas de
+    numéro, c’est cette information qui est indiquée comme résultat du
+    géocodage.
 
 La procédure de géocodage est alors finie. Nous terminons les opérations
 en joignant à chaque adresse trouvée différentes informations
-administratives utiles. Sans être exhaustifs, on y trouve :
+administratives utiles. Sans être exhaustif, on y trouve :
 
 -   Les secteurs statistiques (et leurs noms en NL et FR) ;
 -   Les codes INS des communes, arrondissements, provinces et regions
     (ainsi que leurs noms en FR et NL) ;
--   Les quartier monitoring pour Bruxelles.
+-   Les quartiers monitoring pour Bruxelles.
 
 Nous créons également [un objet `sf`](https://r-spatial.github.io/sf/) -
 exportable en geopackage ou qui peut être cartographié avec la fonction
 `phaco_map_s` - et produisons quelques statistiques indiquant la
 performance du géocodage. Le tableau ci-dessous schématise l’ensemble
-des opérations réalisées :
+des opérations réalisées et expliquées précédemment :
 
 <figure>
 <img src="man/figures/phacochr4.png" width="500"
@@ -266,16 +268,18 @@ par phacochr</figcaption>
 ## Performances de `phacochr`
 
 Nous présentons ici quelques mesures des performances de `phacochr`.
-Nous avons réalisés des tests sur 18 bases de données réelles fournies
+Nous avons réalisé des tests sur 18 bases de données réelles fournies
 par des collègues (merci à elles et eux).
 
 La vitesse d’exécution par adresse suit une fonction inverse (1/x).
-`phacochr` est beaucoup meilleur avec un nombre conséquent d’adresses.
-Ceci vient entre autre du fait qu’il doit charger des données avant de
-réaliser les traitements. Pour plus de 2000 adresses, la vitesse
-d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses. A
-titre d’exemple, 2 adresses sont trouvées en 16s, 300 adresses prend
-environ 20s, 1000 adresses 25s, 20 000 adresses 140s (1m40).
+`phacochr` est bien meilleur avec un nombre conséquent d’adresses. Ceci
+vient entre autre du fait qu’il doit charger des données volumineuses
+avant de réaliser les traitements : le “coût” marginal en temps de ce
+chargement est d’autant plus faible que les données sont nombreuses à
+géocoder. Pour plus de 2000 adresses, la vitesse d’exécution se situe
+entre 0,4 et 0,8 secondes pour 100 adresses. A titre d’exemple, 2
+adresses sont trouvées en 16s, 300 adresses prend environ 20s, 1000
+adresses 25s, 20 000 adresses 140s.
 
 <figure>
 <img src="man/figures/graph_temps_calcul.png" width="500"
@@ -286,10 +290,10 @@ géocoder</figcaption>
 </figure>
 
 `phacochr` possède une bonne capacité à trouver les adresses. Sur le
-même set de 18 base de données, la médiane du pourcentage d’adresses
-trouvées est de 97%. Pour 7 base de données sur les 18 `phacochr`
-trouvent à plus de 98%, pour 6 bases de données entre 96% et 98% et pour
-5 bases de données entre 90% et 96%.
+même set de 18 bases de données, la médiane du pourcentage d’adresses
+trouvées est de 97%. Pour 7 base de données sur les 18, `phacochr`
+trouve les coordonnées à plus de 98%, pour 6 bases de données entre 96%
+et 98% et pour 5 bases de données entre 90% et 96%.
 
 <figure>
 <img src="man/figures/graph_match_rate.png" width="500"
@@ -301,20 +305,20 @@ géocodées</figcaption>
 Ces résultats sur la performance sont à nuancer par le fait qu’il y a
 probablement des “faux positifs”. Pour avoir une idée de la qualités des
 résultats, il est conseillé de vérifier quelles corrections
-orthographiques ont été réalisée, quelle distance a été acceptée pour
+orthographiques ont été réalisées, quelle distance a été acceptée pour
 réaliser la jointure inexacte, si un élargissement aux communes
 adjacentes a été nécessaire et si un autre numéro que celui renseigné a
 été choisi (+ ou - x numéro ou le milieu de la rue).
 
 ## Contact
 
-En cas de bug, n’hésitez surtout pas à nous faire part : nous désirons
-améliorer le programme et sommes à l’écoute de tout retour. Les deux
-auteurs de ce package sont chercheurs en sociologie et en géographie ;
-nous ne sommes pas programmeurs de profession, et sommes également
-preneurs de toute proposition d’amélioration ! Rendez-vous dans la
-section ‘issues’ sur notre
-[Github](https://github.com/phacochr/phacochr/issues).
+Si vous rencontrez un bug à l’utilisation, n’hésitez surtout pas à nous
+en faire part : nous désirons améliorer le programme et sommes désireux
+d’avoir le maximum de retours. Nous - les deux auteurs de ce package -
+sommes chercheurs en sociologie et en géographie ; nous ne sommes pas
+programmeurs de profession, et sommes donc également preneurs de toute
+proposition d’amélioration ! Rendez-vous dans la section ‘issues’ sur
+notre [Github](https://github.com/phacochr/phacochr/issues).
 
 ## Auteurs
 

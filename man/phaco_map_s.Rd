@@ -14,7 +14,7 @@ phaco_map_s(
 )
 }
 \arguments{
-\item{FULL_GEOCODING_sf}{L'objet sfà cartographier issu de phaco_geocode().}
+\item{FULL_GEOCODING_sf}{L'objet sf à cartographier issu de phaco_geocode().}
 
 \item{colonne_ponderation}{Un poids pour les points a cartographier.}
 
