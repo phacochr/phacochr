@@ -97,11 +97,11 @@ appliquée à ce data.frame. Nous indiquons dans cet exemple 3 paramètres
 : les colonnes contenant la rue, le numéro de rue et le code postal,
 disponibles séparément dans la base de données. Il s’agit de la
 situation idéale, mais le programme est compatible avec d’autres
-configurations : celles-ci sont renseignée plus bas au point
-**Configurations de géocodage possibles**. Mentionnons déjà que le
-numéro peut ne pas être renseigné ; `phacochr` trouve alors les
-coordonnées du numéro médian de la rue au code postal indiqué. La
-fonction dispose de plusieurs options, voir le manuel :
+configurations : celles-ci sont renseignée plus bas au point **Format
+des données à géocoder**. Mentionnons déjà que le numéro peut ne pas
+être renseigné ; `phacochr` trouve alors les coordonnées du numéro
+médian de la rue au code postal indiqué. La fonction dispose de
+plusieurs options, voir le manuel :
 <https://phacochr.github.io/phacochr/>.
 
 ``` r
@@ -135,49 +135,50 @@ phaco_map_s(result$data_geocoded_sf,
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
-## Formatage des adresses à géocoder
+## Format des données à géocoder
 
-Cinq configurations de géocodage sont possibles dans `phacochr` :
+`phacochr` est compatible avec cinq formats concernant les données à
+géocoder :
 
 1.  **Le numéro de rue, la rue et le code postal sont présents dans des
-    colonnes séparées dans les données à géocoder :** il s’agit de la
-    configuration idéale qui rencontrera le meilleur résultat. Dans ce
-    cas, il faut renseigner les arguments `colonne_num`, `colonne_rue`
-    et `colonne_code_postal`.
+    colonnes séparées dans les données à géocoder :** il s’agit du
+    format idéal qui rencontrera le meilleur résultat. Dans ce cas, il
+    faut renseigner les arguments `colonne_num`, `colonne_rue` et
+    `colonne_code_postal`.
 2.  **Le numéro de rue et la rue sont mélangés dans une colonne, et le
-    code postal est seul dans une autre :** dans ce cas, `phacochr`
-    recrée à l’aide des [expressions régulières
+    code postal est seul dans une autre :** ce format demande de
+    renseigner les arguments `colonne_num_rue` et `colonne_code_postal`.
+    Dans ce format, `phacochr` reconstitue à l’aide des [expressions
+    régulières
     (REGEX)](https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions)
     la rue et le numéro dans des colonnes séparées. Cette procédure
     fonctionne très bien la plupart du temps. Il faut cependant
     respecter une règle importante : le numéro de rue doit être le
-    premier numéro indiqué dans le champ. Un numéro de boite (ou autre
-    numéro) ne peut par exemple pas précéder le numéro de rue (cas
-    cependant peu courant). Cette configuration demande de renseigner
-    les arguments `colonne_num_rue` et `colonne_code_postal`.
+    premier numéro indiqué dans la colonne `colonne_num_rue`. Un numéro
+    de boite (ou autre numéro) ne peut par exemple pas précéder le
+    numéro de rue (cas cependant peu courant).
 3.  **Le numéro de rue, la rue et le code postal sont intégrés dans la
-    même colonne :** `phacochr` reconstitue le numéro de rue, la rue
-    (comme la situation précédente) mais aussi le code postal dans des
-    colonnes séparées. Cette situation fonctionne également très bien, à
-    condition d’observer cette règle : le numéro doit être le premier
-    nombre et le code postal être en fin de champ (situations les plus
-    courantes). Dans ce cas, il faut renseigner l’argument
-    `colonne_num_rue_code_postal`.
+    même colonne :** dans ce format, il faut renseigner l’argument
+    `colonne_num_rue_code_postal`. Le géocodeur reconstitue le numéro de
+    rue, la rue (comme la situation précédente) mais aussi le code
+    postal dans des colonnes séparées. Cette situation fonctionne
+    également très bien, à condition d’observer cette règle : le numéro
+    doit être le premier nombre et le code postal être en fin de champ
+    (situations les plus courantes).
 4.  **La rue et le code postal sont présents dans des colonnes séparées
     (sans numéro) :** cette situation ressemble à la première, mais sans
     que le numéro soit disponible. `phacochr` géocode alors non pas à un
     niveau de précision du bâtiment, mais choisi comme coordonnées de
     résultat le bâtiment disposant du numéro médian de la rue au sein du
     même code postal (certaines rues traversant différents codes
-    postaux). Cette configuration demande de renseigner les arguments
+    postaux). Ce format demande de renseigner les arguments
     `colonne_rue` et `colonne_code_postal`.
 5.  **La rue et le code postal sont intégrés dans la même colonne (sans
-    numéro) :** le programme recrée la rue et le code postal dans des
-    colonnes séparées (comme la situation 3). Dans ce cas, le code
+    numéro) :** le programme reconstitue la rue et le code postal dans
+    des colonnes séparées (comme la situation 3). Dans ce cas, le code
     postal doit être en fin de champ. Lorsque ce n’est pas le cas, le
-    programme ne fonctionne pas (situation peu courante). Cette
-    configuration demande de renseigner l’argument
-    `colonne_rue_code_postal`.
+    programme ne fonctionne pas (situation peu courante). Ce format
+    demande de renseigner l’argument `colonne_rue_code_postal`.
 
 Dans chacune de ces configurations, le programme procède à différentes
 corrections pour obtenir les informations nécessaires au géocodage. Le
@@ -185,7 +186,7 @@ tableau ci-dessous schématise les différentes configurations, indique
 différents exemples à partir d’une même adresse et mentionne des notes
 pour que l’utilisateur comprenne ce que fait le programme :
 
-![Tableau schématique des configurations
+![Tableau schématique des formats
 possibles](man/figures/cas_adresses2.png)
 
 ## Logique de `phacochr`
@@ -230,7 +231,7 @@ schématise, ces opérations se classent en trois grandes familles :
     exacte* avec les données BeST au niveau du numéro, celles-ci
     comprenant les coordonnées X-Y de l’ensemble des adresses en
     Belgique. Pour ce faire, seuls les arrondissements dans lesquels
-    sont présents les codes postaux des doonées à géocoder sont chargés
+    sont présents les codes postaux des données à géocoder sont chargés
     en RAM, pour augmenter la vitesse du traitement et soulager
     l’ordinateur. Les coordonnées des adresses qui ne sont pas trouvées
     sont approximées en trouvant les coordonnées connues de l’adresse la
@@ -276,9 +277,9 @@ La vitesse d’exécution par adresse suit une fonction inverse (1/x).
 vient entre autre du fait qu’il doit charger des données volumineuses
 avant de réaliser les traitements : le “coût” marginal en temps de ce
 chargement est d’autant plus faible que les données sont nombreuses à
-géocoder. Pour plus de 2000 adresses, la vitesse d’exécution se situe
-entre 0,4 et 0,8 secondes pour 100 adresses. A titre d’exemple, 2
-adresses sont trouvées en 16s, 300 adresses prend environ 20s, 1000
+géocoder. A partir de 2000 adresses, la vitesse d’exécution se situe
+entre 0,4 et 0,8 secondes / 100 adresses. A titre d’exemple, 2 adresses
+sont trouvées en 16s, géocoder 300 adresses prend environ 20s, 1000
 adresses 25s, 20 000 adresses 140s.
 
 <figure>
@@ -291,7 +292,7 @@ géocoder</figcaption>
 
 `phacochr` possède une bonne capacité à trouver les adresses. Sur le
 même set de 18 bases de données, la médiane du pourcentage d’adresses
-trouvées est de 97%. Pour 7 base de données sur les 18, `phacochr`
+trouvées est de 97%. Pour 7 bases de données sur les 18, `phacochr`
 trouve les coordonnées à plus de 98%, pour 6 bases de données entre 96%
 et 98% et pour 5 bases de données entre 90% et 96%.
 
@@ -312,13 +313,13 @@ adjacentes a été nécessaire et si un autre numéro que celui renseigné a
 
 ## Contact
 
-Si vous rencontrez un bug à l’utilisation, n’hésitez surtout pas à nous
-en faire part : nous désirons améliorer le programme et sommes désireux
-d’avoir le maximum de retours. Nous - les deux auteurs de ce package -
-sommes chercheurs en sociologie et en géographie ; nous ne sommes pas
-programmeurs de profession, et sommes donc également preneurs de toute
-proposition d’amélioration ! Rendez-vous dans la section ‘issues’ sur
-notre [Github](https://github.com/phacochr/phacochr/issues).
+Si vous rencontrez un bug à l’utilisation, n’hésitez pas à nous en faire
+part : nous désirons améliorer le programme et sommes intéressés d’avoir
+le maximum de retours. Les deux auteurs de ce package sont chercheurs en
+sociologie et en géographie ; nous ne sommes pas programmeurs de
+profession, et sommes donc également preneurs de toute proposition
+d’amélioration ! Rendez-vous dans la section ‘issues’ sur notre
+[Github](https://github.com/phacochr/phacochr/issues).
 
 ## Auteurs
 
