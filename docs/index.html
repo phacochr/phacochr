@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Geocodeur belge">
 <meta property="og:description" content="PhacochR est un géocodeur pour la Belgique sous forme de package R. A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.">
@@ -84,7 +84,7 @@
 <!-- badges: end -->
 <p><code>phacochr</code> est un géocodeur pour la Belgique sous forme de package R. A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.</p>
 <p>Le programme fonctionne avec les données publiques <a href="https://opendata.bosa.be/" class="external-link">BeST Address</a> compilées par BOSA à partir des données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de <code>phacochr</code> est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address grâce aux fonctions des packages R <a href="https://cran.r-project.org/web/packages/fuzzyjoin/index.html" class="external-link">fuzzyjoin</a> et <a href="https://cran.r-project.org/web/packages/stringdist/index.html" class="external-link">stringdist</a>. <code>phacochr</code> dispose de plusieurs options : il peut notamment réaliser des corrections orthographiques (en français et néérlandais) préalables à la détection des rues ou procéder au géocodage au numéro le plus proche - de préférence du même côté de la rue - si les coordonnées du numéro indiqué sont inconnues (par exemple si l’adresse n’existe plus). En cas de non disponibilité du numéro de la rue, le programme indique les coordonnées du numéro médian de la rue. <code>phacochr</code> est compatible avec les 3 langues nationales : il géocode des adresses écrites en français, néérlandais ou allemand.</p>
-<p>Le package est très rapide pour géocoder de longues listes (+/- 1min40 pour géocoder 20.000 adresses dans les 3 langues et situées dans toute la Belgique) et le taux de succès pour le géocodage est élevé (en moyenne 95%). <code>phacochr</code> constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.</p>
+<p>Le package est très rapide pour géocoder de longues listes (+/- 1min40 pour géocoder 20.000 adresses dans les 3 langues et situées dans toute la Belgique) et le taux de succès pour le géocodage est élevé (médiane de 97%). <code>phacochr</code> constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -135,7 +135,7 @@
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
 </div>
 <div class="section level2">
-<h2 id="configurations-de-géocodage-possibles">Configurations de géocodage possibles<a class="anchor" aria-label="anchor" href="#configurations-de-g%C3%A9ocodage-possibles"></a>
+<h2 id="formatage-des-adresses-à-géocoder">Formatage des adresses à géocoder<a class="anchor" aria-label="anchor" href="#formatage-des-adresses-%C3%A0-g%C3%A9ocoder"></a>
 </h2>
 <p>Cinq configurations de géocodage sont possibles dans <code>phacochr</code> :</p>
 <ol style="list-style-type: decimal">
@@ -181,9 +181,20 @@ Tableau schématique du traitement opéré par phacochr
 </figcaption></figure>
 </div>
 <div class="section level2">
+<h2 id="performances-de-phacochr">Performances de <code>phacochr</code>
+<a class="anchor" aria-label="anchor" href="#performances-de-phacochr"></a>
+</h2>
+<p>Nous présentons ici quelques mesures des performances de <code>phacochr</code>. Nous avons réalisés des tests sur 18 bases de données réelles fournies par des collègues (merci à elles et eux).</p>
+<p>La vitesse d’exécution par adresse suit une fonction inverse (1/x). <code>phacochr</code> est beaucoup meilleur avec un nombre conséquent d’adresses. Ceci vient entre autre du fait qu’il doit charger des données avant de réaliser les traitements. Pour plus de 2000 adresses, la vitesse d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses. A titre d’exemple, 2 adresses sont trouvées en 16s, 300 adresses prend environ 20s, 1000 adresses 25s, 20 000 adresses 140s (1m40).</p>
+<figure><img src="reference/figures/graph_temps_calcul.png" width="500" alt="Graphique du temps de calcul nécessaire pour géocoder avec phacochr selon le nombre d’adresses à géocoder"><figcaption aria-hidden="true">
+Graphique du temps de calcul nécessaire pour géocoder avec phacochr selon le nombre d’adresses à géocoder
+</figcaption></figure><p><code>phacochr</code> possède une bonne capacité à trouver les adresses. Sur le même set de 18 base de données, la médiane du pourcentage d’adresses trouvées est de 97%. Pour 7 base de données sur les 18 <code>phacochr</code> trouvent à plus de 98%, pour 6 bases de données entre 96% et 98% et pour 5 bases de données entre 90% et 96%.</p>
+<p><img src="reference/figures/graph_match_rate.png" width="500" alt="Graphique du % d’adresses géocodées"> Ces résultats sur la performance sont à nuancer par le fait qu’il y a probablement des “faux positifs”. Pour avoir une idée de la qualités des résultats, il est conseillé de vérifier quelles corrections orthographiques ont été réalisée, quelle distance a été acceptée pour réaliser la jointure inexacte, si un élargissement aux communes adjacentes a été nécessaire et si un autre numéro que celui renseigné a été choisi (+ ou - x numéro ou le milieu de la rue).</p>
+</div>
+<div class="section level2">
 <h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
 </h2>
-<p>En cas de bug, n’hésitez surtout pas à nous contacter : nous désirons améliorer le programme et sommes à l’écoute de tout retour. Les deux auteurs de ce package sont chercheurs en sociologie et en géographie ; nous ne sommes pas programmeurs de profession, et sommes également preneurs de toute proposition d’amélioration !</p>
+<p>En cas de bug, n’hésitez surtout pas à nous faire part : nous désirons améliorer le programme et sommes à l’écoute de tout retour. Les deux auteurs de ce package sont chercheurs en sociologie et en géographie ; nous ne sommes pas programmeurs de profession, et sommes également preneurs de toute proposition d’amélioration ! Rendez-vous dans la section ‘issues’ sur notre <a href="https://github.com/phacochr/phacochr/issues" class="external-link">Github</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="auteurs">Auteurs<a class="anchor" aria-label="anchor" href="#auteurs"></a>
@@ -231,6 +242,13 @@ Tableau schématique du traitement opéré par phacochr
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
 <li><a href="authors.html#citation">Citing phacochr</a></li>
+</ul>
+</div>
+
+<div class="table-of-contents">
+<h2 data-toc-skip>Table of contents</h2>
+<ul class="list-unstyled">
+<li><nav id="toc"></nav></li>
 </ul>
 </div>
 
