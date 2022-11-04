@@ -2,12 +2,12 @@
 #'
 #' Cette fonction produit facilement une carte statique a partir de l'objet issu du geocodage.
 #'
-#' @param FULL_GEOCODING_sf Un objet sf a cartographier
-#' @param title_carto Le titre de la carte produite
-#' @param colonne_ponderation Un poids pour les points a cartographier
-#' @param filter_bxl Afficher uniquement Bruxelles
-#' @param zoom_geocoded Zoomer sur les points
-#' @param nom_admin Afficher les noms des entites administratives
+#' @param FULL_GEOCODING_sf L'objet sfà cartographier issu de phaco_geocode().
+#' @param title_carto Le titre de la carte produite.
+#' @param colonne_ponderation Un poids pour les points a cartographier.
+#' @param filter_bxl Afficher uniquement Bruxelles.
+#' @param zoom_geocoded Zoomer sur les points.
+#' @param nom_admin Afficher les noms des entités administratives sur la carte.
 #'
 #' @import dplyr
 #' @import sf

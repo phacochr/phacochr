@@ -2,21 +2,21 @@
 #'
 #' Cette fonction est la principale du package phacochr. A partir d’une liste d’adresses, elle permet de retrouver leurs coordonnees X-Y.
 #'
-#' @param data_to_geocode Un dataframe avec les adresses a geocoder
-#' @param colonne_rue Nom de la colonne avec les rues
-#' @param colonne_num Nom de la colonne avec les numéros
-#' @param colonne_code_postal Nom de la colonne avec les codes postaux
-#' @param colonne_num_rue Nom de la colonne avec numéros et rues ensembles
-#' @param colonne_rue_code_postal Nom de la colonne avec rues et code postaux ensembles
-#' @param colonne_num_rue_code_postal Nom de la colonne avec numéros, rues et code postaux ensembles
+#' @param data_to_geocode Un dataframe avec les adresses a geocoder.
+#' @param colonne_rue Nom de la colonne avec les rues.
+#' @param colonne_num Nom de la colonne avec les numéros.
+#' @param colonne_code_postal Nom de la colonne avec les codes postaux.
+#' @param colonne_num_rue Nom de la colonne avec numéros et rues ensemble.
+#' @param colonne_rue_code_postal Nom de la colonne avec rues et code postaux ensemble.
+#' @param colonne_num_rue_code_postal Nom de la colonne avec numéros, rues et code postaux ensemble.
 #' @param method_stringdist Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles: "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw","soundex".
-#' @param corrections_REGEX Correction orthographique. Par défaut: TRUE. Cette option n'est désactivable que si la rue est contenue dans une colonne séparée, et ne contient ni le numéro ni le code postal.
-#' @param error_max Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: TRUE
-#' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50
-#' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE
-#' @param mid_street Indique les coordonnées du milieu de la rue si les coordonnées du numéro ne sont pas trouvée. Par défaut: TRUE
-#' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE")
-#' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier correspondant.
+#' @param corrections_REGEX Correction orthographique. Par défaut: TRUE. Cette option n'est désactivable que si la rue est contenue dans une colonne séparée (c'est-à-dire qu'elle ne contient ni le numéro ni le code postal).
+#' @param error_max Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: TRUE.
+#' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50.
+#' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE.
+#' @param mid_street Indique les coordonnées du milieu de la rue si les coordonnées du numéro ne sont pas trouvée. Par défaut: TRUE.
+#' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE").
+#' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
 #'
 #' @import dplyr
 #' @import tidyr

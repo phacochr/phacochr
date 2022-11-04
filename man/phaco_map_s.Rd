@@ -14,17 +14,17 @@ phaco_map_s(
 )
 }
 \arguments{
-\item{FULL_GEOCODING_sf}{Un objet sf a cartographier}
+\item{FULL_GEOCODING_sf}{L'objet sfà cartographier issu de phaco_geocode().}
 
-\item{colonne_ponderation}{Un poids pour les points a cartographier}
+\item{colonne_ponderation}{Un poids pour les points a cartographier.}
 
-\item{title_carto}{Le titre de la carte produite}
+\item{title_carto}{Le titre de la carte produite.}
 
-\item{filter_bxl}{Afficher uniquement Bruxelles}
+\item{filter_bxl}{Afficher uniquement Bruxelles.}
 
-\item{zoom_geocoded}{Zoomer sur les points}
+\item{zoom_geocoded}{Zoomer sur les points.}
 
-\item{nom_admin}{Afficher les noms des entites administratives}
+\item{nom_admin}{Afficher les noms des entités administratives sur la carte.}
 }
 \description{
 Cette fonction produit facilement une carte statique a partir de l'objet issu du geocodage.

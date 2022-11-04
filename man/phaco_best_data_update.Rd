@@ -7,7 +7,7 @@
 phaco_best_data_update(force = FALSE)
 }
 \arguments{
-\item{force}{Force la mise à jour même si les données sont à jour. Par défaut: FALSE}
+\item{force}{Force la mise à jour même si les données sont à jour. Par défaut: FALSE.}
 }
 \description{
 Cette fonction met à jour les données BeST Address vers la dernière version disponible sur le site de BOSA : https://opendata.bosa.be ainsi que les fichiers connexes nécessaire au géocodage.

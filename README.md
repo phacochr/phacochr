@@ -266,7 +266,7 @@ par phacochr</figcaption>
 ## Contact
 
 En cas de bug, n’hésitez surtout pas à nous contacter : nous désirons
-améliorer le programme et sommes preneur de tout retour. Les deux
+améliorer le programme et sommes à l’écoute de tout retour. Les deux
 auteurs de ce package sont chercheurs en sociologie et en géographie ;
 nous ne sommes pas programmeurs de profession, et sommes également
 preneurs de toute proposition d’amélioration !
