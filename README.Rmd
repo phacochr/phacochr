@@ -29,7 +29,7 @@ knitr::opts_chunk$set(
 Le programme fonctionne avec les données publiques [BeST Address](https://opendata.bosa.be/) compilées par BOSA à partir des données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de `phacochr` est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address grâce aux fonctions des packages R [fuzzyjoin](https://cran.r-project.org/web/packages/fuzzyjoin/index.html) et [stringdist](https://cran.r-project.org/web/packages/stringdist/index.html).
 `phacochr` dispose de plusieurs options : il peut notamment réaliser des corrections orthographiques (en français et néérlandais) préalables à la détection des rues ou procéder au géocodage au numéro le plus proche - de préférence du même côté de la rue - si les coordonnées du numéro indiqué sont inconnues (par exemple si l'adresse n'existe plus). En cas de non disponibilité du numéro de la rue, le programme indique les coordonnées du numéro médian de la rue. `phacochr` est compatible avec les 3 langues nationales : il géocode des adresses écrites en français, néérlandais ou allemand.
 
-Le package est très rapide pour géocoder de longues listes (la vitesse d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses) et le taux de succès pour le géocodage est élevé (médiane de 97%). Voir plus bas le point **Performances de `phacochr`** pour le détail des performances. `phacochr` constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.
+Le package est très rapide pour géocoder de longues listes (la vitesse d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses) et le taux de succès pour le géocodage est élevé (médiane de 97%). Voir plus bas le point **Performances de phacochr** pour le détail des performances. `phacochr` constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.
 
 
 ## Installation
@@ -107,7 +107,7 @@ Dans chacun de ces formats, le programme procède à différentes corrections po
 
 ## Logique de `phacochr`
 
-Nous expliquons ici avec plus de détail la logique du traitement réalisé par `phacochr`. Celui-ci repose sur les données BeST Address, que nous avons largement reformatées pour optimiser le traitement. Nous avons également utilisé des données produites par Statbel et Urbis dans ce reformatage. Nous ne rentrons pas dans l'explication de ces modifications ici, et renvoyons les curieux au [code de la fonction `phaco_best_data_update()` disponible sur Github](https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R).
+Nous expliquons ici avec plus de détail la logique du traitement réalisé par `phacochr`. Celui-ci repose sur les données BeST Address, que nous avons reformatées pour optimiser le traitement. Nous avons également utilisé des données produites par Statbel et Urbis dans ce reformatage. Nous ne rentrons pas dans l'explication de ces modifications ici, et renvoyons les curieux au [code de la fonction `phaco_best_data_update()` disponible sur Github](https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R).
 
 Nous nous concentrons ici sur les opérations réalisées par la fonction `phaco_geocode()`, fonction de géocodage à proprement parler. Si l'on schématise, ces opérations se classent en trois grandes familles :
 
@@ -146,6 +146,12 @@ Ces résultats sur la performance sont à nuancer par le fait qu'il y a probable
 * Procéder à la même comparaison pour les rues dont la détection a nécessité un élargissement aux communes adjacentes (colonne `type_geocoding == elargissement_adj`). Une rue au même nom aurait pu être trouvée dans une commune voisine ;
 * Vérifier la proportion des adresses qui ont nécessité une localisation géographique à un autre numéro si celui renseigné n'a pas été trouvé, ainsi que l'ampleur de cette approximation (colonne `approx_num`) ;
 * Vérifier la proportion des adresses qui ont demandé une localisation au numéro médian de la rue au code postal indiqué si aucune autre localisation plus précise n'a plus être réalisée (colonne `type_geocoding == mid_street`).
+
+## Fiabilité de `phacochr`
+
+Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré la *distance* entre la géolocalisation opérée par `phacochr` avec ses réglages par défaut et les coordonnées spatiales déjà présentes dans deux bases de données : celle des écoles néérlandophones et celle des pharmacies, les deux pour toute la Belgique. Cette distance peut être interprétée comme l'erreur dans la géolocalisation (bien qu'il est possible que les coordonnées déjà présentes dans ces deux bases de données ne soient pas précises : nous n'avons pas investigué la manière dont elles ont été produites). Le tableau suivant montre la répartition en pourcentages de cette erreur par classe de distance. On voit ainsi que 97,6% des adresses géocodées sont localisées à moins de 100m de leurs coordonnées "réelles", montrant un degré de fiabilité tout à fait satisfaisant.
+
+![Graphique de la répartition de l'erreur de géolocalisation](man/figures/erreur.png){width=500px}
 
 ## Contact
 

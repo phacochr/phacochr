@@ -40,7 +40,7 @@ néérlandais ou allemand.
 Le package est très rapide pour géocoder de longues listes (la vitesse
 d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses) et le
 taux de succès pour le géocodage est élevé (médiane de 97%). Voir plus
-bas le point **Performances de `phacochr`** pour le détail des
+bas le point **Performances de phacochr** pour le détail des
 performances. `phacochr` constitue donc une alternative très performante
 face aux solutions existantes tout en reposant entièrement sur des
 données publiques et des procédures libres.
@@ -194,11 +194,11 @@ possibles](man/figures/cas_adresses2.png)
 
 Nous expliquons ici avec plus de détail la logique du traitement réalisé
 par `phacochr`. Celui-ci repose sur les données BeST Address, que nous
-avons largement reformatées pour optimiser le traitement. Nous avons
-également utilisé des données produites par Statbel et Urbis dans ce
-reformatage. Nous ne rentrons pas dans l’explication de ces
-modifications ici, et renvoyons les curieux au [code de la fonction
-`phaco_best_data_update()` disponible sur
+avons reformatées pour optimiser le traitement. Nous avons également
+utilisé des données produites par Statbel et Urbis dans ce reformatage.
+Nous ne rentrons pas dans l’explication de ces modifications ici, et
+renvoyons les curieux au [code de la fonction `phaco_best_data_update()`
+disponible sur
 Github](https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R).
 
 Nous nous concentrons ici sur les opérations réalisées par la fonction
@@ -332,6 +332,29 @@ il est conseillé de vérifier plusieurs éléments :
     au numéro médian de la rue au code postal indiqué si aucune autre
     localisation plus précise n’a plus être réalisée (colonne
     `type_geocoding == mid_street`).
+
+## Fiabilité de `phacochr`
+
+Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré
+la *distance* entre la géolocalisation opérée par `phacochr` avec ses
+réglages par défaut et les coordonnées spatiales déjà présentes dans
+deux bases de données : celle des écoles néérlandophones et celle des
+pharmacies, les deux pour toute la Belgique. Cette distance peut être
+interprétée comme l’erreur dans la géolocalisation (bien qu’il est
+possible que les coordonnées déjà présentes dans ces deux bases de
+données ne soient pas précises : nous n’avons pas investigué la manière
+dont elles ont été produites). Le tableau suivant montre la répartition
+en pourcentages de cette erreur par classe de distance. On voit ainsi
+que 97,6% des adresses géocodées sont localisées à moins de 100m de
+leurs coordonnées “réelles”, montrant un degré de fiabilité tout à fait
+satisfaisant.
+
+<figure>
+<img src="man/figures/erreur.png" width="500"
+alt="Graphique de la répartition de l’erreur de géolocalisation" />
+<figcaption aria-hidden="true">Graphique de la répartition de l’erreur
+de géolocalisation</figcaption>
+</figure>
 
 ## Contact
 
