@@ -3,8 +3,7 @@
 
 <!-- badges: start -->
 
-[![R build
-status](https://github.com/GuangchuangYu/badger/workflows/R-CMD-check/badge.svg)](https://github.com/GuangchuangYu/badger/actions)
+[![R-CMD-check](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml)
 [![GPLv3
 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/phacochr/phacochr/blob/main/LICENSE)
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
