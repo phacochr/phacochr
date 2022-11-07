@@ -18,7 +18,7 @@
 #'
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' phaco_best_data_update()
 #' }
 #'

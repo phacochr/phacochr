@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' phaco_setup_data()
 #' }
 
