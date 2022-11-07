@@ -8,7 +8,9 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' phaco_setup_data()
+#' }
 
 phaco_setup_data <- function(){
 

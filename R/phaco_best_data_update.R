@@ -17,6 +17,10 @@
 #' @importFrom stats quantile
 #'
 #' @export
+#' @examples
+#' \donttest{
+#' phaco_best_data_update()
+#' }
 #'
 #'
 
