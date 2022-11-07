@@ -12,6 +12,3 @@ phaco_best_data_update(force = FALSE)
 \description{
 Cette fonction met à jour les données BeST Address vers la dernière version disponible sur le site de BOSA : https://opendata.bosa.be ainsi que les fichiers connexes nécessaire au géocodage.
 }
-\examples{
-phaco_best_data_update()
-}
