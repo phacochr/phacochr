@@ -335,18 +335,18 @@ il est conseillé de vérifier plusieurs éléments :
 ## Fiabilité de `phacochr`
 
 Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré
-la *distance* entre la géolocalisation opérée par `phacochr` avec ses
-réglages par défaut et les coordonnées spatiales déjà présentes dans
-deux bases de données : celle des écoles néérlandophones et celle des
-pharmacies, les deux pour toute la Belgique. Cette distance peut être
-interprétée comme l’erreur dans la géolocalisation (bien qu’il est
-possible que les coordonnées déjà présentes dans ces deux bases de
-données ne soient pas précises : nous n’avons pas investigué la manière
-dont elles ont été produites). Le tableau suivant montre la répartition
-en pourcentages de cette erreur par classe de distance. On voit ainsi
-que 97,6% des adresses géocodées sont localisées à moins de 100m de
-leurs coordonnées “réelles”, montrant un degré de fiabilité tout à fait
-satisfaisant.
+la *distance* (euclidienne, en mètres) entre la géolocalisation opérée
+par `phacochr` avec ses réglages par défaut et les coordonnées spatiales
+déjà présentes dans deux bases de données : celle des écoles
+néérlandophones et celle des pharmacies, les deux pour toute la
+Belgique. Cette distance peut être interprétée comme l’*erreur dans la
+géolocalisation* (bien qu’il est possible que les coordonnées déjà
+présentes dans ces deux bases de données ne soient pas précises : nous
+n’avons pas investigué la manière dont elles ont été produites). Le
+tableau suivant montre la répartition en pourcentages de cette erreur
+par classe de distance. On voit ainsi que 97,6% des adresses géocodées
+sont localisées à moins de 100m de leurs coordonnées “réelles”, montrant
+un degré de fiabilité tout à fait satisfaisant.
 
 <figure>
 <img src="man/figures/erreur.png" width="500"

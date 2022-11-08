@@ -204,7 +204,7 @@ Graphique du pourcentage d’adresses géocodées
 <h2 id="fiabilité-de-phacochr">Fiabilité de <code>phacochr</code>
 <a class="anchor" aria-label="anchor" href="#fiabilit%C3%A9-de-phacochr"></a>
 </h2>
-<p>Malgré cette mise en garde, <code>phacochr</code> reste fiable. Nous avons mesuré la <em>distance</em> entre la géolocalisation opérée par <code>phacochr</code> avec ses réglages par défaut et les coordonnées spatiales déjà présentes dans deux bases de données : celle des écoles néérlandophones et celle des pharmacies, les deux pour toute la Belgique. Cette distance peut être interprétée comme l’erreur dans la géolocalisation (bien qu’il est possible que les coordonnées déjà présentes dans ces deux bases de données ne soient pas précises : nous n’avons pas investigué la manière dont elles ont été produites). Le tableau suivant montre la répartition en pourcentages de cette erreur par classe de distance. On voit ainsi que 97,6% des adresses géocodées sont localisées à moins de 100m de leurs coordonnées “réelles”, montrant un degré de fiabilité tout à fait satisfaisant.</p>
+<p>Malgré cette mise en garde, <code>phacochr</code> reste fiable. Nous avons mesuré la <em>distance</em> (euclidienne, en mètres) entre la géolocalisation opérée par <code>phacochr</code> avec ses réglages par défaut et les coordonnées spatiales déjà présentes dans deux bases de données : celle des écoles néérlandophones et celle des pharmacies, les deux pour toute la Belgique. Cette distance peut être interprétée comme l’<em>erreur dans la géolocalisation</em> (bien qu’il est possible que les coordonnées déjà présentes dans ces deux bases de données ne soient pas précises : nous n’avons pas investigué la manière dont elles ont été produites). Le tableau suivant montre la répartition en pourcentages de cette erreur par classe de distance. On voit ainsi que 97,6% des adresses géocodées sont localisées à moins de 100m de leurs coordonnées “réelles”, montrant un degré de fiabilité tout à fait satisfaisant.</p>
 <figure><img src="reference/figures/erreur.png" width="500" alt="Graphique de la répartition de l’erreur de géolocalisation"><figcaption aria-hidden="true">
 Graphique de la répartition de l’erreur de géolocalisation
 </figcaption></figure>
@@ -232,7 +232,7 @@ Graphique de la répartition de l’erreur de géolocalisation
   </main><aside class="col-md-3"><div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/GuangchuangYu/badger/actions" class="external-link"><img src="https://github.com/GuangchuangYu/badger/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://github.com/phacochr/phacochr/blob/main/LICENSE" class="external-link"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="GPLv3 license"></a></li>
 <li><a href="https://svgshare.com/i/Zhy.svg" class="external-link"><img src="https://svgshare.com/i/Zhy.svg" alt="Linux"></a></li>
 <li><a href="https://svgshare.com/i/ZhY.svg" class="external-link"><img src="https://svgshare.com/i/ZhY.svg" alt="Windows"></a></li>
