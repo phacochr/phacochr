@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">phacochr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -243,7 +243,7 @@ Graphique de la répartition de l’erreur de géolocalisation
 </tr>
 <tr class="even">
 <td><strong>street_FINAL_detected</strong></td>
-<td>La rue détectée par <code>phacochr</code> issue des données BeST. <em><code>NA</code> si aucune rue n’a été trouvée</em>.</td>
+<td>La rue détectée par <code>phacochr</code> issue des données BeST. <em><code>NA</code> si aucune rue n’a été détectée</em>.</td>
 </tr>
 <tr class="odd">
 <td><strong>num_rue_clean</strong></td>
@@ -259,11 +259,11 @@ Graphique de la répartition de l’erreur de géolocalisation
 </tr>
 <tr class="even">
 <td><strong>langue_FINAL_detected</strong></td>
-<td>La langue détectée d’écriture de la rue (<code>FR</code>, <code>NL</code> ou <code>DE</code>). <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
+<td>La langue détectée d’écriture de la rue (<code>FR</code>, <code>NL</code> ou <code>DE</code>). <em><code>NA</code> si aucune rue n’a été détectée</em>.</td>
 </tr>
 <tr class="odd">
 <td><strong>nom_propre_abv</strong></td>
-<td>Une valeur <code>1</code> indique que <code>phacochr</code> a détecté un nom propre abrégé dans le champ de rue original (<code>NA</code> dans le cas contraire). Cette information est produite durant le processus de détection des rues dans le but de maximiser la détection des rues dont les noms propres sont orthographiés avec des abréviations.</td>
+<td>Une valeur <code>1</code> indique que <code>phacochr</code> a détecté un nom propre abrégé dans le champ de rue original, <em><code>NA</code> dans le cas contraire</em>. Cette information est produite durant le processus de détection des rues dans le but de maximiser la détection des rues dont les noms propres sont orthographiés avec des abréviations.</td>
 </tr>
 <tr class="even">
 <td><strong>mid_num</strong></td>
@@ -283,7 +283,7 @@ Graphique de la répartition de l’erreur de géolocalisation
 </tr>
 <tr class="even">
 <td><strong>dist_fuzzy</strong></td>
-<td>Indique le nombre d’erreurs qui ont été nécessaires pour faire la jointure avec les données de rue BeST. La valeur maximale est égal à <code>error_max</code> (<code>4</code> par défaut); <code>0</code> signifie que le matching est exact. <em>NA si aucune rue n’a été trouvée</em>.</td>
+<td>Indique le nombre d’erreurs qui ont été nécessaires pour faire la jointure avec les données de rue BeST. La valeur maximale est égal à <code>error_max</code> (<code>4</code> par défaut); <code>0</code> signifie que le matching est exact. <em><code>NA</code> si aucune rue n’a été détectée</em>.</td>
 </tr>
 <tr class="odd">
 <td><strong>type_geocoding</strong></td>
@@ -307,7 +307,7 @@ Graphique de la répartition de l’erreur de géolocalisation
 </tr>
 <tr class="even">
 <td><strong>approx_num</strong></td>
-<td>Indique si la localisation n’a pas pu se faire au numéro indiqué. La valeur indique la distance entre le numéro “réel” indiqué et celui effectivement localisé. <code>0</code> si la localisation est exacte au numéro. <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
+<td>Indique si la localisation n’a pas pu se faire au numéro indiqué. La valeur indique la distance entre le numéro “réel” indiqué et celui effectivement localisé. <code>0</code> si la localisation est exacte au numéro. <em><code>NA</code> si aucune coordonnée n’a été trouvée au numéro exact ou approximé (elles ont cependant pu l’être pour le milieu de la rue)</em>.</td>
 </tr>
 <tr class="odd">
 <td><strong>tx_sector_descr_nl</strong></td>
