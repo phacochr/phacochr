@@ -3,7 +3,6 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/phacochr/phacochr/actions/workflows/R-CMD-check.yaml)
 [![GPLv3
 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/phacochr/phacochr/blob/main/LICENSE)
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
@@ -12,10 +11,14 @@ license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.co
 
 <!-- badges: end -->
 
-`phacochr` est un géocodeur pour la Belgique sous forme de package R. A
-partir d’une liste d’adresses, il permet de retrouver les coordonnées
-X-Y nécessaires à toute analyse spatiale, à un niveau de précision du
-bâtiment.
+`phacochr` est un géocodeur pour la Belgique sous forme de package R.
+Son principe est de produire, à partir d’une base de données d’adresses,
+une série d’informations nécessaires pour l’analyse spatiale : les
+coordonnées X-Y au format “Lambert 72” mais également d’autres
+informations utiles comme le secteur statistique ou le quartier du
+monitoring pour Bruxelles (voir plus bas le point **Logique de
+phacochr** pour plus de détails). Concernant les coordonnées X-Y, le
+niveau de précision du géocodage est celui du bâtiment.
 
 Le programme fonctionne avec les données publiques [BeST
 Address](https://opendata.bosa.be/) compilées par BOSA à partir des
@@ -39,10 +42,10 @@ néérlandais ou allemand.
 Le package est très rapide pour géocoder de longues listes (la vitesse
 d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses) et le
 taux de succès pour le géocodage est élevé (médiane de 97%). Voir plus
-bas le point **Performances de phacochr** pour le détail des
-performances. `phacochr` constitue donc une alternative très performante
-face aux solutions existantes tout en reposant entièrement sur des
-données publiques et des procédures libres.
+bas le point **Performances et fiabilité de phacochr** pour le détail
+des performances. `phacochr` constitue donc une alternative très
+performante face aux solutions existantes tout en reposant entièrement
+sur des données publiques et des procédures libres.
 
 ## Installation
 
@@ -244,9 +247,11 @@ schématise, ces opérations se classent en trois grandes familles :
     numéro, c’est cette information qui est indiquée comme résultat du
     géocodage.
 
-La procédure de géocodage est alors finie. Nous terminons les opérations
-en joignant à chaque adresse trouvée différentes informations
-administratives utiles. Sans être exhaustif, on y trouve :
+La procédure de géocodage est alors terminée. Les coordonnées X-Y
+produites se trouvent dans les colonnes `x_31370` et `y_31370` au format
+“Lambert 72”. Outre ces coordonnées, sont jointes à chaque adresse
+trouvée différentes informations utiles. On y trouve notamment (liste à
+compléter) :
 
 -   Les secteurs statistiques (colonne `cd_sector` et leurs noms en NL
     et FR `tx_sector_descr_nl` et `tx_sector_descr_fr`) ;
@@ -254,22 +259,35 @@ administratives utiles. Sans être exhaustif, on y trouve :
     noms en NL et FR `NAME_DUT` et `NAME_FRE` ) ;
 -   Les codes INS des communes, arrondissements, provinces et regions
     (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les
-    appelations classiques de Statbel.
+    appelations classiques de Statbel ;
+-   Toute une série d’indicateurs sur la qualité de la localisation
+    (voir point suivant **Performances et fiabilité de phacochr**).
 
-Nous créons également [un objet `sf`](https://r-spatial.github.io/sf/) -
-exportable en geopackage ou qui peut être cartographié avec la fonction
-`phaco_map_s` - et produisons quelques statistiques indiquant la
-performance du géocodage. Le tableau ci-dessous schématise l’ensemble
-des opérations réalisées et expliquées précédemment :
+Le résultat du géocodage est une liste (au sens de R). Il comprend trois
+objets :
+
+-   `data_geocoded` : la base de données originale à laquelle sont
+    ajoutées les informations précitées ;
+-   `data_geocoded_sf` : [un objet
+    `sf`](https://r-spatial.github.io/sf/) produit à partir des adresses
+    pour lesquelles des coordonnées ont effectivement été trouvées (le
+    nombre de lignes reprises dans l’objet dépend donc du taux de
+    géocodage). Cet objet est exportable en geopackage ou peut
+    directement être cartographié avec la fonction `phaco_map_s` ;
+-   `summary` : un tableau avec quelques statistiques synthétiques
+    indiquant la performance du géocodage.
+
+Le tableau ci-dessous schématise l’ensemble des opérations réalisées et
+expliquées précédemment :
 
 <figure>
-<img src="man/figures/phacochr4.png" width="500"
+<img src="man/figures/phacochr4.png" width="550"
 alt="Tableau schématique du traitement opéré par phacochr" />
 <figcaption aria-hidden="true">Tableau schématique du traitement opéré
 par phacochr</figcaption>
 </figure>
 
-## Performances de `phacochr`
+## Performances et fiabilité de `phacochr`
 
 Nous présentons ici quelques mesures des performances de `phacochr`.
 Nous avons réalisé des tests sur 18 bases de données réelles fournies
@@ -331,8 +349,6 @@ il est conseillé de vérifier plusieurs éléments :
     au numéro médian de la rue au code postal indiqué si aucune autre
     localisation plus précise n’a plus être réalisée (colonne
     `type_geocoding == mid_street`).
-
-## Fiabilité de `phacochr`
 
 Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré
 la *distance* (euclidienne, en mètres) entre la géolocalisation opérée
