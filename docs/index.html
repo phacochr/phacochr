@@ -82,7 +82,7 @@
 <!-- badges: start -->
 
 <!-- badges: end -->
-<p><code>phacochr</code> est un géocodeur pour la Belgique sous forme de package R. Son principe est de produire, à partir d’une base de données d’adresses, une série d’informations nécessaires pour l’analyse spatiale : les coordonnées X-Y au format “Lambert 72” mais également d’autres informations utiles comme le secteur statistique ou le quartier du monitoring pour Bruxelles (voir plus bas le point <strong>Logique de phacochr</strong> pour plus de détails). Concernant les coordonnées X-Y, le niveau de précision du géocodage est celui du bâtiment.</p>
+<p><code>phacochr</code> est un géocodeur pour la Belgique sous forme de package R. Son principe est de produire, à partir d’une base de données d’adresses, une série d’informations nécessaires pour l’analyse spatiale : les coordonnées X-Y au format Lambert 72 mais également d’autres informations utiles comme le secteur statistique ou le quartier du monitoring pour Bruxelles. Concernant les coordonnées X-Y, le niveau de précision du géocodage est celui du bâtiment.</p>
 <p>Le programme fonctionne avec les données publiques <a href="https://opendata.bosa.be/" class="external-link">BeST Address</a> compilées par BOSA à partir des données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de <code>phacochr</code> est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address grâce aux fonctions des packages R <a href="https://cran.r-project.org/web/packages/fuzzyjoin/index.html" class="external-link">fuzzyjoin</a> et <a href="https://cran.r-project.org/web/packages/stringdist/index.html" class="external-link">stringdist</a>. <code>phacochr</code> dispose de plusieurs options : il peut notamment réaliser des corrections orthographiques (en français et néérlandais) préalables à la détection des rues ou procéder au géocodage au numéro le plus proche - de préférence du même côté de la rue - si les coordonnées du numéro indiqué sont inconnues (par exemple si l’adresse n’existe plus). En cas de non disponibilité du numéro de la rue, le programme indique les coordonnées du numéro médian de la rue. <code>phacochr</code> est compatible avec les 3 langues nationales : il géocode des adresses écrites en français, néérlandais ou allemand.</p>
 <p>Le package est très rapide pour géocoder de longues listes (la vitesse d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses) et le taux de succès pour le géocodage est élevé (médiane de 97%). Voir plus bas le point <strong>Performances et fiabilité de phacochr</strong> pour le détail des performances. <code>phacochr</code> constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.</p>
 <div class="section level2">
@@ -120,9 +120,9 @@
 <p>Le géocodage se lance simplement avec la fonction <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code> appliquée à ce data.frame. Nous indiquons dans cet exemple 3 paramètres : les colonnes contenant la rue, le numéro de rue et le code postal, disponibles séparément dans la base de données. Il s’agit de la situation idéale, mais le programme est compatible avec d’autres configurations : celles-ci sont renseignée plus bas au point <strong>Format des données à géocoder</strong>. Mentionnons déjà que le numéro peut ne pas être renseigné ; <code>phacochr</code> trouve alors les coordonnées du numéro médian de la rue au code postal indiqué. La fonction dispose de plusieurs options, voir le manuel : <a href="https://phacochr.github.io/phacochr/" class="uri">https://phacochr.github.io/phacochr/</a>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/phaco_geocode.html">phaco_geocode</a></span><span class="op">(</span>data_to_geocode <span class="op">=</span> <span class="va">x</span>,</span>
-<span>                        colonne_rue<span class="op">=</span> <span class="st">"rue"</span>,</span>
-<span>                        colonne_num<span class="op">=</span> <span class="st">"num"</span>,</span>
-<span>                        colonne_code_postal<span class="op">=</span><span class="st">"code_postal"</span><span class="op">)</span></span></code></pre></div>
+<span>                        colonne_rue <span class="op">=</span> <span class="st">"rue"</span>,</span>
+<span>                        colonne_num <span class="op">=</span> <span class="st">"num"</span>,</span>
+<span>                        colonne_code_postal <span class="op">=</span> <span class="st">"code_postal"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span><span class="op">$</span><span class="va">data_geocoded</span> <span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ID_address"</span>, <span class="st">"x_31370"</span>, <span class="st">"y_31370"</span>, <span class="st">"cd_sector"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;   ID_address x_31370 y_31370 cd_sector</span></span>
@@ -169,7 +169,7 @@
 <li>
 <strong>Jointure avec les coordonnées géographiques :</strong> une fois les rues trouvées, il est désormais possible de réaliser une <em>jointure exacte</em> avec les données BeST au niveau du numéro, celles-ci comprenant les coordonnées X-Y de l’ensemble des adresses en Belgique. Pour ce faire, seuls les arrondissements dans lesquels sont présents les codes postaux des données à géocoder sont chargés en RAM, pour augmenter la vitesse du traitement et soulager l’ordinateur. Les coordonnées des adresses qui ne sont pas trouvées sont approximées en trouvant les coordonnées connues de l’adresse la plus proche du même côté de la rue. L’amplitude maximale de cette approximation est réglable avec le paramètre <code>approx_num_max</code> (à régler à 0 pour la désactiver). Dans le cas où les coordonnées ne sont pas trouvées, ce sont celles du numéro médian de la rue (proxy du milieu de la rue) qui sont indiquées (désactivable avec l’argument <code>mid_street = FALSE</code>). Si les données ne possèdent pas de numéro, c’est cette information qui est indiquée comme résultat du géocodage.</li>
 </ol>
-<p>La procédure de géocodage est alors terminée. Les coordonnées X-Y produites se trouvent dans les colonnes <code>x_31370</code> et <code>y_31370</code> au format “Lambert 72”. Outre ces coordonnées, sont jointes à chaque adresse trouvée différentes informations utiles. On y trouve notamment (liste à compléter) :</p>
+<p>La procédure de géocodage est alors terminée. Les coordonnées X-Y produites se trouvent dans les colonnes <code>x_31370</code> et <code>y_31370</code> au format “Lambert 72”. Outre ces coordonnées, sont jointes à chaque adresse trouvée différentes informations utiles. On y trouve notamment (la liste complète est disponible au point <strong>Colonnes créées par phacochr</strong> en fin de page) :</p>
 <ul>
 <li>Les secteurs statistiques (colonne <code>cd_sector</code> et leurs noms en NL et FR <code>tx_sector_descr_nl</code> et <code>tx_sector_descr_fr</code>) ;</li>
 <li>Les quartiers monitoring pour Bruxelles (colonne <code>MDRC</code> et leurs noms en NL et FR <code>NAME_DUT</code> et <code>NAME_FRE</code> ) ;</li>
@@ -201,7 +201,7 @@ Graphique du temps de calcul nécessaire pour géocoder avec phacochr selon le n
 </figcaption></figure><p><code>phacochr</code> possède une bonne capacité à trouver les adresses. Sur le même set de 18 bases de données, la médiane du pourcentage d’adresses trouvées est de 97%. Pour 7 bases de données sur les 18, <code>phacochr</code> trouve les coordonnées à plus de 98%, pour 6 bases de données entre 96% et 98% et pour 5 bases de données entre 90% et 96%.</p>
 <figure><img src="reference/figures/graph_match_rate.png" width="500" alt="Graphique du pourcentage d’adresses géocodées"><figcaption aria-hidden="true">
 Graphique du pourcentage d’adresses géocodées
-</figcaption></figure><p>Ces résultats sur la performance sont à nuancer par le fait qu’il y a probablement des “faux positifs” (normalement peu nombreux avec les réglages par défaut). Pour avoir une idée de la qualité des résultats, il est conseillé de vérifier plusieurs éléments :</p>
+</figcaption></figure><p>Ces résultats sur la performance sont à nuancer par le fait qu’il y a probablement des “faux positifs” (normalement peu nombreux avec les réglages par défaut). Pour avoir une idée de la qualité des résultats, il est conseillé de vérifier plusieurs éléments (la synthèse des indicateurs de qualité du géocodage est disponible au point <strong>Colonnes créées par phacochr</strong> en fin de page) :</p>
 <ul>
 <li>Vérifier globalement que les corrections orthographiques ont bien fonctionné (la colonne <code>rue_recoded</code> comprend la rue nettoyée et corrigée, et <code>recode</code> indique les types de corrections réalisées) ;</li>
 <li>Comparer les rues détectées par <code>phacochr</code> (la colonne <code>street_FINAL_detected</code>) avec les rues d’origine pour les erreurs les plus élevées dans la jointure inexacte (la colonne <code>dist_fuzzy</code> indique le nombre d’erreurs nécessaires pour faire la jointure avec les données BeST. 0 signifie que le matching est exact) ;</li>
@@ -213,6 +213,184 @@ Graphique du pourcentage d’adresses géocodées
 <figure><img src="reference/figures/erreur.png" width="500" alt="Graphique de la répartition de l’erreur de géolocalisation"><figcaption aria-hidden="true">
 Graphique de la répartition de l’erreur de géolocalisation
 </figcaption></figure>
+</div>
+<div class="section level2">
+<h2 id="colonnes-créées-par-phacochr">Colonnes créées par <code>phacochr</code>
+<a class="anchor" aria-label="anchor" href="#colonnes-cr%C3%A9%C3%A9es-par-phacochr"></a>
+</h2>
+<p>Le principe de <code>phacochr</code> est d’adjoindre une série d’informations spatiales à la liste d’adresses originale : il s’agit bien entendu des coordonnées X-Y mais également d’informations administratives sur les entités spatiales et d’indices sur la qualité du géocodage. En voici une synthèse:</p>
+<table class="table">
+<colgroup>
+<col width="8%">
+<col width="92%">
+</colgroup>
+<thead><tr class="header">
+<th><strong>Colonne créée</strong></th>
+<th><strong>Signification</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>ID_address</strong></td>
+<td>Un identifiant unique par ligne du tableau original créé pour le fonctionnement de <code>phacochr</code>. Le nombre maximal de cet identifiant est égal au nombre de lignes du tableau.</td>
+</tr>
+<tr class="even">
+<td><strong>rue_recoded</strong></td>
+<td>La rue extraite, nettoyée et corrigée à partir du champ original contenant la rue. C’est par le biais de cette colonne qu’est réalisé le matching inexact pour la rue.</td>
+</tr>
+<tr class="odd">
+<td><strong>recode</strong></td>
+<td>Indique les diffétents nettoyages / corrections réalisés.</td>
+</tr>
+<tr class="even">
+<td><strong>street_FINAL_detected</strong></td>
+<td>La rue détectée par <code>phacochr</code> issue des données BeST. <em><code>NA</code> si aucune rue n’a été trouvée</em>.</td>
+</tr>
+<tr class="odd">
+<td><strong>num_rue_clean</strong></td>
+<td>Le numéro de rue nettoyé (un chiffre unique est extrait, sans lettres ou caractères typographiques).</td>
+</tr>
+<tr class="even">
+<td><strong>code_postal_to_geocode</strong></td>
+<td>Le code postal nettoyé (sans nom de commune s’il était présent dans le champ original). Si la rue est trouvée dans une commune adjacente, le code postal où se trouve cette rue remplace le code postal original dans cette colonne.</td>
+</tr>
+<tr class="odd">
+<td><strong>street_id_phaco</strong></td>
+<td>L’identifiant numérique des rues BeST propre à <code>phacochr</code>. Cet identifiant est créé lors du géocodage. Ce champ n’est pas utile pour l’utilisateur.</td>
+</tr>
+<tr class="even">
+<td><strong>langue_FINAL_detected</strong></td>
+<td>La langue détectée d’écriture de la rue (<code>FR</code>, <code>NL</code> ou <code>DE</code>).</td>
+</tr>
+<tr class="odd">
+<td><strong>nom_propre_abv</strong></td>
+<td>Une valeur <code>1</code> indique que <code>phacochr</code> a détecté un nom propre abrégé dans le champ de rue original (<code>NA</code> dans le cas contraire). Cette information est produite durant le processus de détection des rues dans le but de maximiser la détection des rues dont les noms propres sont orthographiés avec des abréviations.</td>
+</tr>
+<tr class="even">
+<td><strong>mid_num</strong></td>
+<td>Le numéro médian de la rue au code postal considéré.</td>
+</tr>
+<tr class="odd">
+<td><strong>mid_x_31370</strong></td>
+<td>La coordonnée X (<em>format: Lambert 72</em>) du numéro médian de la rue au code postal considéré.</td>
+</tr>
+<tr class="even">
+<td><strong>mid_y_31370</strong></td>
+<td>La coordonnée Y (<em>format: Lambert 72</em>) du numéro médian de la rue au code postal considéré.</td>
+</tr>
+<tr class="odd">
+<td><strong>mid_cd_sector</strong></td>
+<td>Le secteur statistique du numéro médian de la rue au code postal considéré.</td>
+</tr>
+<tr class="even">
+<td><strong>dist_fuzzy</strong></td>
+<td>Indique le nombre d’erreurs qui ont été nécessaires pour faire la jointure avec les données de rue BeST. La valeur maximale est égal à <code>error_max</code> (<code>4</code> par défaut); <code>0</code> signifie que le matching est exact. <em>NA si aucune rue n’a été trouvée</em>.</td>
+</tr>
+<tr class="odd">
+<td><strong>type_geocoding</strong></td>
+<td>Indique la nature du géocodage. Les rues dont la détection a nécessité un élargissement aux communes adjacentes sont indiquées par la valeur <code>elargissement_adj</code>. Les adresses qui ont demandé une localisation au numéro médian de la rue au code postal indiqué sont signalées par la valeur <code>mid_street</code>. Les autres cas présentent une valeur vide.</td>
+</tr>
+<tr class="even">
+<td><strong>house_number_sans_lettre</strong></td>
+<td>Le numéro qui a été géolocalisé dans les données BeST.</td>
+</tr>
+<tr class="odd">
+<td><strong>x_31370</strong></td>
+<td>Les coordonnée X (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (<code>type_geocoding == mid_street</code>), la valeur = <code>mid_x_31370</code>. <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
+</tr>
+<tr class="even">
+<td><strong>y_31370</strong></td>
+<td>Les coordonnée Y (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (<code>type_geocoding == mid_street</code>), la valeur = <code>mid_y_31370</code>. <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
+</tr>
+<tr class="odd">
+<td><strong>cd_sector</strong></td>
+<td>Le secteur statistique.</td>
+</tr>
+<tr class="even">
+<td><strong>approx_num</strong></td>
+<td>Indique si la localisation n’a pas pu se faire au numéro indiqué. La valeur indique la distance entre le numéro “réel” indiqué et celui effectivement localisé. <code>0</code> si la localisation est exacte au numéro indiqué.</td>
+</tr>
+<tr class="odd">
+<td><strong>tx_sector_descr_nl</strong></td>
+<td>Le nom du secteur statistique en NL (Statbel).</td>
+</tr>
+<tr class="even">
+<td><strong>tx_sector_descr_fr</strong></td>
+<td>Le nom du secteur statistique en FR (Statbel).</td>
+</tr>
+<tr class="odd">
+<td><strong>cd_sub_munty</strong></td>
+<td>Code Refnis des subdivisions des communes (Statbel).</td>
+</tr>
+<tr class="even">
+<td><strong>tx_sub_munty_nl</strong></td>
+<td>Nom des subdivisions des communes en NL (Statbel).</td>
+</tr>
+<tr class="odd">
+<td><strong>tx_sub_munty_fr</strong></td>
+<td>Nom des subdivisions des communes en FR (Statbel).</td>
+</tr>
+<tr class="even">
+<td><strong>cd_munty_refnis</strong></td>
+<td>Code Refnis des communes (Statbel).</td>
+</tr>
+<tr class="odd">
+<td><strong>tx_munty_descr_nl</strong></td>
+<td>Nom des subdivisions des communes en NL (Statbel).</td>
+</tr>
+<tr class="even">
+<td><strong>tx_munty_descr_fr</strong></td>
+<td>Nom des subdivisions des communes en FR (Statbel).</td>
+</tr>
+<tr class="odd">
+<td><strong>cd_dstr_refnis</strong></td>
+<td>Code Refnis de l’arrondissement (Statbel).</td>
+</tr>
+<tr class="even">
+<td><strong>tx_adm_dstr_descr_nl</strong></td>
+<td>Nom de l’arrondissement en NL (Statbel).</td>
+</tr>
+<tr class="odd">
+<td><strong>tx_adm_dstr_descr_fr</strong></td>
+<td>Nom de l’arrondissement en FR (Statbel).</td>
+</tr>
+<tr class="even">
+<td><strong>cd_prov_refnis</strong></td>
+<td>Code Refnis de la province (Statbel).</td>
+</tr>
+<tr class="odd">
+<td><strong>tx_prov_descr_nl</strong></td>
+<td>Nom de la province en NL (Statbel).</td>
+</tr>
+<tr class="even">
+<td><strong>tx_prov_descr_fr</strong></td>
+<td>Nom de la province en FR (Statbel).</td>
+</tr>
+<tr class="odd">
+<td><strong>cd_rgn_refnis</strong></td>
+<td>Code Refnis de la région (Statbel).</td>
+</tr>
+<tr class="even">
+<td><strong>tx_rgn_descr_nl</strong></td>
+<td>Nom de la région en NL (Statbel).</td>
+</tr>
+<tr class="odd">
+<td><strong>tx_rgn_descr_fr</strong></td>
+<td>Nom de la région en FR (Statbel).</td>
+</tr>
+<tr class="even">
+<td><strong>MDRC</strong></td>
+<td>Code du quartier monitoring pour Bruxelles (Urbis).</td>
+</tr>
+<tr class="odd">
+<td><strong>NAME_FRE</strong></td>
+<td>Nom du quartier monitoring pour Bruxelles en FR (Urbis).</td>
+</tr>
+<tr class="even">
+<td><strong>NAME_DUT</strong></td>
+<td>Nom du quartier monitoring pour Bruxelles en NL (Urbis).</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
 <h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
