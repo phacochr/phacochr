@@ -716,7 +716,7 @@ phaco_geocode <- function(data_to_geocode,
       filter(is.na(dist_fuzzy)) %>%
       mutate(address_join = str_to_lower(str_trim(rue_recoded))) %>%
       select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -dist_fuzzy,
-             -mid_num, -mid_x_31370, -mid_y_31370, -mid_postcode, -mid_cd_sector, -mid_arrond)
+             -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector)
 
     if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
 

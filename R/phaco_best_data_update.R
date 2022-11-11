@@ -213,7 +213,7 @@ phaco_best_data_update <- function(force=FALSE) {
     cat(paste0("\r",  colourise("\u2714", fg="green")," Cr", "\u00e9", "ation du fichier des adresses BeST (jointure spatiale avec les secteurs statistiques)"))
 
 
-    # 3. Export Belgium street ----------------------------------------------------------------------------------------------------------------
+    # 3. Belgium street : noms abrégés, mid_street et export ----------------------------------------------------------------------------------
 
     cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
 
@@ -309,7 +309,7 @@ phaco_best_data_update <- function(force=FALSE) {
              mid_postcode= postcode,
              mid_cd_sector= cd_sector,
              mid_arrond= arrond) %>%
-      select(-c(3:5)) %>%
+      select(street_id_phaco, postal_id, mid_num, mid_x_31370, mid_y_31370, mid_cd_sector) %>%
       unique()
 
     belgium_street_abv<-belgium_street_abv %>%
