@@ -169,7 +169,7 @@
 <li>
 <strong>Jointure avec les coordonnées géographiques :</strong> une fois les rues trouvées, il est désormais possible de réaliser une <em>jointure exacte</em> avec les données BeST au niveau du numéro, celles-ci comprenant les coordonnées X-Y de l’ensemble des adresses en Belgique. Pour ce faire, seuls les arrondissements dans lesquels sont présents les codes postaux des données à géocoder sont chargés en RAM, pour augmenter la vitesse du traitement et soulager l’ordinateur. Les coordonnées des adresses qui ne sont pas trouvées sont approximées en trouvant les coordonnées connues de l’adresse la plus proche du même côté de la rue. L’amplitude maximale de cette approximation est réglable avec le paramètre <code>approx_num_max</code> (à régler à 0 pour la désactiver). Dans le cas où les coordonnées ne sont pas trouvées, ce sont celles du numéro médian de la rue (proxy du milieu de la rue) qui sont indiquées (désactivable avec l’argument <code>mid_street = FALSE</code>). Si les données ne possèdent pas de numéro, c’est cette information qui est indiquée comme résultat du géocodage.</li>
 </ol>
-<p>La procédure de géocodage est alors terminée. Les coordonnées X-Y produites se trouvent dans les colonnes <code>x_31370</code> et <code>y_31370</code> au format “Lambert 72”. Outre ces coordonnées, sont jointes à chaque adresse trouvée différentes informations utiles. On y trouve notamment (la liste complète est disponible au point <strong>Colonnes créées par phacochr</strong> en fin de page) :</p>
+<p>La procédure de géocodage est alors terminée. Les coordonnées X-Y produites se trouvent dans les colonnes <code>x_31370</code> et <code>y_31370</code> au format Lambert 72. Outre ces coordonnées, sont jointes à chaque adresse trouvée différentes informations utiles. On y trouve notamment (la liste complète est disponible au point <strong>Colonnes créées par phacochr</strong> en fin de page) :</p>
 <ul>
 <li>Les secteurs statistiques (colonne <code>cd_sector</code> et leurs noms en NL et FR <code>tx_sector_descr_nl</code> et <code>tx_sector_descr_fr</code>) ;</li>
 <li>Les quartiers monitoring pour Bruxelles (colonne <code>MDRC</code> et leurs noms en NL et FR <code>NAME_DUT</code> et <code>NAME_FRE</code> ) ;</li>
@@ -259,7 +259,7 @@ Graphique de la répartition de l’erreur de géolocalisation
 </tr>
 <tr class="even">
 <td><strong>langue_FINAL_detected</strong></td>
-<td>La langue détectée d’écriture de la rue (<code>FR</code>, <code>NL</code> ou <code>DE</code>).</td>
+<td>La langue détectée d’écriture de la rue (<code>FR</code>, <code>NL</code> ou <code>DE</code>). <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
 </tr>
 <tr class="odd">
 <td><strong>nom_propre_abv</strong></td>
@@ -295,19 +295,19 @@ Graphique de la répartition de l’erreur de géolocalisation
 </tr>
 <tr class="odd">
 <td><strong>x_31370</strong></td>
-<td>Les coordonnée X (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (<code>type_geocoding == mid_street</code>), la valeur = <code>mid_x_31370</code>. <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
+<td>Les coordonnée X (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (<code>type_geocoding == mid_street</code>), la valeur est la même que <code>mid_x_31370</code>. <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
 </tr>
 <tr class="even">
 <td><strong>y_31370</strong></td>
-<td>Les coordonnée Y (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (<code>type_geocoding == mid_street</code>), la valeur = <code>mid_y_31370</code>. <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
+<td>Les coordonnée Y (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (<code>type_geocoding == mid_street</code>), la valeur est la même que <code>mid_y_31370</code>. <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
 </tr>
 <tr class="odd">
 <td><strong>cd_sector</strong></td>
-<td>Le secteur statistique.</td>
+<td>Le secteur statistique. Si la localisation n’a pu se faire qu’au numéro médian de la rue (<code>type_geocoding == mid_street</code>), la valeur est la même que <code>mid_cd_sector</code>. <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
 </tr>
 <tr class="even">
 <td><strong>approx_num</strong></td>
-<td>Indique si la localisation n’a pas pu se faire au numéro indiqué. La valeur indique la distance entre le numéro “réel” indiqué et celui effectivement localisé. <code>0</code> si la localisation est exacte au numéro indiqué.</td>
+<td>Indique si la localisation n’a pas pu se faire au numéro indiqué. La valeur indique la distance entre le numéro “réel” indiqué et celui effectivement localisé. <code>0</code> si la localisation est exacte au numéro. <em><code>NA</code> si aucune coordonnée n’a été trouvée</em>.</td>
 </tr>
 <tr class="odd">
 <td><strong>tx_sector_descr_nl</strong></td>

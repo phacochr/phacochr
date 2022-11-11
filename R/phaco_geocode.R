@@ -832,7 +832,7 @@ phaco_geocode <- function(data_to_geocode,
       mutate(address_join_geocoding = str_c(num_rue_clean, street_FINAL_detected, code_postal_to_geocode, sep = " ")) %>%
       left_join(select(openaddress_be, -street_FINAL_detected, -postal_id, -street_id_phaco), by = "address_join_geocoding") %>%
       #select(-house_number) %>%
-      mutate(approx_num = 0)
+      mutate(approx_num = ifelse(!is.na(x_31370), 0, NA))
 
     cat(paste0("\r",colourise("\u2714", fg="green")," Jointure avec les coordonn","\u00e9","es X-Y"))
 
@@ -943,8 +943,8 @@ phaco_geocode <- function(data_to_geocode,
     FULL_GEOCODING <- FULL_GEOCODING %>%
       mutate(type_geocoding2 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), "mid_street", NA),
              x_31370 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), mid_x_31370, x_31370),
-             y_31370 = ifelse(is.na(y_31370) & !is.na(mid_y_31370), mid_y_31370, y_31370)
-             )
+             y_31370 = ifelse(is.na(y_31370) & !is.na(mid_y_31370), mid_y_31370, y_31370),
+             cd_sector = ifelse(is.na(cd_sector) & !is.na(mid_cd_sector), mid_cd_sector, cd_sector))
 
     FULL_GEOCODING <- FULL_GEOCODING %>%
       unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite doit fonctionne en dehors de mutate
