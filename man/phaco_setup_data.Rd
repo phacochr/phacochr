@@ -10,5 +10,7 @@ phaco_setup_data()
 Cette fonction permet d'installer sur l'ordinateur les fichiers nécessaires pour le geocodage des adresses.
 }
 \examples{
+\dontrun{
 phaco_setup_data()
+}
 }

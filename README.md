@@ -38,12 +38,13 @@ les 3 langues nationales : il géocode des adresses écrites en français,
 néérlandais ou allemand.
 
 Le package est très rapide pour géocoder de longues listes (la vitesse
-d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses) et le
-taux de succès pour le géocodage est élevé (médiane de 97%). Voir plus
-bas le point *Performances et fiabilité de phacochr* pour le détail des
-performances. `phacochr` constitue donc une alternative très performante
-face aux solutions existantes tout en reposant entièrement sur des
-données publiques et des procédures libres.
+d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses sur un
+ordinateur de puissance moyenne) et le taux de succès pour le géocodage
+est élevé (médiane de 97%). Voir plus bas le point *Performances et
+fiabilité de phacochr* pour le détail des performances. `phacochr`
+constitue donc une alternative très performante face aux solutions
+existantes tout en reposant entièrement sur des données publiques et des
+procédures libres.
 
 ## Installation
 
@@ -101,7 +102,8 @@ configurations : celles-ci sont renseignée plus bas au point *Format des
 données à géocoder*. Mentionnons déjà que le numéro peut ne pas être
 renseigné ; `phacochr` trouve alors les coordonnées du numéro médian de
 la rue au code postal indiqué. La fonction dispose de plusieurs options,
-voir le manuel : <https://phacochr.github.io/phacochr/>.
+voir le dictionnaire des fonctions :
+<https://phacochr.github.io/phacochr/reference/index.html>.
 
 ``` r
 result <- phaco_geocode(data_to_geocode = x,
@@ -127,7 +129,8 @@ fonction dessine alors les coordonnées des adresses sur une carte dont
 les frontières administratives sont également affichées. Si les adresses
 se restreignent à Bruxelles, la carte se limite automatiquement à la
 Région bruxelloise. Les options de la fonction [sont également
-renseignées dans le manuel](https://phacochr.github.io/phacochr/).
+renseignées dans le dictionnaire des
+fonctions](https://phacochr.github.io/phacochr/reference/index.html).
 
 ``` r
 phaco_map_s(result$data_geocoded_sf,
@@ -198,8 +201,8 @@ par `phacochr`. Celui-ci repose sur les données BeST Address, que nous
 avons reformatées pour optimiser le traitement. Nous avons également
 utilisé des données produites par Statbel et Urbis dans ce reformatage.
 Nous ne rentrons pas dans l’explication de ces modifications ici, et
-renvoyons les curieux au [code de la fonction `phaco_best_data_update()`
-disponible sur
+renvoyons au [code de la fonction `phaco_best_data_update()` disponible
+sur
 Github](https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R).
 
 Nous nous concentrons ici sur les opérations réalisées par la fonction
@@ -215,35 +218,42 @@ schématise, ces opérations se classent en trois grandes familles :
 2)  **Détection des rues :** `phacochr` procède alors à une *jointure
     inexacte* entre chacune des rues (nettoyées au point précédent) et
     l’ensemble des rue de BeST Address *au sein du code postal indiqué*.
-    La procédure est réalisée en calcul parallélisé avec n-1 cores afin
-    d’augmenter sa vitesse. Le paramètre `error_max` permet d’indiquer
-    l’erreur acceptable par l’utilisateur. Celle-ci est réglée par
-    défaut à 4, ce qui permet de trouver des rues mal orthographiées,
-    sans les confondre avec d’autres, avec un très bon taux de succès.
-    Augmenter ce paramètre accroît le pourcentage de rues trouvées, mais
-    aussi d’erreurs réalisées. Dans le cas où la langue dans laquelle
-    les adresses sont inscrites est connue, elle peut être renseignée
-    via l’argument `lang_encoded`, ce qui augmente la vitesse et la
-    fiabilité du processus. Si la rue n’est pas trouvée, le programme
-    étend sa recherche à la commune entière et à toutes les communes
-    limitrophes. Cette procédure optionnelle peut être désactivée avec
-    le paramètre `elargissement_com_adj = FALSE`.
+    Un matching inexact est nécessaire pour pouvoir apparier la rue des
+    données BeST (disons *Rue Belliard* à 1040) avec la même rue telle
+    qu’elle est écrite concrètement dans la base de données à géocoder
+    (par exemple *Rue Beliar* avec un seul *l* et sans *d* également à
+    1040). Le matching inexact est parallélisé sur les n-1 cores du CPU
+    afin d’augmenter la vitesse du traitement (de nombreuses
+    combinaisons devant être calculées). Le paramètre `error_max` permet
+    d’indiquer l’erreur acceptable par l’utilisateur. Celle-ci est
+    réglée par défaut à `4`, ce qui permet de trouver des rues mal
+    orthographiées, sans les confondre avec d’autres, avec un très bon
+    taux de succès. Augmenter ce paramètre accroît le pourcentage de
+    rues trouvées, mais aussi d’erreurs réalisées. Dans le cas où la
+    langue dans laquelle les adresses sont inscrites est connue, elle
+    peut être renseignée via l’argument `lang_encoded`, ce qui augmente
+    la vitesse et la fiabilité du processus en limitant le matching à la
+    langue définie. Si la rue n’est pas trouvée, le programme étend sa
+    recherche à la commune entière et à toutes les communes limitrophes.
+    Cette procédure optionnelle peut être désactivée avec le paramètre
+    `elargissement_com_adj = FALSE`.
 3)  **Jointure avec les coordonnées géographiques :** une fois les rues
     trouvées, il est désormais possible de réaliser une *jointure
-    exacte* avec les données BeST au niveau du numéro, celles-ci
-    comprenant les coordonnées X-Y de l’ensemble des adresses en
-    Belgique. Pour ce faire, seuls les arrondissements dans lesquels
+    exacte* avec les données BeST géolocalisées au niveau du numéro,
+    celles-ci comprenant les coordonnées X-Y de l’ensemble des adresses
+    en Belgique. Pour ce faire, seuls les arrondissements dans lesquels
     sont présents les codes postaux des données à géocoder sont chargés
     en RAM, pour augmenter la vitesse du traitement et soulager
     l’ordinateur. Les coordonnées des adresses qui ne sont pas trouvées
     sont approximées en trouvant les coordonnées connues de l’adresse la
     plus proche du même côté de la rue. L’amplitude maximale de cette
-    approximation est réglable avec le paramètre `approx_num_max` (à
-    régler à 0 pour la désactiver). Dans le cas où les coordonnées ne
-    sont pas trouvées, ce sont celles du numéro médian de la rue (proxy
-    du milieu de la rue) qui sont indiquées (désactivable avec
-    l’argument `mid_street = FALSE`). Si les données ne possèdent pas de
-    numéro, c’est cette information qui est indiquée comme résultat du
+    approximation est réglable avec le paramètre `approx_num_max` (réglé
+    par défaut à `50` ; indiquer `0` pour désactiver l’approximation).
+    Dans le cas où les coordonnées ne sont pas trouvées, ce sont celles
+    du numéro médian de la rue (proxy du milieu de la rue) qui sont
+    indiquées (option activée par défaut et désactivable avec l’argument
+    `mid_street = FALSE`). Si les données ne possèdent pas de numéro,
+    c’est cette information qui est indiquée comme résultat du
     géocodage.
 
 La procédure de géocodage est alors terminée. Les coordonnées X-Y
@@ -338,7 +348,7 @@ créées par phacochr** en fin de page) :
     `street_FINAL_detected`) avec les rues d’origine pour les erreurs
     les plus élevées dans la jointure inexacte (la colonne `dist_fuzzy`
     indique le nombre d’erreurs nécessaires pour faire la jointure avec
-    les données BeST. 0 signifie que le matching est exact) ;
+    les données BeST. `0` signifie que le matching est exact) ;
 -   Procéder à la même comparaison pour les rues dont la détection a
     nécessité un élargissement aux communes adjacentes (colonne
     `type_geocoding == elargissement_adj`). Une rue au même nom aurait
