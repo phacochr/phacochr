@@ -11,6 +11,8 @@ license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.co
 
 <!-- badges: end -->
 
+:heavy_check_mark:️
+
 `phacochr` est un géocodeur pour la Belgique sous forme de package R.
 Son principe est de produire, à partir d’une base de données d’adresses,
 une série d’informations nécessaires pour l’analyse spatiale : les
