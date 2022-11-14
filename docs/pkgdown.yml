@@ -1,9 +1,9 @@
-pandoc: '2.18'
+pandoc: 2.17.1.1
 pkgdown: 2.0.6.9000
 pkgdown_sha: 5bb671b1a8bac8e926479868681936f7c9ee41b3
 articles:
   shiny_app: shiny_app.html
-last_built: 2022-11-14T10:58Z
+last_built: 2022-11-14T23:24Z
 urls:
   reference: https://phacochr.github.io/phacochr/reference
   article: https://phacochr.github.io/phacochr/articles

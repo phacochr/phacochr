@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Geocodeur belge">
 <meta property="og:description" content="PhacochR est un géocodeur pour la Belgique sous forme de package R. A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.">
@@ -138,11 +138,8 @@
 <h2 id="format-des-données-à-géocoder">Format des données à géocoder<a class="anchor" aria-label="anchor" href="#format-des-donn%C3%A9es-%C3%A0-g%C3%A9ocoder"></a>
 </h2>
 <p><code>phacochr</code> est compatible avec cinq formats concernant les données à géocoder. Dans chacun de ces formats, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Les tableau ci-dessous schématisent les différentes configurations envisageables, indiquent différents exemples à partir d’une même adresse (le <em>71 rue Belliard, 1040 Bruxelles</em>) et mentionnent des notes pour que l’utilisateur comprenne ce que fait le programme.</p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Le numéro de rue, la rue et le code postal sont présents dans des colonnes séparées dans les données à géocoder :</strong> il s’agit du format idéal qui rencontrera le meilleur résultat. Dans ce cas, il faut renseigner les arguments <code>colonne_num</code>, <code>colonne_rue</code> et <code>colonne_code_postal</code>.</li>
-</ol>
-<table class="table">
+<p><strong>1. Le numéro de rue, la rue et le code postal sont présents dans des colonnes séparées dans les données à géocoder :</strong> il s’agit du format idéal qui rencontrera le meilleur résultat. Dans ce cas, il faut renseigner les arguments <code>colonne_num</code>, <code>colonne_rue</code> et <code>colonne_code_postal</code>.</p>
+<table style="width:100%;" class="table">
 <colgroup>
 <col width="4%">
 <col width="13%">
@@ -154,7 +151,7 @@
 <th align="left">️rue</th>
 <th align="left">num</th>
 <th align="left">code_postal</th>
-<th></th>
+<th align="center">statut</th>
 <th>Note</th>
 </tr></thead>
 <tbody>
@@ -162,7 +159,7 @@
 <td align="left">rue Belliard</td>
 <td align="left">71</td>
 <td align="left">1040</td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
 <td>Situation idéale !</td>
 </tr>
@@ -171,7 +168,7 @@
 <td align="left">71<span style="color: #FF0000">B</span>
 </td>
 <td align="left">1040</td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
 <td>S’il y a des caractères non numériques après le numéro de rue (lettres, caractères typographiques…), ceux-ci ne sont pas pris en compte.</td>
 </tr>
@@ -180,7 +177,7 @@
 <td align="left">71<span style="color: #FF0000">-73</span>
 </td>
 <td align="left">1040</td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
 <td>Si le champ de numéro de rue compte plusieurs numéros, seul le premier est considéré.</td>
 </tr>
@@ -188,7 +185,7 @@
 <td align="left">rue Belliard</td>
 <td align="left">71</td>
 <td align="left"><span style="color: #0000FF">1040 Bruxelles</span></td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
 <td>Le nom de la commune (en lettres) peut être indiqué dans le champ code postal ➡ seul le nombre est considéré. L’ordre « code postal - commune » ou « commune - code postal » n’importe pas.</td>
 </tr>
@@ -196,7 +193,7 @@
 <td align="left">rue Belliard</td>
 <td align="left">71</td>
 <td align="left"><span style="color: #0000FF">Bruxelles 1040</span></td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
 <td></td>
 </tr>
@@ -205,41 +202,38 @@
 <td align="left">71</td>
 <td align="left">1040 <span style="color: #FF0000">Etterbeek</span>
 </td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
 <td>Il n’y a pas d’incidence si le nom de la commune est erroné ➡ seul le code postal (nombre) est considéré.</td>
 </tr>
 </tbody>
 </table>
-<ol start="2" style="list-style-type: decimal">
-<li>
-<strong>Le numéro de rue et la rue sont mélangés dans une colonne, et le code postal est seul dans une autre :</strong> ce format demande de renseigner les arguments <code>colonne_num_rue</code> et <code>colonne_code_postal</code>. Dans ce format, <code>phacochr</code> reconstitue à l’aide des <a href="https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions" class="external-link">expressions régulières (REGEX)</a> la rue et le numéro dans des colonnes séparées. Cette procédure fonctionne très bien la plupart du temps. Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans la colonne <code>colonne_num_rue</code>. Un numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas cependant peu courant).</li>
-</ol>
+<p><strong>2. Le numéro de rue et la rue sont mélangés dans une colonne, et le code postal est seul dans une autre :</strong> ce format demande de renseigner les arguments <code>colonne_num_rue</code> et <code>colonne_code_postal</code>. Dans ce format, <code>phacochr</code> reconstitue à l’aide des <a href="https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions" class="external-link">expressions régulières (REGEX)</a> la rue et le numéro dans des colonnes séparées. Cette procédure fonctionne très bien la plupart du temps. Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans la colonne <code>colonne_num_rue</code>. Un numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas cependant peu courant).</p>
 <table class="table">
 <colgroup>
 <col width="3%">
 <col width="18%">
-<col width="5%">
+<col width="6%">
 <col width="71%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">code_postal</th>
 <th align="left">num_rue</th>
-<th></th>
+<th align="center">statut</th>
 <th>Note</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">1040</td>
 <td align="left"><span style="color: #0000FF">71, rue Belliard</span></td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
-<td>Si la rue et le numéro sont intégrés dans le même champ, leur ordre n’a pas d’importance. La présence de signes de ponctuations (virgule, tiret…) ne pose pas de problèmes pour la détection de la rue =&gt; ils sont nettoyés avec la correction.</td>
+<td>Si la rue et le numéro sont intégrés dans le même champ, leur ordre n’a pas d’importance. La présence de signes de ponctuation (virgule, tiret…) ne pose pas de problèmes pour la détection de la rue =&gt; ils sont nettoyés avec la correction.</td>
 </tr>
 <tr class="even">
 <td align="left">1040</td>
 <td align="left"><span style="color: #0000FF">rue Belliard, 71</span></td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
 <td></td>
 </tr>
@@ -247,7 +241,7 @@
 <td align="left">1040</td>
 <td align="left">rue Belliard, 71 <span style="color: #FF0000">bte 5</span>
 </td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
 <td>Le fait que le numéro de boite soit indiqué n’a pas d’incidence =&gt; il est nettoyé avant la détection de la rue.</td>
 </tr>
@@ -255,22 +249,19 @@
 <td align="left">1040</td>
 <td align="left">
 <span style="color: #FF0000">bte 5 -</span> rue Belliard, 71</td>
-<td><span class="emoji" data-emoji="x">❌</span></td>
+<td align="center"><span class="emoji" data-emoji="x">❌</span></td>
 <td>Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans le champ. Le numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas peu courant).</td>
 </tr>
 <tr class="odd">
 <td align="left">1040</td>
 <td align="left">rue Belliard, <span style="color: #FF0000">n°</span>71</td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
 <td>Le fait que « n° », « no », « n. » soit indiqué avant le numéro n’a pas d’incidence =&gt; il est nettoyé avant la détection de la rue.</td>
 </tr>
 </tbody>
 </table>
-<ol start="3" style="list-style-type: decimal">
-<li>
-<strong>Le numéro de rue, la rue et le code postal sont intégrés dans la même colonne :</strong> dans ce format, il faut renseigner l’argument <code>colonne_num_rue_code_postal</code>. Le géocodeur reconstitue le numéro de rue, la rue (comme la situation précédente) mais aussi le code postal dans des colonnes séparées. Cette situation fonctionne également très bien, à condition d’observer cette règle : le numéro doit être le premier nombre et le code postal être en fin de champ (situations les plus courantes).</li>
-</ol>
+<p><strong>3. Le numéro de rue, la rue et le code postal sont intégrés dans la même colonne :</strong> dans ce format, il faut renseigner l’argument <code>colonne_num_rue_code_postal</code>. Le géocodeur reconstitue le numéro de rue, la rue (comme la situation précédente) mais aussi le code postal dans des colonnes séparées. Cette situation fonctionne également très bien, à condition d’observer cette règle : le numéro doit être le premier nombre et le code postal être en fin de champ (situations les plus courantes).</p>
 <table class="table">
 <colgroup>
 <col width="26%">
@@ -279,14 +270,14 @@
 </colgroup>
 <thead><tr class="header">
 <th align="left">num_rue_code_postal</th>
-<th align="left"></th>
+<th align="center">statut</th>
 <th align="left">Note</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">rue Belliard, <span style="color: #0000FF">71 1040</span>
 </td>
-<td align="left">
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
 <td align="left">Dans le cas où la rue, le numéro et le code postal sont intégrés dans un même champ, il faut observer une règle fondamentale : le numéro doit être le premier nombre et le code postal être en fin de champ.</td>
 </tr>
@@ -294,60 +285,52 @@
 <td align="left">
 <span style="color: #0000FF">71,</span> rue Belliard <span style="color: #0000FF">1040</span>
 </td>
-<td align="left">
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
 <td align="left"></td>
 </tr>
 <tr class="odd">
 <td align="left">rue Belliard <span style="color: #FF0000">1040 n°71</span>
 </td>
-<td align="left"><span class="emoji" data-emoji="x">❌</span></td>
+<td align="center"><span class="emoji" data-emoji="x">❌</span></td>
 <td align="left"></td>
 </tr>
 <tr class="even">
 <td align="left">71, rue Belliard 1040 <span style="color: #0000FF">Bruxelles</span>
 </td>
-<td align="left">
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
 <td align="left">Le nom de la commune (en lettres) peut être accolé au code postal (nombre) si ce dernier est en fin de champ. Si le nom de la commune vient après, il est nettoyé sans condition. S’il vient avant, il doit être écrit avec la bonne orthographe.</td>
 </tr>
 <tr class="odd">
 <td align="left">71, rue Belliard <span style="color: #0000FF">Bruxelles</span> 1040</td>
-<td align="left">
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
 <td align="left"></td>
 </tr>
 <tr class="even">
-<td align="left">71, rue Belliard <span style="color: #FF0000">BXL</span> 1040 1040</td>
-<td align="left">
+<td align="left">71, rue Belliard <span style="color: #FF0000">BXL</span> 1040</td>
+<td align="center">
 <span class="emoji" data-emoji="x">❌</span>️</td>
 <td align="left"></td>
 </tr>
 </tbody>
 </table>
-<ol start="4" style="list-style-type: decimal">
-<li>
-<strong>La rue et le code postal sont présents dans des colonnes séparées (sans numéro) :</strong> cette situation ressemble à la première, mais sans que le numéro soit disponible. <code>phacochr</code> géocode alors non pas à un niveau de précision du bâtiment, mais choisi comme coordonnées de résultat le bâtiment disposant du numéro médian de la rue au sein du même code postal (certaines rues traversant différents codes postaux). Ce format demande de renseigner les arguments <code>colonne_rue</code> et <code>colonne_code_postal</code>.</li>
-</ol>
+<p><strong>4. La rue et le code postal sont présents dans des colonnes séparées (sans numéro) :</strong> cette situation ressemble à la première, mais sans que le numéro soit disponible. <code>phacochr</code> géocode alors non pas à un niveau de précision du bâtiment, mais choisi comme coordonnées de résultat le bâtiment disposant du numéro médian de la rue au sein du même code postal (certaines rues traversant différents codes postaux). Ce format demande de renseigner les arguments <code>colonne_rue</code> et <code>colonne_code_postal</code>.</p>
 <table class="table">
 <thead><tr class="header">
 <th align="left">️rue</th>
 <th align="left">code_postal</th>
-<th></th>
-<th>Note</th>
+<th align="center">statut</th>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">rue Belliard</td>
 <td align="left">1040</td>
-<td>
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
-<td></td>
 </tr></tbody>
 </table>
-<ol start="5" style="list-style-type: decimal">
-<li>
-<strong>La rue et le code postal sont intégrés dans la même colonne (sans numéro) :</strong> le programme reconstitue la rue et le code postal dans des colonnes séparées (comme la situation 3). Dans ce cas, le code postal doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (situation peu courante). Ce format demande de renseigner l’argument <code>colonne_rue_code_postal</code>.</li>
-</ol>
+<p><strong>5. La rue et le code postal sont intégrés dans la même colonne (sans numéro) :</strong> le programme reconstitue la rue et le code postal dans des colonnes séparées (comme la situation 3). Dans ce cas, le code postal doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (situation peu courante). Ce format demande de renseigner l’argument <code>colonne_rue_code_postal</code>.</p>
 <table class="table">
 <colgroup>
 <col width="22%">
@@ -356,20 +339,20 @@
 </colgroup>
 <thead><tr class="header">
 <th align="left">rue_code_postal</th>
-<th align="left"></th>
+<th align="center">statut</th>
 <th align="left">Note</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">rue Belliard 1040</td>
-<td align="left">
+<td align="center">
 <span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
 <td align="left">Lorsqu’un champ contient la rue et le code postal, ce dernier doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (peu courant).</td>
 </tr>
 <tr class="even">
 <td align="left">
 <span style="color: #FF0000">1040</span> rue Belliard</td>
-<td align="left"><span class="emoji" data-emoji="x">❌</span></td>
+<td align="center"><span class="emoji" data-emoji="x">❌</span></td>
 <td align="left"></td>
 </tr>
 </tbody>
@@ -381,12 +364,9 @@
 <p>Nous expliquons ici avec plus de détail la logique du traitement réalisé par <code>phacochr</code>. Celui-ci repose sur les données BeST Address, que nous avons reformatées pour optimiser le traitement. Nous avons également utilisé des données produites par Statbel et Urbis dans ce reformatage. Nous ne rentrons pas dans l’explication de ces modifications ici, et renvoyons au <a href="https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R" class="external-link">code de la fonction <code>phaco_best_data_update()</code> disponible sur Github</a>.</p>
 <p>Nous nous concentrons ici sur les opérations réalisées par la fonction <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code>, fonction de géocodage à proprement parler. Si l’on schématise, ces opérations se classent en trois grandes familles :</p>
 <ol style="list-style-type: decimal">
-<li>
-<strong>Formatage des données :</strong> le programme détecte d’abord la configuration des données à géocoder, et créé les colonnes nettoyées de numéro de rue (si disponible, ce qui est souvent le cas), de rue et de code postal. Des corrections sont faites pour chacun de ces champs, afin de maximiser les chances de trouver l’adresse dans la suite des opérations.</li>
-<li>
-<strong>Détection des rues :</strong> <code>phacochr</code> procède alors à une <em>jointure inexacte</em> entre chacune des rues (nettoyées au point précédent) et l’ensemble des rue de BeST Address <em>au sein du code postal indiqué</em>. Un matching inexact est nécessaire pour pouvoir apparier la rue des données BeST (disons <em>Rue Belliard</em> au code postal 1040) avec la même rue telle qu’elle est écrite concrètement dans la base de données à géocoder, potentiellement avec des coquilles ou fautes d’orthographe (par exemple <em>Rue Beliar</em> avec un seul <em>l</em> et sans <em>d</em>, également au code postal 1040). Le matching inexact est parallélisé sur les n-1 cores du CPU afin d’augmenter la vitesse du traitement (de nombreuses combinaisons devant être calculées). Le paramètre <code>error_max</code> permet d’indiquer l’erreur acceptable par l’utilisateur. Celle-ci est réglée par défaut à <code>4</code>, ce qui permet de trouver des rues mal orthographiées, sans les confondre avec d’autres, avec un très bon taux de succès. Augmenter ce paramètre accroît le pourcentage de rues trouvées, mais aussi d’erreurs réalisées. Dans le cas où la langue dans laquelle les adresses sont inscrites est connue, elle peut être renseignée via l’argument <code>lang_encoded</code>, ce qui augmente la vitesse et la fiabilité du processus en limitant le matching à la langue définie. Si la rue n’est pas trouvée, le programme étend sa recherche à la commune entière et à toutes les communes limitrophes. Cette procédure optionnelle peut être désactivée avec le paramètre <code>elargissement_com_adj = FALSE</code>.</li>
-<li>
-<strong>Jointure avec les coordonnées géographiques :</strong> une fois les rues trouvées, il est désormais possible de réaliser une <em>jointure exacte</em> avec les données BeST géolocalisées au niveau du numéro, celles-ci comprenant les coordonnées X-Y de l’ensemble des adresses en Belgique. Pour ce faire, seuls les arrondissements dans lesquels sont présents les codes postaux des données à géocoder sont chargés en RAM, pour augmenter la vitesse du traitement et soulager l’ordinateur. Les coordonnées des adresses qui ne sont pas trouvées sont approximées en trouvant les coordonnées connues de l’adresse la plus proche du même côté de la rue. L’amplitude maximale de cette approximation est réglable avec le paramètre <code>approx_num_max</code> (réglé par défaut à <code>50</code> ; indiquer <code>0</code> pour désactiver l’approximation). Dans le cas où les coordonnées ne sont pas trouvées, ce sont celles du numéro médian de la rue (proxy du milieu de la rue) qui sont indiquées (option activée par défaut et désactivable avec l’argument <code>mid_street = FALSE</code>). Si les données ne possèdent pas de numéro, c’est cette information qui est indiquée comme résultat du géocodage.</li>
+<li><p><strong>Formatage des données :</strong> le programme détecte d’abord la configuration des données à géocoder, et créé les colonnes nettoyées de numéro de rue (si disponible, ce qui est souvent le cas), de rue et de code postal. Des corrections sont faites pour chacun de ces champs, afin de maximiser les chances de trouver l’adresse dans la suite des opérations.</p></li>
+<li><p><strong>Détection des rues :</strong> <code>phacochr</code> procède alors à une <em>jointure inexacte</em> entre chacune des rues (nettoyées au point précédent) et l’ensemble des rue de BeST Address <em>au sein du code postal indiqué</em>. Un matching inexact est nécessaire pour pouvoir apparier la rue des données BeST (disons <em>Rue Belliard</em> au code postal 1040) avec la même rue telle qu’elle est écrite concrètement dans la base de données à géocoder, potentiellement avec des coquilles ou fautes d’orthographe (par exemple <em>Rue Beliar</em> avec un seul <em>l</em> et sans <em>d</em>, également au code postal 1040). Le matching inexact est parallélisé sur les n-1 cores du CPU afin d’augmenter la vitesse du traitement (de nombreuses combinaisons devant être calculées). Le paramètre <code>error_max</code> permet d’indiquer l’erreur acceptable par l’utilisateur. Celle-ci est réglée par défaut à <code>4</code>, ce qui permet de trouver des rues mal orthographiées, sans les confondre avec d’autres, avec un très bon taux de succès. Augmenter ce paramètre accroît le pourcentage de rues trouvées, mais aussi d’erreurs réalisées. Dans le cas où la langue dans laquelle les adresses sont inscrites est connue, elle peut être renseignée via l’argument <code>lang_encoded</code>, ce qui augmente la vitesse et la fiabilité du processus en limitant le matching à la langue définie. Si la rue n’est pas trouvée, le programme étend sa recherche à la commune entière et à toutes les communes limitrophes. Cette procédure optionnelle peut être désactivée avec le paramètre <code>elargissement_com_adj = FALSE</code>.</p></li>
+<li><p><strong>Jointure avec les coordonnées géographiques :</strong> une fois les rues trouvées, il est désormais possible de réaliser une <em>jointure exacte</em> avec les données BeST géolocalisées au niveau du numéro, celles-ci comprenant les coordonnées X-Y de l’ensemble des adresses en Belgique. Pour ce faire, seuls les arrondissements dans lesquels sont présents les codes postaux des données à géocoder sont chargés en RAM, pour augmenter la vitesse du traitement et soulager l’ordinateur. Les coordonnées des adresses qui ne sont pas trouvées sont approximées en trouvant les coordonnées connues de l’adresse la plus proche du même côté de la rue. L’amplitude maximale de cette approximation est réglable avec le paramètre <code>approx_num_max</code> (réglé par défaut à <code>50</code> ; indiquer <code>0</code> pour désactiver l’approximation). Dans le cas où les coordonnées ne sont pas trouvées, ce sont celles du numéro médian de la rue (proxy du milieu de la rue) qui sont indiquées (option activée par défaut et désactivable avec l’argument <code>mid_street = FALSE</code>). Si les données ne possèdent pas de numéro, c’est cette information qui est indiquée comme résultat du géocodage.</p></li>
 </ol>
 <p>La procédure de géocodage est alors terminée. Les coordonnées X-Y produites se trouvent dans les colonnes <code>x_31370</code> et <code>y_31370</code> au format Lambert 72. Outre ces coordonnées, sont jointes à chaque adresse trouvée différentes informations utiles. On y trouve notamment (la liste complète est disponible au point <em>Colonnes créées par phacochr</em> en fin de page) :</p>
 <ul>
