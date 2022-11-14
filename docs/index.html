@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Geocodeur belge">
 <meta property="og:description" content="PhacochR est un géocodeur pour la Belgique sous forme de package R. A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.">
@@ -137,27 +137,246 @@
 <div class="section level2">
 <h2 id="format-des-données-à-géocoder">Format des données à géocoder<a class="anchor" aria-label="anchor" href="#format-des-donn%C3%A9es-%C3%A0-g%C3%A9ocoder"></a>
 </h2>
-<p><code>phacochr</code> est compatible avec cinq formats concernant les données à géocoder :</p>
+<p><code>phacochr</code> est compatible avec cinq formats concernant les données à géocoder. Dans chacun de ces formats, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Les tableau ci-dessous schématisent les différentes configurations envisageables, indiquent différents exemples à partir d’une même adresse (le <em>71 rue Belliard, 1040 Bruxelles</em>) et mentionnent des notes pour que l’utilisateur comprenne ce que fait le programme.</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Le numéro de rue, la rue et le code postal sont présents dans des colonnes séparées dans les données à géocoder :</strong> il s’agit du format idéal qui rencontrera le meilleur résultat. Dans ce cas, il faut renseigner les arguments <code>colonne_num</code>, <code>colonne_rue</code> et <code>colonne_code_postal</code>.</li>
+</ol>
+<table class="table">
+<colgroup>
+<col width="4%">
+<col width="13%">
+<col width="16%">
+<col width="6%">
+<col width="59%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">️rue</th>
+<th align="left">num</th>
+<th align="left">code_postal</th>
+<th></th>
+<th>Note</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">rue Belliard</td>
+<td align="left">71</td>
+<td align="left">1040</td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
+<td>Situation idéale !</td>
+</tr>
+<tr class="even">
+<td align="left">rue Belliard</td>
+<td align="left">71<span style="color: #FF0000">B</span>
+</td>
+<td align="left">1040</td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
+<td>S’il y a des caractères non numériques après le numéro de rue (lettres, caractères typographiques…), ceux-ci ne sont pas pris en compte.</td>
+</tr>
+<tr class="odd">
+<td align="left">rue Belliard</td>
+<td align="left">71<span style="color: #FF0000">-73</span>
+</td>
+<td align="left">1040</td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
+<td>Si le champ de numéro de rue compte plusieurs numéros, seul le premier est considéré.</td>
+</tr>
+<tr class="even">
+<td align="left">rue Belliard</td>
+<td align="left">71</td>
+<td align="left"><span style="color: #0000FF">1040 Bruxelles</span></td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
+<td>Le nom de la commune (en lettres) peut être indiqué dans le champ code postal ➡ seul le nombre est considéré. L’ordre « code postal - commune » ou « commune - code postal » n’importe pas.</td>
+</tr>
+<tr class="odd">
+<td align="left">rue Belliard</td>
+<td align="left">71</td>
+<td align="left"><span style="color: #0000FF">Bruxelles 1040</span></td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
+<td></td>
+</tr>
+<tr class="even">
+<td align="left">rue Belliard</td>
+<td align="left">71</td>
+<td align="left">1040 <span style="color: #FF0000">Etterbeek</span>
+</td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
+<td>Il n’y a pas d’incidence si le nom de la commune est erroné ➡ seul le code postal (nombre) est considéré.</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" style="list-style-type: decimal">
 <li>
 <strong>Le numéro de rue et la rue sont mélangés dans une colonne, et le code postal est seul dans une autre :</strong> ce format demande de renseigner les arguments <code>colonne_num_rue</code> et <code>colonne_code_postal</code>. Dans ce format, <code>phacochr</code> reconstitue à l’aide des <a href="https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions" class="external-link">expressions régulières (REGEX)</a> la rue et le numéro dans des colonnes séparées. Cette procédure fonctionne très bien la plupart du temps. Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans la colonne <code>colonne_num_rue</code>. Un numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas cependant peu courant).</li>
+</ol>
+<table class="table">
+<colgroup>
+<col width="3%">
+<col width="18%">
+<col width="5%">
+<col width="71%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">code_postal</th>
+<th align="left">num_rue</th>
+<th></th>
+<th>Note</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">1040</td>
+<td align="left"><span style="color: #0000FF">71, rue Belliard</span></td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
+<td>Si la rue et le numéro sont intégrés dans le même champ, leur ordre n’a pas d’importance. La présence de signes de ponctuations (virgule, tiret…) ne pose pas de problèmes pour la détection de la rue =&gt; ils sont nettoyés avec la correction.</td>
+</tr>
+<tr class="even">
+<td align="left">1040</td>
+<td align="left"><span style="color: #0000FF">rue Belliard, 71</span></td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td align="left">1040</td>
+<td align="left">rue Belliard, 71 <span style="color: #FF0000">bte 5</span>
+</td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
+<td>Le fait que le numéro de boite soit indiqué n’a pas d’incidence =&gt; il est nettoyé avant la détection de la rue.</td>
+</tr>
+<tr class="even">
+<td align="left">1040</td>
+<td align="left">
+<span style="color: #FF0000">bte 5 -</span> rue Belliard, 71</td>
+<td><span class="emoji" data-emoji="x">❌</span></td>
+<td>Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans le champ. Le numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas peu courant).</td>
+</tr>
+<tr class="odd">
+<td align="left">1040</td>
+<td align="left">rue Belliard, <span style="color: #FF0000">n°</span>71</td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️️</td>
+<td>Le fait que « n° », « no », « n. » soit indiqué avant le numéro n’a pas d’incidence =&gt; il est nettoyé avant la détection de la rue.</td>
+</tr>
+</tbody>
+</table>
+<ol start="3" style="list-style-type: decimal">
 <li>
 <strong>Le numéro de rue, la rue et le code postal sont intégrés dans la même colonne :</strong> dans ce format, il faut renseigner l’argument <code>colonne_num_rue_code_postal</code>. Le géocodeur reconstitue le numéro de rue, la rue (comme la situation précédente) mais aussi le code postal dans des colonnes séparées. Cette situation fonctionne également très bien, à condition d’observer cette règle : le numéro doit être le premier nombre et le code postal être en fin de champ (situations les plus courantes).</li>
+</ol>
+<table class="table">
+<colgroup>
+<col width="26%">
+<col width="5%">
+<col width="67%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">num_rue_code_postal</th>
+<th align="left"></th>
+<th align="left">Note</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">rue Belliard, <span style="color: #0000FF">71 1040</span>
+</td>
+<td align="left">
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
+<td align="left">Dans le cas où la rue, le numéro et le code postal sont intégrés dans un même champ, il faut observer une règle fondamentale : le numéro doit être le premier nombre et le code postal être en fin de champ.</td>
+</tr>
+<tr class="even">
+<td align="left">
+<span style="color: #0000FF">71,</span> rue Belliard <span style="color: #0000FF">1040</span>
+</td>
+<td align="left">
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">rue Belliard <span style="color: #FF0000">1040 n°71</span>
+</td>
+<td align="left"><span class="emoji" data-emoji="x">❌</span></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">71, rue Belliard 1040 <span style="color: #0000FF">Bruxelles</span>
+</td>
+<td align="left">
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
+<td align="left">Le nom de la commune (en lettres) peut être accolé au code postal (nombre) si ce dernier est en fin de champ. Si le nom de la commune vient après, il est nettoyé sans condition. S’il vient avant, il doit être écrit avec la bonne orthographe.</td>
+</tr>
+<tr class="odd">
+<td align="left">71, rue Belliard <span style="color: #0000FF">Bruxelles</span> 1040</td>
+<td align="left">
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">71, rue Belliard <span style="color: #FF0000">BXL</span> 1040 1040</td>
+<td align="left">
+<span class="emoji" data-emoji="x">❌</span>️</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+<ol start="4" style="list-style-type: decimal">
 <li>
 <strong>La rue et le code postal sont présents dans des colonnes séparées (sans numéro) :</strong> cette situation ressemble à la première, mais sans que le numéro soit disponible. <code>phacochr</code> géocode alors non pas à un niveau de précision du bâtiment, mais choisi comme coordonnées de résultat le bâtiment disposant du numéro médian de la rue au sein du même code postal (certaines rues traversant différents codes postaux). Ce format demande de renseigner les arguments <code>colonne_rue</code> et <code>colonne_code_postal</code>.</li>
+</ol>
+<table class="table">
+<thead><tr class="header">
+<th align="left">️rue</th>
+<th align="left">code_postal</th>
+<th></th>
+<th>Note</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="left">rue Belliard</td>
+<td align="left">1040</td>
+<td>
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
+<td></td>
+</tr></tbody>
+</table>
+<ol start="5" style="list-style-type: decimal">
 <li>
 <strong>La rue et le code postal sont intégrés dans la même colonne (sans numéro) :</strong> le programme reconstitue la rue et le code postal dans des colonnes séparées (comme la situation 3). Dans ce cas, le code postal doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (situation peu courante). Ce format demande de renseigner l’argument <code>colonne_rue_code_postal</code>.</li>
 </ol>
-<p>Dans chacun de ces formats, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Le tableau ci-dessous schématise les différentes configurations envisageables, indique différents exemples à partir d’une même adresse (le <em>71 rue Belliard, 1040 Bruxelles</em>) et mentionne des notes pour que l’utilisateur comprenne ce que fait le programme :</p>
-<div class="figure">
-<img src="reference/figures/cas_adresses2.png" alt=""><p class="caption">Tableau schématique des formats possibles</p>
-</div>
+<table class="table">
+<colgroup>
+<col width="22%">
+<col width="8%">
+<col width="68%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">rue_code_postal</th>
+<th align="left"></th>
+<th align="left">Note</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">rue Belliard 1040</td>
+<td align="left">
+<span class="emoji" data-emoji="heavy_check_mark">✔️</span>️</td>
+<td align="left">Lorsqu’un champ contient la rue et le code postal, ce dernier doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (peu courant).</td>
+</tr>
+<tr class="even">
+<td align="left">
+<span style="color: #FF0000">1040</span> rue Belliard</td>
+<td align="left"><span class="emoji" data-emoji="x">❌</span></td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
-<h2 id="logique-de-phacochr">Logique de <code>phacochr</code>
-<a class="anchor" aria-label="anchor" href="#logique-de-phacochr"></a>
+<h2 id="logique">Logique<a class="anchor" aria-label="anchor" href="#logique"></a>
 </h2>
 <p>Nous expliquons ici avec plus de détail la logique du traitement réalisé par <code>phacochr</code>. Celui-ci repose sur les données BeST Address, que nous avons reformatées pour optimiser le traitement. Nous avons également utilisé des données produites par Statbel et Urbis dans ce reformatage. Nous ne rentrons pas dans l’explication de ces modifications ici, et renvoyons au <a href="https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R" class="external-link">code de la fonction <code>phaco_best_data_update()</code> disponible sur Github</a>.</p>
 <p>Nous nous concentrons ici sur les opérations réalisées par la fonction <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code>, fonction de géocodage à proprement parler. Si l’on schématise, ces opérations se classent en trois grandes familles :</p>
@@ -181,7 +400,7 @@
 <li>
 <code>data_geocoded</code> : la base de données originale à laquelle sont ajoutées les informations précitées ;</li>
 <li>
-<code>data_geocoded_sf</code> : <a href="https://r-spatial.github.io/sf/" class="external-link">un objet <code>sf</code></a> produit à partir des adresses pour lesquelles des coordonnées ont effectivement été trouvées (le nombre de lignes reprises dans l’objet dépend donc du taux de géocodage). Cet objet est exportable en geopackage ou peut directement être cartographié avec la fonction <code>phaco_map_s</code> ;</li>
+<code>data_geocoded_sf</code> : <a href="https://r-spatial.github.io/sf/" class="external-link">un objet <code>sf</code></a> produit à partir des adresses pour lesquelles des coordonnées ont effectivement été trouvées (le nombre de lignes reprises dans l’objet dépend donc du taux de géocodage). Cet objet est exportable en .gpkg (ou autre format vectoriel) à l’aide de la fonction <a href="https://r-spatial.github.io/sf/reference/st_write.html" class="external-link">st_write</a> ou peut directement être cartographié avec la fonction <code>phaco_map_s</code> ;</li>
 <li>
 <code>summary</code> : un tableau avec quelques statistiques synthétiques indiquant la performance du géocodage.</li>
 </ul>
@@ -191,8 +410,7 @@ Tableau schématique du traitement opéré par phacochr
 </figcaption></figure>
 </div>
 <div class="section level2">
-<h2 id="performances-et-fiabilité-de-phacochr">Performances et fiabilité de <code>phacochr</code>
-<a class="anchor" aria-label="anchor" href="#performances-et-fiabilit%C3%A9-de-phacochr"></a>
+<h2 id="performances-et-fiabilité">Performances et fiabilité<a class="anchor" aria-label="anchor" href="#performances-et-fiabilit%C3%A9"></a>
 </h2>
 <p>Nous présentons ici quelques mesures des performances de <code>phacochr</code>. Nous avons réalisé des tests sur 18 bases de données réelles fournies par des collègues (merci à elles et eux).</p>
 <p>La vitesse d’exécution par adresse suit une fonction inverse (1/x). <code>phacochr</code> est bien meilleur avec un nombre conséquent d’adresses. Ceci vient entre autre du fait qu’il doit charger des données volumineuses avant de réaliser les traitements : le “coût” marginal en temps de ce chargement est d’autant plus faible que les données sont nombreuses à géocoder. A partir de 2000 adresses, la vitesse d’exécution se situe entre 0,4 et 0,8 secondes / 100 adresses. A titre d’exemple, 2 adresses sont trouvées en 16s, géocoder 300 adresses prend environ 20s, 1000 adresses 25s, 20 000 adresses 140s.</p>
@@ -215,8 +433,7 @@ Graphique de la répartition de l’erreur de géolocalisation
 </figcaption></figure>
 </div>
 <div class="section level2">
-<h2 id="colonnes-créées-par-phacochr">Colonnes créées par <code>phacochr</code>
-<a class="anchor" aria-label="anchor" href="#colonnes-cr%C3%A9%C3%A9es-par-phacochr"></a>
+<h2 id="colonnes-créées">Colonnes créées<a class="anchor" aria-label="anchor" href="#colonnes-cr%C3%A9%C3%A9es"></a>
 </h2>
 <p>Le principe de <code>phacochr</code> est d’adjoindre une série d’informations à la liste d’adresses originale : il s’agit bien entendu d’informations spatiales (coordonnées X-Y et des informations administratives sur les entités spatiales) mais également d’indices sur la qualité du géocodage. En voici une liste exhaustive et commentée:</p>
 <table class="table">
@@ -391,6 +608,11 @@ Graphique de la répartition de l’erreur de géolocalisation
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level2">
+<h2 id="autres-géocodeurs-libres">Autres géocodeurs libres<a class="anchor" aria-label="anchor" href="#autres-g%C3%A9ocodeurs-libres"></a>
+</h2>
+<p>-<a href="https://nominatim.org/" class="external-link">Nominatim</a>: le géocodeur de OpenStreetMap. -<a href="https://ebxl.be/les-outils/bhigis/" class="external-link">BHiGIS – Brussels Historical Geographical Information System</a>: un géocodeur développé par l’IGEAT permettant de géocoder des données anciennes à Bruxelles.</p>
 </div>
 <div class="section level2">
 <h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
