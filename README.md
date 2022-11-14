@@ -219,23 +219,25 @@ schématise, ces opérations se classent en trois grandes familles :
     inexacte* entre chacune des rues (nettoyées au point précédent) et
     l’ensemble des rue de BeST Address *au sein du code postal indiqué*.
     Un matching inexact est nécessaire pour pouvoir apparier la rue des
-    données BeST (disons *Rue Belliard* à 1040) avec la même rue telle
-    qu’elle est écrite concrètement dans la base de données à géocoder
-    (par exemple *Rue Beliar* avec un seul *l* et sans *d* également à
-    1040). Le matching inexact est parallélisé sur les n-1 cores du CPU
-    afin d’augmenter la vitesse du traitement (de nombreuses
-    combinaisons devant être calculées). Le paramètre `error_max` permet
-    d’indiquer l’erreur acceptable par l’utilisateur. Celle-ci est
-    réglée par défaut à `4`, ce qui permet de trouver des rues mal
-    orthographiées, sans les confondre avec d’autres, avec un très bon
-    taux de succès. Augmenter ce paramètre accroît le pourcentage de
-    rues trouvées, mais aussi d’erreurs réalisées. Dans le cas où la
-    langue dans laquelle les adresses sont inscrites est connue, elle
-    peut être renseignée via l’argument `lang_encoded`, ce qui augmente
-    la vitesse et la fiabilité du processus en limitant le matching à la
-    langue définie. Si la rue n’est pas trouvée, le programme étend sa
-    recherche à la commune entière et à toutes les communes limitrophes.
-    Cette procédure optionnelle peut être désactivée avec le paramètre
+    données BeST (disons *Rue Belliard* au code postal 1040) avec la
+    même rue telle qu’elle est écrite concrètement dans la base de
+    données à géocoder, potentiellement avec des coquilles ou fautes
+    d’orthographe (par exemple *Rue Beliar* avec un seul *l* et sans
+    *d*, également au code postal 1040). Le matching inexact est
+    parallélisé sur les n-1 cores du CPU afin d’augmenter la vitesse du
+    traitement (de nombreuses combinaisons devant être calculées). Le
+    paramètre `error_max` permet d’indiquer l’erreur acceptable par
+    l’utilisateur. Celle-ci est réglée par défaut à `4`, ce qui permet
+    de trouver des rues mal orthographiées, sans les confondre avec
+    d’autres, avec un très bon taux de succès. Augmenter ce paramètre
+    accroît le pourcentage de rues trouvées, mais aussi d’erreurs
+    réalisées. Dans le cas où la langue dans laquelle les adresses sont
+    inscrites est connue, elle peut être renseignée via l’argument
+    `lang_encoded`, ce qui augmente la vitesse et la fiabilité du
+    processus en limitant le matching à la langue définie. Si la rue
+    n’est pas trouvée, le programme étend sa recherche à la commune
+    entière et à toutes les communes limitrophes. Cette procédure
+    optionnelle peut être désactivée avec le paramètre
     `elargissement_com_adj = FALSE`.
 3)  **Jointure avec les coordonnées géographiques :** une fois les rues
     trouvées, il est désormais possible de réaliser une *jointure
@@ -291,7 +293,7 @@ Le tableau ci-dessous schématise l’ensemble des opérations réalisées et
 expliquées précédemment :
 
 <figure>
-<img src="man/figures/phacochr4.png" width="550"
+<img src="man/figures/phacochr4.png" width="580"
 alt="Tableau schématique du traitement opéré par phacochr" />
 <figcaption aria-hidden="true">Tableau schématique du traitement opéré
 par phacochr</figcaption>
