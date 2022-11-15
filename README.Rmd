@@ -54,6 +54,7 @@ Il est également possible pour l'utilisateur de mettre à jour lui-même les do
 phaco_best_data_update()
 ```
 
+
 ## Exemple de géocodage
 
 Voici un exemple de géocodage d'un data.frame contenant deux adresses :
@@ -90,59 +91,60 @@ phaco_map_s(result$data_geocoded_sf,
             title_carto = "Institutions des auteurs")
 ```
 
+
 ## Format des données à géocoder
 
 `phacochr` est compatible avec cinq formats concernant les données à géocoder. Dans chacun de ces formats, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Les tableau ci-dessous schématisent les différentes configurations envisageables, indiquent différents exemples à partir d'une même adresse (le *71 rue Belliard, 1040 Bruxelles*) et mentionnent des notes pour que l'utilisateur comprenne ce que fait le programme.
 
 **1. Le numéro de rue, la rue et le code postal sont présents dans des colonnes séparées dans les données à géocoder :** il s'agit du format idéal qui rencontrera le meilleur résultat. Dans ce cas, il faut renseigner les arguments `colonne_num`, `colonne_rue` et `colonne_code_postal`.
 
-| ️rue          | num                             | code_postal                              |  statut   | Note                                                                                                                                                                                      |
-|:----------|:--|:-------|:---:|----------------------| 
-| rue Belliard | 71                              | 1040                                     | :heavy_check_mark:️  | Situation idéale !                                                                                                                                                                        |
-| rue Belliard | 71[B]{style="color: #FF0000"}   | 1040                                     | :heavy_check_mark:️️  | S'il y a des caractères non numériques après le numéro de rue (lettres, caractères typographiques...), ceux-ci ne sont pas pris en compte.                                                |
-| rue Belliard | 71[-73]{style="color: #FF0000"} | 1040                                     | :heavy_check_mark:️️  | Si le champ de numéro de rue compte plusieurs numéros, seul le premier est considéré.                                                                                                     |
-| rue Belliard | 71                              | [1040 Bruxelles]{style="color: #0000FF"}| :heavy_check_mark:️️  | Le nom de la commune (en lettres) peut être indiqué dans le champ code postal ➡ seul le nombre est considéré. L'ordre « code postal - commune » ou « commune - code postal » n'importe pas. |
-| rue Belliard | 71                              | [Bruxelles 1040]{style="color: #0000FF"} | :heavy_check_mark:️️  |                                                                                                                                                                                           |
-| rue Belliard | 71                              | 1040 [Etterbeek]{style="color: #FF0000"} | :heavy_check_mark:️️  | Il n'y a pas d'incidence si le nom de la commune est erroné ➡ seul le code postal (nombre) est considéré.                                                                            |
+|  rue | num | code_postal | Statut | Note |
+|:----|:----|:------------|:------:|:-----| 
+| rue Belliard | 71 | 1040 | :heavy_check_mark: | Situation idéale ! |
+| rue Belliard | 71[B]{style="color: #FF0000"} | 1040 | :heavy_check_mark: | S'il y a des caractères non numériques après le numéro de rue (lettres, caractères typographiques...), ceux-ci ne sont pas pris en compte. |
+| rue Belliard | 71[-73]{style="color: #FF0000"} | 1040 | :heavy_check_mark: | Si le champ de numéro de rue compte plusieurs numéros, seul le premier est considéré. |
+| rue Belliard | 71 | [1040 Bruxelles]{style="color: #0000FF"}| :heavy_check_mark: | Le nom de la commune (en lettres) peut être indiqué dans le champ code postal ➡ seul le nombre est considéré. L'ordre « code postal - commune » ou « commune - code postal » n'importe pas. |
+| rue Belliard | 71 | [Bruxelles 1040]{style="color: #0000FF"} | :heavy_check_mark: | |
+| rue Belliard | 71 | 1040 [Etterbeek]{style="color: #FF0000"} | :heavy_check_mark: | Il n'y a pas d'incidence si le nom de la commune est erroné  ➡ seul le code postal (nombre) est considéré. |
 
 
 **2. Le numéro de rue et la rue sont mélangés dans une colonne, et le code postal est seul dans une autre :** ce format demande de renseigner les arguments `colonne_num_rue` et `colonne_code_postal`. Dans ce format, `phacochr` reconstitue à l'aide des [expressions régulières (REGEX)](https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions) la rue et le numéro dans des colonnes séparées. Cette procédure fonctionne très bien la plupart du temps. Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans la colonne `colonne_num_rue`. Un numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas cependant peu courant).
 
-| code_postal|num_rue                  |statut |Note                                                                                                                                                                                                                                            |
-|:---|:----------|:---:|-----------------------|
-|        1040| [71, rue Belliard]{style="color: #0000FF"}  | :heavy_check_mark:️️ |Si la rue et le numéro sont intégrés dans le même champ, leur ordre n’a pas d’importance. La présence de signes de ponctuation (virgule, tiret…) ne pose pas de problèmes pour la détection de la rue => ils sont nettoyés avec la correction. |
-|        1040| [rue Belliard, 71]{style="color: #0000FF"}  | :heavy_check_mark:️️ |                                                                                                                                                                                                                                                |
-|        1040|rue Belliard, 71 [bte 5]{style="color: #FF0000"}   | :heavy_check_mark:️️ |Le fait que le numéro de boite soit indiqué n’a pas d’incidence => il est nettoyé avant la détection de la rue.                                                                                                                                 |
-|        1040|[bte 5 -]{style="color: #FF0000"} rue Belliard, 71 |  :x:  |Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans le champ. Le numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas peu courant).                |
-|        1040|rue Belliard, [n°]{style="color: #FF0000"}71       | :heavy_check_mark:️️ |Le fait que « n° », « no », « n. » soit indiqué avant le numéro n’a pas d’incidence => il est nettoyé avant la détection de la rue.     
+| code_postal| num_rue | Statut | Note |
+|:-----------|:--------|:------:|:-----|
+| 1040 | [71, rue Belliard]{style="color: #0000FF"} | :heavy_check_mark: | Si la rue et le numéro sont intégrés dans le même champ, leur ordre n’a pas d’importance. La présence de signes de ponctuation (virgule, tiret…) ne pose pas de problèmes pour la détection de la rue => ils sont nettoyés avec la correction. |
+| 1040 | [rue Belliard, 71]{style="color: #0000FF"} | :heavy_check_mark: | |
+| 1040 | rue Belliard, 71 [bte 5]{style="color: #FF0000"} | :heavy_check_mark: | Le fait que le numéro de boite soit indiqué n’a pas d’incidence => il est nettoyé avant la détection de la rue. Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans le champ. Le numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas peu courant). |
+| 1040 | [bte 5 -]{style="color: #FF0000"} rue Belliard, 71 | :x: | *Ici le numéro de boite vient avant le numéro de rue : `phacochr` interprète alors que le numéro de rue est 5 (alors que c'est 71).* |
+| 1040 | rue Belliard, [n°]{style="color: #FF0000"}71 | :heavy_check_mark: | Le fait que « n° », « no », « n. » soit indiqué avant le numéro n’a pas d’incidence => il est nettoyé avant la détection de la rue.     
 
 **3. Le numéro de rue, la rue et le code postal sont intégrés dans la même colonne :** dans ce format, il faut renseigner l'argument `colonne_num_rue_code_postal`. Le géocodeur reconstitue le numéro de rue, la rue (comme la situation précédente) mais aussi le code postal dans des colonnes séparées. Cette situation fonctionne également très bien, à condition d'observer cette règle : le numéro doit être le premier nombre et le code postal être en fin de champ (situations les plus courantes).
 
 
-|num_rue_code_postal             |   statut |Note                                                                                                                                                                                                                                              |
-|:-----------------|:---:|:----------------------------------------------|
-|rue Belliard, [71 1040]{style="color: #0000FF"}           |:heavy_check_mark:️  |Dans le cas où la rue, le numéro et le code postal sont intégrés dans un même champ, il faut observer une règle fondamentale : le numéro doit être le premier nombre et le code postal être en fin de champ.                                      |
-|[71,]{style="color: #0000FF"} rue Belliard [1040]{style="color: #0000FF"}           |:heavy_check_mark:️  |                                                                                                                                                                                                                                                  |
-|rue Belliard [1040 n°71]{style="color: #FF0000"}          | :x:  |                                                                                                                                                                                                                                                  |
-|71, rue Belliard 1040 [Bruxelles]{style="color: #0000FF"} |:heavy_check_mark:️  |Le nom de la commune (en lettres) peut être accolé au code postal (nombre) si ce dernier est en fin de champ. Si le nom de la commune vient après, il est nettoyé sans condition. S’il vient avant, il doit être écrit avec la bonne orthographe. |
-|71, rue Belliard [Bruxelles]{style="color: #0000FF"} 1040 |:heavy_check_mark:️  |  
-|71, rue Belliard [BXL]{style="color: #FF0000"} 1040 |:x:️  |  
+| num_rue_code_postal | Statut | Note |
+|:--------------------|:------:|:-----|
+| rue Belliard, [71 1040]{style="color: #0000FF"} | :heavy_check_mark: | Dans le cas où la rue, le numéro et le code postal sont intégrés dans un même champ, il faut observer une règle fondamentale : le numéro doit être le premier nombre et le code postal être en fin de champ. |
+| [71,]{style="color: #0000FF"} rue Belliard [1040]{style="color: #0000FF"} | :heavy_check_mark: | |
+| rue Belliard [1040 n°71]{style="color: #FF0000"} | :x: | *Ici le numéro vient après le code postal : `phacochr` interprète alors que le numéro de rue est 1040 (alors que c'est 71).* |
+| 71, rue Belliard 1040 [Bruxelles]{style="color: #0000FF"} | :heavy_check_mark: | Le nom de la commune (en lettres) peut être accolé au code postal (nombre) si ce dernier est en fin de champ. Si le nom de la commune vient après, il est nettoyé sans condition. S’il vient avant, il doit être écrit avec la bonne orthographe. |
+| 71, rue Belliard [Bruxelles]{style="color: #0000FF"} 1040 | :heavy_check_mark: | |
+| 71, rue Belliard [BXL]{style="color: #FF0000"} 1040 | :x: |*Ici le nom de la commune est mal orthographié : "BXL" au lieu de "Bruxelles" : le code postal est détecté (car en fin de champ), mais `phacochr` ne supprime pas le nom "BXL" du champ de rue et trouve moins facilement (ou pas du tout) celle-ci.* |
 
 
 **4. La rue et le code postal sont présents dans des colonnes séparées (sans numéro) :** cette situation ressemble à la première, mais sans que le numéro soit disponible. `phacochr` géocode alors non pas à un niveau de précision du bâtiment, mais choisi comme coordonnées de résultat le bâtiment disposant du numéro médian de la rue au sein du même code postal (certaines rues traversant différents codes postaux). Ce format demande de renseigner les arguments `colonne_rue` et `colonne_code_postal`.
 
-| ️rue          | code_postal | statut  |
-|:--------|:--------|:---:|
-|rue Belliard | 1040 |:heavy_check_mark:️       |
+|  rue | code_postal | Statut |
+|:----|:-------------|:------:|
+| rue Belliard | 1040 | :heavy_check_mark: |
 
 
 **5. La rue et le code postal sont intégrés dans la même colonne (sans numéro) :** le programme reconstitue la rue et le code postal dans des colonnes séparées (comme la situation 3). Dans ce cas, le code postal doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (situation peu courante). Ce format demande de renseigner l'argument `colonne_rue_code_postal`.
 
 
-|rue_code_postal   | statut |Note                                                                                                                                                                |
-|:-----------------|:---:|:-----|
-|rue Belliard 1040 |:heavy_check_mark:️  |Lorsqu’un champ contient la rue et le code postal, ce dernier doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (peu courant). |
-|[1040]{style="color: #FF0000"} rue Belliard |:x:  |     
+| rue_code_postal | Statut | Note |
+|:----------------|:------:|:-----|
+| rue Belliard [1040]{style="color: #0000FF"} | :heavy_check_mark: | Lorsqu’un champ contient la rue et le code postal, ce dernier doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (peu courant). |
+| [1040]{style="color: #FF0000"} rue Belliard | :x: | *Ici le code postal est au début du champ : il n'est donc pas repéré.* |
 
 
 ## Logique
@@ -174,6 +176,7 @@ Le tableau ci-dessous schématise l'ensemble des opérations réalisées et expl
 
 ![Tableau schématique du traitement opéré par phacochr](man/figures/phacochr4.png){width=580px}
 
+
 ## Performances et fiabilité
 
 Nous présentons ici quelques mesures des performances de `phacochr`. Nous avons réalisé des tests sur 18 bases de données réelles fournies par des collègues (merci à elles et eux).
@@ -187,7 +190,6 @@ La vitesse d'exécution par adresse suit une fonction inverse (1/x). `phacochr` 
 
 ![Graphique du pourcentage d'adresses géocodées](man/figures/graph_match_rate.png){width=500px}
 
-
 Ces résultats sur la performance sont à nuancer par le fait qu'il y a probablement des "faux positifs" (normalement peu nombreux avec les réglages par défaut). Pour avoir une idée de la qualité des résultats, il est conseillé de vérifier plusieurs éléments (la synthèse des indicateurs de qualité du géocodage est disponible au point **Colonnes créées par phacochr** en fin de page) :
 
 * Vérifier globalement que les corrections orthographiques ont bien fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et corrigée, et `recode` indique les types de corrections réalisées) ;
@@ -199,6 +201,7 @@ Ces résultats sur la performance sont à nuancer par le fait qu'il y a probable
 Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré la *distance* (euclidienne, en mètres) entre la géolocalisation opérée par `phacochr` avec ses réglages par défaut et les coordonnées spatiales déjà présentes dans deux bases de données : celle des écoles néérlandophones et celle des pharmacies, les deux pour toute la Belgique. Cette distance peut être interprétée comme l'*erreur dans la géolocalisation* (bien qu'il est possible que les coordonnées déjà présentes dans ces deux bases de données ne soient pas précises : nous n'avons pas investigué la manière dont elles ont été produites). Le tableau suivant montre la répartition en pourcentages de cette erreur par classe de distance. On voit ainsi que 97,6% des adresses géocodées sont localisées à moins de 100m de leurs coordonnées "réelles", montrant un degré de fiabilité tout à fait satisfaisant.
 
 ![Graphique de la répartition de l'erreur de géolocalisation](man/figures/erreur.png){width=500px}
+
 
 ## Colonnes créées
 
@@ -247,17 +250,17 @@ Le principe de `phacochr` est d'adjoindre une série d'informations à la liste 
 | **NAME_FRE** | Nom du quartier monitoring pour Bruxelles en FR (Urbis). |
 | **NAME_DUT** | Nom du quartier monitoring pour Bruxelles en NL (Urbis). |
 
+
 ## Autres géocodeurs libres
 
 * [Nominatim](https://nominatim.org/): le géocodeur de OpenStreetMap.
 * [BHiGIS – Brussels Historical Geographical Information System](https://ebxl.be/les-outils/bhigis/): un géocodeur développé par l'IGEAT permettant de géocoder des données anciennes à Bruxelles.
 
 
-
-
 ## Contact
 
 Si vous rencontrez un bug à l'utilisation, n'hésitez pas à nous en faire part : nous désirons améliorer le programme et sommes intéressés d'avoir le maximum de retours. Les deux auteurs de ce package sont chercheurs en sociologie et en géographie ; nous ne sommes pas programmeurs de profession, et sommes donc également preneurs de toute proposition d'amélioration ! Rendez-vous dans la section 'issues' sur notre [Github](https://github.com/phacochr/phacochr/issues). 
+
 
 ## Auteurs
 <center>
@@ -268,6 +271,7 @@ Si vous rencontrez un bug à l'utilisation, n'hésitez pas à nous en faire part
 <img src="man/figures/logo_ulb_igeat.png" align="center" height = 120/>
 </a>
 </center>
+
 
 ## Partenariat
 <center>
