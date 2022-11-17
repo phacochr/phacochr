@@ -296,10 +296,10 @@ phaco_geocode <- function(data_to_geocode,
   # Dans le cas ou il y a une colonne separee avec le num de rue
   if (situation == "num_rue_postal_s") {
     data_to_geocode <- data_to_geocode %>%
-      mutate(num_rue_text = ifelse(str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # J'extrait le num du champ texte (ssi il est absent de num_rue)
-                                   NA,
-                                   str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))),
-             num_rue_clean = ifelse(str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # On cree un numero cleane : le num_rue (sans texte) OU le num du champ texte (ssi num_rue est vide)
+      mutate(num_rue_text = ifelse(is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # J'extrait le num du champ texte (ssi il est absent de num_rue)
+                                   str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE)),
+                                   NA),
+             num_rue_clean = ifelse(!is.na(num_rue_to_geocode) & str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # On cree un numero cleane : le num_rue (sans texte) OU le num du champ texte (ssi num_rue est vide)
                                     str_extract(num_rue_to_geocode, regex("[0-9]+", ignore_case = TRUE)),
                                     num_rue_text)) %>%
       mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
