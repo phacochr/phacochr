@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 Le programme fonctionne avec les données publiques [BeST Address](https://opendata.bosa.be/) compilées par BOSA à partir des données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). La logique de `phacochr` est de réaliser une jointure inexacte entre la liste à géocoder et les données BeST Address grâce aux fonctions des packages R [fuzzyjoin](https://cran.r-project.org/web/packages/fuzzyjoin/index.html) et [stringdist](https://cran.r-project.org/web/packages/stringdist/index.html).
 `phacochr` dispose de plusieurs options : il peut notamment réaliser des corrections orthographiques (en français et néérlandais) préalables à la détection des rues ou procéder au géocodage au numéro le plus proche - de préférence du même côté de la rue - si les coordonnées du numéro indiqué sont inconnues (par exemple si l'adresse n'existe plus). En cas de non disponibilité du numéro de la rue, le programme indique les coordonnées du numéro médian de la rue. `phacochr` est compatible avec les 3 langues nationales : il géocode des adresses écrites en français, néérlandais ou allemand.
 
-Le package est très rapide pour géocoder de longues listes (la vitesse d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses sur un ordinateur de puissance moyenne) et le taux de succès pour le géocodage est élevé (médiane de 97%). Voir plus bas le point *Performances et fiabilité* pour le détail des performances. `phacochr` constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.
+Le package est très rapide pour géocoder de longues listes (la vitesse d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses sur un ordinateur de puissance moyenne) et le taux de succès pour le géocodage est élevé (médiane de 97%). Voir plus bas le point [Performances et fiabilité](#performances-et-fiabilit%C3%A9) pour le détail des performances. `phacochr` constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.
 
 
 ## Installation
@@ -71,7 +71,7 @@ x <- data.frame(nom = c("Observatoire de la Santé et du Social", "ULB"),
 x
 ```
 
-Le géocodage se lance simplement avec la fonction `phaco_geocode()` appliquée à ce data.frame. Nous indiquons dans cet exemple 3 paramètres : les colonnes contenant la rue, le numéro de rue et le code postal, disponibles séparément dans la base de données. Il s'agit de la situation idéale, mais le programme est compatible avec d'autres configurations : celles-ci sont renseignée plus bas au point *Format des données à géocoder*. Mentionnons déjà que le numéro peut ne pas être renseigné ; `phacochr` trouve alors les coordonnées du numéro médian de la rue au code postal indiqué. La fonction dispose de plusieurs options, voir le dictionnaire des fonctions : https://phacochr.github.io/phacochr/reference/index.html.
+Le géocodage se lance simplement avec la fonction `phaco_geocode()` appliquée à ce data.frame. Nous indiquons dans cet exemple 3 paramètres : les colonnes contenant la rue, le numéro de rue et le code postal, disponibles séparément dans la base de données. Il s'agit de la situation idéale, mais le programme est compatible avec d'autres configurations : celles-ci sont renseignée plus bas au point [Format des données à géocoder](#format-des-donn%C3%A9es-%C3%A0-g%C3%A9ocoder). Mentionnons déjà que le numéro peut ne pas être renseigné ; `phacochr` trouve alors les coordonnées du numéro médian de la rue au code postal indiqué. La fonction dispose de plusieurs options, voir le dictionnaire des fonctions : https://phacochr.github.io/phacochr/reference/index.html.
 
 ```{r , warning = FALSE, message = FALSE,  results='hide'}
 result <- phaco_geocode(data_to_geocode = x,
@@ -94,11 +94,11 @@ phaco_map_s(result$data_geocoded_sf,
 
 ## Format des données à géocoder
 
-`phacochr` est compatible avec cinq formats concernant les données à géocoder. Dans chacun de ces formats, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Les tableau ci-dessous schématisent les différentes configurations envisageables, indiquent différents exemples à partir d'une même adresse (le *71 rue Belliard, 1040 Bruxelles*) et mentionnent des notes pour que l'utilisateur comprenne ce que fait le programme.
+`phacochr` est compatible avec cinq formats concernant les données à géocoder. Dans chacun de ces formats, le programme procède à différentes corrections pour obtenir les informations nécessaires au géocodage. Les tableaux ci-dessous schématisent les différentes configurations envisageables, indiquent différents exemples à partir d'une même adresse (le *71 rue Belliard, 1040 Bruxelles*) et mentionnent des notes pour que l'utilisateur comprenne ce que fait le programme.
 
 **1. Le numéro de rue, la rue et le code postal sont présents dans des colonnes séparées dans les données à géocoder :** il s'agit du format idéal qui rencontrera le meilleur résultat. Dans ce cas, il faut renseigner les arguments `colonne_num`, `colonne_rue` et `colonne_code_postal`.
 
-|  rue | num | code_postal | Statut | Note |
+| rue | num | code_postal | Statut | Note |
 |:----|:----|:------------|:------:|:-----| 
 | rue Belliard | 71 | 1040 | :heavy_check_mark: | Situation idéale ! |
 | rue Belliard | 71[B]{style="color: #FF0000"} | 1040 | :heavy_check_mark: | S'il y a des caractères non numériques après le numéro de rue (lettres, caractères typographiques...), ceux-ci ne sont pas pris en compte. |
@@ -147,7 +147,7 @@ phaco_map_s(result$data_geocoded_sf,
 | [1040]{style="color: #FF0000"} rue Belliard | :x: | *Ici le code postal est au début du champ : il n'est donc pas repéré.* |
 
 
-## Logique
+## Logique du géocodage
 
 Nous expliquons ici avec plus de détail la logique du traitement réalisé par `phacochr`. Celui-ci repose sur les données BeST Address, que nous avons reformatées pour optimiser le traitement. Nous avons également utilisé des données produites par Statbel et Urbis dans ce reformatage. Nous ne rentrons pas dans l'explication de ces modifications ici, et renvoyons au [code de la fonction `phaco_best_data_update()` disponible sur Github](https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R).
 
@@ -164,7 +164,7 @@ La procédure de géocodage est alors terminée. Les coordonnées X-Y produites 
 * Les secteurs statistiques (colonne `cd_sector` et leurs noms en NL et FR `tx_sector_descr_nl` et `tx_sector_descr_fr`) ;
 * Les quartiers monitoring pour Bruxelles (colonne `MDRC` et leurs noms en NL et FR `NAME_DUT` et `NAME_FRE` ) ;
 * Les codes INS des communes, arrondissements, provinces et regions (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les appelations classiques de Statbel ;
-* Toute une série d'indicateurs sur la qualité de la localisation (voir point suivant *Performances et fiabilité de phacochr*).
+* Toute une série d'indicateurs sur la qualité de la localisation (voir point suivant [Performances et fiabilité](#performances-et-fiabilit%C3%A9)).
 
 Le résultat du géocodage est une liste (au sens de R). Il comprend trois objets :
 
@@ -190,7 +190,7 @@ La vitesse d'exécution par adresse suit une fonction inverse (1/x). `phacochr` 
 
 ![Graphique du pourcentage d'adresses géocodées](man/figures/graph_match_rate.png){width=500px}
 
-Ces résultats sur la performance sont à nuancer par le fait qu'il y a probablement des "faux positifs" (normalement peu nombreux avec les réglages par défaut). Pour avoir une idée de la qualité des résultats, il est conseillé de vérifier plusieurs éléments (la synthèse des indicateurs de qualité du géocodage est disponible au point **Colonnes créées par phacochr** en fin de page) :
+Ces résultats sur la performance sont à nuancer par le fait qu'il y a probablement des "faux positifs" (normalement peu nombreux avec les réglages par défaut). Pour avoir une idée de la qualité des résultats, il est conseillé de vérifier plusieurs éléments (la synthèse des indicateurs de qualité du géocodage est disponible au point [Colonnes créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 
 * Vérifier globalement que les corrections orthographiques ont bien fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et corrigée, et `recode` indique les types de corrections réalisées) ;
 * Comparer les rues détectées par `phacochr` (la colonne `street_FINAL_detected`) avec les rues d'origine pour les erreurs les plus élevées dans la jointure inexacte (la colonne `dist_fuzzy` indique le nombre d'erreurs nécessaires pour faire la jointure avec les données BeST. `0` signifie que le matching est exact) ;

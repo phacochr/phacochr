@@ -40,10 +40,11 @@ néérlandais ou allemand.
 Le package est très rapide pour géocoder de longues listes (la vitesse
 d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses sur un
 ordinateur de puissance moyenne) et le taux de succès pour le géocodage
-est élevé (médiane de 97%). Voir plus bas le point *Performances et
-fiabilité* pour le détail des performances. `phacochr` constitue donc
-une alternative très performante face aux solutions existantes tout en
-reposant entièrement sur des données publiques et des procédures libres.
+est élevé (médiane de 97%). Voir plus bas le point [Performances et
+fiabilité](#performances-et-fiabilit%C3%A9) pour le détail des
+performances. `phacochr` constitue donc une alternative très performante
+face aux solutions existantes tout en reposant entièrement sur des
+données publiques et des procédures libres.
 
 ## Installation
 
@@ -97,11 +98,12 @@ appliquée à ce data.frame. Nous indiquons dans cet exemple 3 paramètres
 : les colonnes contenant la rue, le numéro de rue et le code postal,
 disponibles séparément dans la base de données. Il s’agit de la
 situation idéale, mais le programme est compatible avec d’autres
-configurations : celles-ci sont renseignée plus bas au point *Format des
-données à géocoder*. Mentionnons déjà que le numéro peut ne pas être
-renseigné ; `phacochr` trouve alors les coordonnées du numéro médian de
-la rue au code postal indiqué. La fonction dispose de plusieurs options,
-voir le dictionnaire des fonctions :
+configurations : celles-ci sont renseignée plus bas au point [Format des
+données à géocoder](#format-des-donn%C3%A9es-%C3%A0-g%C3%A9ocoder).
+Mentionnons déjà que le numéro peut ne pas être renseigné ; `phacochr`
+trouve alors les coordonnées du numéro médian de la rue au code postal
+indiqué. La fonction dispose de plusieurs options, voir le dictionnaire
+des fonctions :
 <https://phacochr.github.io/phacochr/reference/index.html>.
 
 ``` r
@@ -143,7 +145,7 @@ phaco_map_s(result$data_geocoded_sf,
 `phacochr` est compatible avec cinq formats concernant les données à
 géocoder. Dans chacun de ces formats, le programme procède à différentes
 corrections pour obtenir les informations nécessaires au géocodage. Les
-tableau ci-dessous schématisent les différentes configurations
+tableaux ci-dessous schématisent les différentes configurations
 envisageables, indiquent différents exemples à partir d’une même adresse
 (le *71 rue Belliard, 1040 Bruxelles*) et mentionnent des notes pour que
 l’utilisateur comprenne ce que fait le programme.
@@ -226,7 +228,7 @@ l’argument `colonne_rue_code_postal`.
 | rue Belliard <span style="color: #0000FF">1040</span> | :heavy_check_mark: | Lorsqu’un champ contient la rue et le code postal, ce dernier doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (peu courant). |
 | <span style="color: #FF0000">1040</span> rue Belliard |        :x:         | *Ici le code postal est au début du champ : il n’est donc pas repéré.*                                                                                              |
 
-## Logique
+## Logique du géocodage
 
 Nous expliquons ici avec plus de détail la logique du traitement réalisé
 par `phacochr`. Celui-ci repose sur les données BeST Address, que nous
@@ -307,7 +309,8 @@ de page) :
     (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les
     appelations classiques de Statbel ;
 -   Toute une série d’indicateurs sur la qualité de la localisation
-    (voir point suivant *Performances et fiabilité de phacochr*).
+    (voir point suivant [Performances et
+    fiabilité](#performances-et-fiabilit%C3%A9)).
 
 Le résultat du géocodage est une liste (au sens de R). Il comprend trois
 objets :
@@ -377,8 +380,8 @@ Ces résultats sur la performance sont à nuancer par le fait qu’il y a
 probablement des “faux positifs” (normalement peu nombreux avec les
 réglages par défaut). Pour avoir une idée de la qualité des résultats,
 il est conseillé de vérifier plusieurs éléments (la synthèse des
-indicateurs de qualité du géocodage est disponible au point **Colonnes
-créées par phacochr** en fin de page) :
+indicateurs de qualité du géocodage est disponible au point [Colonnes
+créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 
 -   Vérifier globalement que les corrections orthographiques ont bien
     fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et
