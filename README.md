@@ -46,6 +46,27 @@ performances. `phacochr` constitue donc une alternative très performante
 face aux solutions existantes tout en reposant entièrement sur des
 données publiques et des procédures libres.
 
+<div style="border:0px; background-color:#f8f5e4; padding: 10px;">
+
+**Note de développement:** Cette version de `phacochr` est encore une
+version de développement. Elle est néanmoins pleinement fonctionnelle et
+a passé l’épreuve de nombreux tests, au cours desquels une multitude de
+bugs ont été réglés. La mise à disposition publique du package nous
+permettra de bénéficier de retours plus larges concernant des problèmes
+que nous n’aurions pas anticipés. Nous passerons `phacochr` en version
+1.0 lorsque nous serons assurés que le package est suffisamment solide
+pour faire face à un grand nombre de situations. A noter que des
+éléments changeront certainement dans l’avenir : il s’agit des noms des
+[colonnes créées](#colonnes-cr%C3%A9%C3%A9es) et des noms des arguments
+des
+[fonctions](https://phacochr.github.io/phacochr/reference/index.html),
+qui seront harmonisés et simplifiés. La logique interne du package, y
+compris le nombre, le rôle et le contenu des arguments des fonctions, ne
+devrait quant à elle plus changer (sauf correction de bugs) dans un
+avenir proche.
+
+</div>
+
 ## Installation
 
 Vous pouvez installer le package `phacochr` depuis
@@ -298,8 +319,8 @@ La procédure de géocodage est alors terminée. Les coordonnées X-Y
 produites se trouvent dans les colonnes `x_31370` et `y_31370` au format
 Lambert 72. Outre ces coordonnées, sont jointes à chaque adresse trouvée
 différentes informations utiles. On y trouve notamment (la liste
-complète est disponible au point *Colonnes créées par phacochr* en fin
-de page) :
+complète est disponible au point [Colonnes
+créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 
 -   Les secteurs statistiques (colonne `cd_sector` et leurs noms en NL
     et FR `tx_sector_descr_nl` et `tx_sector_descr_fr`) ;
