@@ -46,24 +46,25 @@ performances. `phacochr` constitue donc une alternative très performante
 face aux solutions existantes tout en reposant entièrement sur des
 données publiques et des procédures libres.
 
-<div style="border:0px; background-color:#f8f5e4; padding: 10px;">
+<div
+style="border:0px; background-color:#f8f5e4; padding: 10px; margin-bottom: 10px">
 
 **Note de développement:** Cette version de `phacochr` est encore une
 version de développement. Elle est néanmoins pleinement fonctionnelle et
-a passé l’épreuve de nombreux tests, au cours desquels une multitude de
-bugs ont été réglés. La mise à disposition publique du package nous
-permettra de bénéficier de retours plus larges concernant des problèmes
-que nous n’aurions pas anticipés. Nous passerons `phacochr` en version
-1.0 lorsque nous serons assurés que le package est suffisamment solide
-pour faire face à un grand nombre de situations. A noter que des
-éléments changeront certainement dans l’avenir : il s’agit des noms des
-[colonnes créées](#colonnes-cr%C3%A9%C3%A9es) et des noms des arguments
-des
+a passé l’épreuve de nombreux tests, au cours desquels des solutions ont
+été apportées aux problèmes posés par des structures de données
+diverses. La mise à disposition publique du package nous permettra de
+bénéficier de retours plus larges concernant des problèmes que nous
+n’aurions pas anticipés. Nous passerons `phacochr` en version 1.0
+lorsque nous serons assurés que le package est suffisamment solide pour
+faire face à un grand nombre de situations. Néanmoins, dans un but de
+continuité d’utilisation, la logique d’utilisation de `phacochr` ne
+changera plus. Seuls quelques éléments seront encore certainement
+modifiés dans un avenir proche : il s’agit des noms des [colonnes
+créées](#colonnes-cr%C3%A9%C3%A9es) et des noms des arguments des
 [fonctions](https://phacochr.github.io/phacochr/reference/index.html),
-qui seront harmonisés et simplifiés. La logique interne du package, y
-compris le nombre, le rôle et le contenu des arguments des fonctions, ne
-devrait quant à elle plus changer (sauf correction de bugs) dans un
-avenir proche.
+qui seront harmonisés et simplifiés, sans que cela impacte l’utilisation
+du programme.
 
 </div>
 
