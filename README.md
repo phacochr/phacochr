@@ -16,7 +16,18 @@ Son principe est de produire, à partir d’une base de données d’adresses,
 une série d’informations nécessaires pour l’analyse spatiale : les
 coordonnées X-Y mais également d’autres informations utiles comme le
 secteur statistique ou le quartier du monitoring pour Bruxelles. Le
-niveau de précision du géocodage est celui du bâtiment.
+niveau de précision du géocodage est celui du bâtiment. Le package est
+très rapide pour géocoder de longues listes (la vitesse d’exécution se
+situe entre 0,4 et 0,8 secondes pour 100 adresses sur un ordinateur de
+puissance moyenne) et le taux de succès pour le géocodage est élevé
+(médiane de 97%). Voir plus bas le point [Performances et
+fiabilité](#performances-et-fiabilit%C3%A9) pour le détail des
+performances. Par ailleurs, le géocodage est réalisé entièrement en
+local, permettant une confidentialité maximale dans le cas d’adresses
+qui ne peuvent pas être envoyées sur des serveurs externes. `phacochr`
+constitue donc une alternative très performante face aux solutions
+existantes tout en reposant entièrement sur des données publiques et des
+procédures libres, le tout sans poser de problème de confidentialité.
 
 Le programme fonctionne avec les données publiques [BeST
 Address](https://opendata.bosa.be/) compilées par BOSA à partir des
@@ -36,15 +47,6 @@ de non disponibilité du numéro de la rue, le programme indique les
 coordonnées du numéro médian de la rue. `phacochr` est compatible avec
 les 3 langues nationales : il géocode des adresses écrites en français,
 néérlandais ou allemand.
-
-Le package est très rapide pour géocoder de longues listes (la vitesse
-d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses sur un
-ordinateur de puissance moyenne) et le taux de succès pour le géocodage
-est élevé (médiane de 97%). Voir plus bas le point [Performances et
-fiabilité](#performances-et-fiabilit%C3%A9) pour le détail des
-performances. `phacochr` constitue donc une alternative très performante
-face aux solutions existantes tout en reposant entièrement sur des
-données publiques et des procédures libres.
 
 <div
 style="border:0px; background-color:#f8f5e4; padding: 10px; margin-bottom: 10px">
