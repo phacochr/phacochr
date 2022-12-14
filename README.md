@@ -27,7 +27,7 @@ local, permettant une confidentialité maximale dans le cas d’adresses
 qui ne peuvent pas être envoyées sur des serveurs externes. `phacochr`
 constitue donc une alternative très performante face aux solutions
 existantes tout en reposant entièrement sur des données publiques et des
-procédures libres, le tout sans poser de problème de confidentialité.
+procédures libres.
 
 Le programme fonctionne avec les données publiques [BeST
 Address](https://opendata.bosa.be/) compilées par BOSA à partir des
