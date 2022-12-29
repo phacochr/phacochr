@@ -131,11 +131,33 @@ phaco_geocode <- function(data_to_geocode,
 
   }
 
-  cat("--- PhacochR ---")
+  # On ne lance pas la fonction si des noms de colonnes du fichier a geocoder ont des noms de colonnes similaires a ceux utilises en interne
+  # Pour l'instant on demande de changer les noms en indiquant ceux qui posent pb
+  # Alternatives plus performantes dans le futur ?
+  # 1) d'abord mettre des noms moins communs a l'aide d'un prefixe
+  # 2) changer automatiquement les noms qui posent pb avec un suffice _2, _3, etc.
+  forbidden_names <- c("ID_address", "rue_to_geocode", "num_rue_to_geocode", "code_postal_to_geocode", "arrond", "Region", "num_rue_text", "num_rue_clean", "rue_recoded", "rue_recoded_commune",
+    "rue_recoded_code_postal", "rue_recoded_virgule", "rue_recoded_deux_points", "rue_recoded_parenthese", "rue_recoded_slash", "rue_recoded_boite", "rue_recoded_BP_CP",
+    "rue_recoded_No", "rue_recoded_num", "rue_recoded_Rez", "rue_recoded_Bis", "rue_recoded_Rdc", "rue_recoded_Commandant", "rue_recoded_Lieutenant", "rue_recoded_Saint",
+    "rue_recoded_chaussee", "rue_recoded_avenue", "rue_recoded_koning", "rue_recoded_professor", "rue_recoded_square", "rue_recoded_steenweg", "rue_recoded_burg",
+    "rue_recoded_dokter", "rue_recoded_boulevard", "rue_recoded_route", "rue_recoded_place", "rue_recoded_Rue", "rue_recoded_apostrophe", "rue_recoded_lettre_end",
+    "rue_recoded_lettre_end2", "rue_recoded_tiret", "recode", "street_id_phaco", "postal_id", "street_FINAL_detected", "langue_FINAL_detected", "nom_propre_abv", "mid_num",
+    "mid_x_31370", "mid_y_31370", "mid_cd_sector", "dist_fuzzy", "min", "address_join", "address_join_street", "distance_jw", "min_jw", "type_geocoding", "Refnis code",
+    "house_number_sans_lettre", "x_31370", "y_31370", "cd_sector", "address_join_geocoding", "approx_num", "type_geocoding2", "tx_sector_descr_nl", "tx_sector_descr_fr",
+    "cd_sub_munty", "tx_sub_munty_nl", "tx_sub_munty_fr", "tx_munty_dstr", "cd_munty_refnis", "tx_munty_descr_nl", "tx_munty_descr_fr", "cd_dstr_refnis", "tx_adm_dstr_descr_nl",
+    "tx_adm_dstr_descr_fr", "cd_prov_refnis", "tx_prov_descr_nl", "tx_prov_descr_fr", "cd_rgn_refnis", "tx_rgn_descr_nl", "tx_rgn_descr_fr", "MDRC", "NAME_FRE", "NAME_DUT")
+
+  if(sum(names(data_to_geocode) %in% forbidden_names) > 0){
+    cat("\n")
+    stop(paste0("\u2716"," des noms de colonnes de votre fichier sont similaires ","\u00e0"," certains utilis","\u00e9"," en interne par phaco_geocode(). Changez les noms de colonnes suivants : ", paste(intersect(names(data_to_geocode), forbiden_names), collapse = ", ")))
+    }
+
 
 
   # 0. FORMATAGE DES DONNEES ==================================================================================================================
   # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+  cat("--- PhacochR ---")
 
   cat(paste0("\n","-- Formatage des donn","\u00e9","es"))
 
@@ -162,7 +184,7 @@ phaco_geocode <- function(data_to_geocode,
 
   } else if (!is.null(colonne_num_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
     situation <- "num_rue_i_postal_s"
-    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro et rue int","\u00e9","gr","\u00e9","s + code postal s","\u00e9","par","\u00e9","s"))
+    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro et rue int","\u00e9","gr","\u00e9","s + code postal s","\u00e9","par","\u00e9"))
     if(
       sum(c(colonne_num_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
     ){
