@@ -8,3 +8,4 @@
 ^pkgdown$
 ^vignettes/shiny_app.Rmd
 ^cran-comments\.md$
+^CRAN-SUBMISSION$
