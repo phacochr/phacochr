@@ -6,7 +6,7 @@ Authors@R:
     person("Hugo", "Perilleux", email = "hugo.perilleux@ulb.be", role = "aut"))
 Description: From a list of addresses, it allows the finding of the X-Y coordinates necessary for any spatial analysis, at a level of precision of the building. - A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.
 URL: https://phacochr.github.io/phacochr/, https://github.com/phacochr
-License: GPL (>= 3) + file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
