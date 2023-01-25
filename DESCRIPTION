@@ -1,16 +1,16 @@
 Package: phacochr
-Title: Geocodeur belge
+Title: Geocoder for Belgium - Geocodeur pour la Belgique
 Version: 0.9.0.6
 Authors@R: 
     c(person("Joel", "Gires", email = "jgires@ccc.brussels", role = c("aut", "cre")),
     person("Hugo", "Perilleux", email = "hugo.perilleux@ulb.be", role = "aut"))
-Description: PhacochR est un géocodeur pour la Belgique sous forme de package R. A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.
+Description: From a list of addresses, it allows the finding of the X-Y coordinates necessary for any spatial analysis, at a level of precision of the building. - A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.
 URL: https://phacochr.github.io/phacochr/, https://github.com/phacochr
-License: GPL (>= 3) + file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, purrr, stats,
     readr, readxl, stringdist, sf, sp, spdep, knitr, 
     stringr, tidyr, rappdirs, utils, mapsf, scales
-VignetteBuilder: knitr
+Language: fr
