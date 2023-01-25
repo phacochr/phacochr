@@ -1106,7 +1106,7 @@ phaco_geocode <- function(data_to_geocode,
   cat(paste0("\n",colourise("/!\\", fg="red"), " Toutes les adresses n'ont pas ","\u00e9","t","\u00e9"," trouv","\u00e9","es avec certitude ", colourise("/!\\", fg="red"),"
 - check \'dist_fuzzy\' pour les erreurs de reconnaissance des rues
 - check \'approx_num\' pour les approximations de num","\u00e9","ro
-- check \'type_geocoding\' pour l'","\u00e9","argissement aux communes adjacentes et le g","\u00e9","ocodage au milieu de la rue
+- check \'type_geocoding\' pour l'","\u00e9","largissement aux communes adjacentes et le g","\u00e9","ocodage au milieu de la rue
 - check \'nom_propre_abv\' pour les abr","\u00e9","viations de noms propres
              "))
 

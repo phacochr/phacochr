@@ -357,54 +357,15 @@ phaco_best_data_update <- function(force=FALSE) {
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table 'codes postaux - nom des communes' (Statbel)"))
 
     table_postal_com_name <- code_postal_INS %>%
-      add_row(code_postal = "1020", # On ajoute qques communes a la main dont l'orthographe a ete detectee dans une base de donnee (pour BXL uniquement) => RENDRE CA PLUS PROPRE ?
+      add_row(code_postal = "1020", # On ajoute qques communes a la main dont l'orthographe a ete detectee dans une base de donnee (pour BXL uniquement)
               Gemeentenaam = "Laken",
               `Nom commune` = "Laeken") %>%
-      add_row(code_postal = "1060",
-              Gemeentenaam = "Saint Gilles",
-              `Nom commune` = "Sint Gillis") %>%
-      add_row(code_postal = "1170",
-              `Nom commune` = "Watermael Boitsfort",
-              Gemeentenaam = "Watermaal Bosvoorde") %>%
-      add_row(code_postal = "1150",
-              `Nom commune` = "Woluwe Saint Pierre",
-              Gemeentenaam = "Sint Pieters Woluwe") %>%
-      add_row(code_postal = "1150",
-              `Nom commune` = "Woluwe Saint-Pierre",
-              Gemeentenaam = "Sint-Pieters Woluwe") %>%
-      add_row(code_postal = "1150",
-              `Nom commune` = paste0("Woluw", "\u00e9", " Saint Pierre"),
-              Gemeentenaam = "Sint Pieters Woluwe") %>%
-      add_row(code_postal = "1150",
-              `Nom commune` = paste0("Woluw", "\u00e9", " Saint-Pierre"),
-              Gemeentenaam = "Sint-Pieters Woluwe") %>%
-      add_row(code_postal = "1150",
-              `Nom commune` = paste0("Woluw", "\u00e9", "-Saint-Pierre"),
-              Gemeentenaam = "Sint-Pieters-Woluwe") %>%
-      add_row(code_postal = "1200",
-              `Nom commune` = "Woluwe Saint Lambert",
-              Gemeentenaam = "Sint Pieters Woluwe") %>%
-      add_row(code_postal = "1200",
-              `Nom commune` = "Woluwe Saint-Lambert",
-              Gemeentenaam = "Sint-Pieters Woluwe") %>%
-      add_row(code_postal = "1200",
-              `Nom commune` = paste0("Woluw", "\u00e9", " Saint Lambert"),
-              Gemeentenaam = "Sint Pieters Woluwe") %>%
-      add_row(code_postal = "1200",
-              `Nom commune` = paste0("Woluw", "\u00e9", " Saint-Lambert"),
-              Gemeentenaam = "Sint-Pieters Woluwe") %>%
-      add_row(code_postal = "1200",
-              `Nom commune` = paste0("Woluw", "\u00e9", "-Saint-Lambert"),
-              Gemeentenaam = "Sint-Pieters-Woluwe") %>%
       add_row(code_postal = "1120",
               `Nom commune` = "Neder-Over-Heembeek",
               Gemeentenaam = "Neder-Over-Heembeek") %>%
       add_row(code_postal = "1080",
               Gemeentenaam = "Molenbeek",
               `Nom commune` = "Molenbeek") %>%
-      add_row(code_postal = "1080",
-              Gemeentenaam = "Sint Jans Molenbeek",
-              `Nom commune` = "Molenbeek Saint Jean") %>%
       add_row(code_postal = "1130",
               Gemeentenaam = "Haren",
               `Nom commune` = "Haren") %>%
@@ -417,25 +378,35 @@ phaco_best_data_update <- function(force=FALSE) {
                    values_to = "CP_NAME") %>%
       select(-name)
 
+    # Ici partie pour ajouter "tous les codes postaux X Bruxelles"
     table_postal_com_name_BXL <- code_postal_INS %>%
       filter(substr(`Refnis code`, 1, 2) == 21) %>%
       mutate(Gemeentenaam = "Brussel",
              `Nom commune` = "Bruxelles",
              name_eng = "Brussels",
+             name_abv = "BXL",
              cp_n_fr = paste(code_postal, `Nom commune`),
              cp_n_nl = paste(code_postal, Gemeentenaam),
              cp_n_eng = paste(code_postal, name_eng),
+             cp_n_abv = paste(code_postal, name_abv),
              n_cp_fr = paste(`Nom commune`, code_postal),
              n_cp_nl = paste(Gemeentenaam, code_postal),
-             n_cp_eng = paste(name_eng, code_postal)) %>%
-      select(cp_n_fr, cp_n_nl, cp_n_eng, n_cp_fr, n_cp_nl, n_cp_eng) %>%
-      pivot_longer(cols = c("cp_n_fr", "cp_n_nl", "cp_n_eng", "n_cp_fr", "n_cp_nl", "n_cp_eng"),
+             n_cp_eng = paste(name_eng, code_postal),
+             n_cp_abv = paste(name_abv, code_postal)) %>%
+      select(cp_n_fr, cp_n_nl, cp_n_eng, cp_n_abv, n_cp_fr, n_cp_nl, n_cp_eng, n_cp_abv) %>%
+      pivot_longer(cols = c("cp_n_fr", "cp_n_nl", "cp_n_eng", "cp_n_abv", "n_cp_fr", "n_cp_nl", "n_cp_eng", "n_cp_abv"),
                    values_to = "CP_NAME") %>%
       select(-name)
 
     table_postal_com_name <- table_postal_com_name %>%
       bind_rows(table_postal_com_name_BXL) %>%
-      distinct()
+      distinct() %>%
+      mutate(CP_NAME = str_replace_all(CP_NAME, "[-]", "[- ]"), # Ici je remplace par des expressions REGEX pour rendre insensible aux caracteres speciaux
+             CP_NAME = str_replace_all(CP_NAME, "[a\u00e0\u00e2]", "[a\u00e0\u00e2]"),
+             CP_NAME = str_replace_all(CP_NAME, "[e\u00e8\u00e9\u00ea\u00eb]", "[e\u00e8\u00e9\u00ea\u00eb]"),
+             CP_NAME = str_replace_all(CP_NAME, "[u\u00fb\u00fc]", "[u\u00fb\u00fc]"),
+             CP_NAME = str_replace_all(CP_NAME, "[c\u00e7]", "[c\u00e7]")
+             )
 
 
     write_csv2(table_postal_com_name, paste0(path_data, "BeST/PREPROCESSED/table_postal_com_name.csv"), progress=F)

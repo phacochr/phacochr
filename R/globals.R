@@ -33,6 +33,7 @@ globalVariables(unique(c(
   "tx_munty_descr_de", "tx_prov_descr_de", "tx_rgn_descr_de", "tx_rgn_descr_fr",
   "tx_sector_descr_de", "voisin", "cp_n_eng", "cp_n_fr", "cp_n_nl", "Gemeentenaam",
   "n_cp_eng", "n_cp_fr", "n_cp_nl", "name", "name_eng", "Nom commune",
+  "name_abv", "cp_n_abv", "n_cp_abv", "CP_NAME",
   # phaco_best_data_update : extract_street:
   "key_street_unique",
   # phaco_best_data_update : select_id_street:
