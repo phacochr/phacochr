@@ -19,6 +19,7 @@ phaco_geocode(
   elargissement_com_adj = TRUE,
   mid_street = TRUE,
   lang_encoded = c("FR", "NL", "DE"),
+  anonymous = FALSE,
   path_data = NULL
 )
 }
@@ -50,6 +51,8 @@ phaco_geocode(
 \item{mid_street}{Indique les coordonnées du milieu de la rue si les coordonnées du numéro ne sont pas trouvée. Par défaut: TRUE.}
 
 \item{lang_encoded}{Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE").}
+
+\item{anonymous}{Paramètre qui anonymise les résultats en supprimant toute les informations indiquant l'adresse. Par défaut: FALSE.}
 
 \item{path_data}{Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.}
 }

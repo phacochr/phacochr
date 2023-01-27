@@ -16,6 +16,7 @@
 #' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE.
 #' @param mid_street Indique les coordonnées du milieu de la rue si les coordonnées du numéro ne sont pas trouvée. Par défaut: TRUE.
 #' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE").
+#' @param anonymous Paramètre qui anonymise les résultats en supprimant toute les informations indiquant l'adresse. Par défaut: FALSE.
 #' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
 #'
 #' @import dplyr
@@ -62,6 +63,7 @@ phaco_geocode <- function(data_to_geocode,
                           elargissement_com_adj = TRUE,
                           mid_street = TRUE,
                           lang_encoded = c("FR", "NL", "DE"),
+                          anonymous = FALSE,
                           path_data = NULL){
 
 
@@ -1070,20 +1072,63 @@ phaco_geocode <- function(data_to_geocode,
     select(-Region, -arrond)
 
 
-  ## 3) Creation de l'objet SF avec les coordonnees -----------------------------------------------------------------------------------------
+  ## 3) Anonymisation potentielle -----------------------------------------------------------------------------------------------------------
 
-  if (length(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)])) > 0){
-    # NOTE : l'objet sf ne peut pas contenir de NA pour les coordonnees
-    FULL_GEOCODING_sf <- FULL_GEOCODING %>%
-      filter(!is.na(x_31370)) %>%
-      st_as_sf(coords = c("x_31370", "y_31370")) %>%  # on cree l'objet sf
-      st_set_crs(31370) # on definit le systeme de projection
+  # Si l'anonymat est enclenche, supression de toutes les colonnes permettant de reconnaitre l'adresse
+  if (anonymous == TRUE) {
+
+    if (situation == "num_rue_postal_s") {
+      FULL_GEOCODING <- FULL_GEOCODING %>%
+        select(-.data[[colonne_rue]],
+               -.data[[colonne_num]])
+    }
+
+    if (situation == "num_rue_i_postal_s") {
+      FULL_GEOCODING <- FULL_GEOCODING %>%
+        select(-.data[[colonne_num_rue]])
+    }
+
+    if (situation == "num_rue_postal_i") {
+      FULL_GEOCODING <- FULL_GEOCODING %>%
+        select(-.data[[colonne_num_rue_code_postal]])
+    }
+
+    if (situation == "no_num_rue_postal_s") {
+      FULL_GEOCODING <- FULL_GEOCODING %>%
+        select(-.data[[colonne_rue]])
+    }
+
+    if (situation == "no_num_rue_postal_i") {
+      FULL_GEOCODING <- FULL_GEOCODING %>%
+        select(-.data[[colonne_rue_code_postal]])
+    }
+
+    FULL_GEOCODING <- FULL_GEOCODING %>%
+      select(-rue_recoded, -recode, -street_FINAL_detected, -num_rue_clean, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector, -house_number_sans_lettre, -x_31370, -y_31370)
+
+  }
+
+
+  ## 4) Creation de l'objet SF avec les coordonnees -----------------------------------------------------------------------------------------
+
+  if (anonymous == FALSE) {
+
+    if (length(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)])) > 0){
+      # NOTE : l'objet sf ne peut pas contenir de NA pour les coordonnees
+      FULL_GEOCODING_sf <- FULL_GEOCODING %>%
+        filter(!is.na(x_31370)) %>%
+        st_as_sf(coords = c("x_31370", "y_31370")) %>%  # on cree l'objet sf
+        st_set_crs(31370) # on definit le systeme de projection
+    }
+
   }
 
   result <- list()
   result$summary <- Summary_full
   result$data_geocoded <- FULL_GEOCODING
-  result$data_geocoded_sf <- FULL_GEOCODING_sf
+  if (anonymous == FALSE) {
+    result$data_geocoded_sf <- FULL_GEOCODING_sf
+  }
   # remplacer par 0 les NA (pas tres propre)
   result$summary$`Approx.(n)`[is.na(result$summary$`Approx.(n)`)]<-0
 
@@ -1109,6 +1154,10 @@ phaco_geocode <- function(data_to_geocode,
 - check \'type_geocoding\' pour l'","\u00e9","largissement aux communes adjacentes et le g","\u00e9","ocodage au milieu de la rue
 - check \'nom_propre_abv\' pour les abr","\u00e9","viations de noms propres
              "))
+
+  if (anonymous == TRUE) {
+    cat(paste0("\n",colourise(paste0(" /!\\ Anonymisation enclench", "\u00e9e (supression des adresses) /!\\\n"), fg= "brown")))
+  }
 
   cat(paste0("\n",colourise(paste0("-- Plus de r","\u00e9","sultats:"), fg= "light cyan"),
              "\n",colourise('\u2192', fg= "blue")," Tableau synth","\u00e9","tique : ","$summary",
