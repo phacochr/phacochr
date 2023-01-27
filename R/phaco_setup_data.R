@@ -33,9 +33,9 @@ phaco_setup_data <- function(){
   options(timeout=300)
 
   cat(paste0("\n","\u29D7"," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es ...","\n"))
-  download.file("https://github.com/phacochr/phacochr_data/blob/main/data_phacochr/phacochr_data_best.zip",
+  download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_best.zip",
                 paste0(path_data,"/phacochr_data_best.zip"))
-  download.file("https://github.com/phacochr/phacochr_data/blob/main/data_phacochr/phacochr_data_statbel_urbis.zip",
+  download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_statbel_urbis.zip",
                 paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
 
   # Test si les donnees ont ete telechargees
