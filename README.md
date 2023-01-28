@@ -217,14 +217,14 @@ bien, à condition d’observer cette règle : le numéro doit être le
 premier nombre et le code postal être en fin de champ (situations les
 plus courantes).
 
-| num_rue_code_postal                                                                           |       Statut       | Note                                                                                                                                                                                                                                                  |
-|:----------------------------------------------------------------------------------------------|:------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| rue Belliard, <span style="color: #0000FF">71 1040</span>                                     | :heavy_check_mark: | Dans le cas où la rue, le numéro et le code postal sont intégrés dans un même champ, il faut observer une règle fondamentale : le numéro doit être le premier nombre et le code postal être en fin de champ.                                          |
-| <span style="color: #0000FF">71,</span> rue Belliard <span style="color: #0000FF">1040</span> | :heavy_check_mark: |                                                                                                                                                                                                                                                       |
-| rue Belliard <span style="color: #FF0000">1040 n°71</span>                                    |        :x:         | *Ici le numéro vient après le code postal : `phacochr` interprète alors que le numéro de rue est 1040 (alors que c’est 71).*                                                                                                                          |
-| 71, rue Belliard 1040 <span style="color: #0000FF">Bruxelles</span>                           | :heavy_check_mark: | Le nom de la commune (en lettres) peut être accolé au code postal (nombre) si ce dernier est en fin de champ. Si le nom de la commune vient après, il est nettoyé sans condition. S’il vient avant, il doit être écrit avec la bonne orthographe.     |
-| 71, rue Belliard <span style="color: #0000FF">Bruxelles</span> 1040                           | :heavy_check_mark: |                                                                                                                                                                                                                                                       |
-| 71, rue Belliard <span style="color: #FF0000">BXL</span> 1040                                 |        :x:         | *Ici le nom de la commune est mal orthographié : “BXL” au lieu de “Bruxelles” : le code postal est détecté (car en fin de champ), mais `phacochr` ne supprime pas le nom “BXL” du champ de rue et trouve moins facilement (ou pas du tout) celle-ci.* |
+| num_rue_code_postal                                                                           |       Statut       | Note                                                                                                                                                                                                                                                        |
+|:----------------------------------------------------------------------------------------------|:------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| rue Belliard, <span style="color: #0000FF">71 1040</span>                                     | :heavy_check_mark: | Dans le cas où la rue, le numéro et le code postal sont intégrés dans un même champ, il faut observer une règle fondamentale : le numéro doit être le premier nombre et le code postal être en fin de champ.                                                |
+| <span style="color: #0000FF">71,</span> rue Belliard <span style="color: #0000FF">1040</span> | :heavy_check_mark: |                                                                                                                                                                                                                                                             |
+| rue Belliard <span style="color: #FF0000">1040 n°71</span>                                    |        :x:         | *Ici le numéro vient après le code postal : `phacochr` interprète alors que le numéro de rue est 1040 (alors que c’est 71).*                                                                                                                                |
+| 71, rue Belliard 1040 <span style="color: #0000FF">Bruxelles</span>                           | :heavy_check_mark: | Le nom de la commune (en lettres) peut être accolé au code postal (nombre) si ce dernier est en fin de champ. Si le nom de la commune vient après, il est nettoyé sans condition. S’il vient avant, il doit être écrit avec la bonne orthographe.           |
+| 71, rue Belliard <span style="color: #0000FF">Bruxelles</span> 1040                           | :heavy_check_mark: |                                                                                                                                                                                                                                                             |
+| 71, rue Belliard <span style="color: #FF0000">Bruxel</span> 1040                              |        :x:         | *Ici le nom de la commune est mal orthographié : “Bruxel” au lieu de “Bruxelles” : le code postal est détecté (car en fin de champ), mais `phacochr` ne supprime pas le nom “Bruxel” du champ de rue et trouve moins facilement (ou pas du tout) celle-ci.* |
 
 **4. La rue et le code postal sont présents dans des colonnes séparées
 (sans numéro) :** cette situation ressemble à la première, mais sans que
@@ -324,31 +324,33 @@ différentes informations utiles. On y trouve notamment (la liste
 complète est disponible au point [Colonnes
 créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 
-- Les secteurs statistiques (colonne `cd_sector` et leurs noms en NL et
-  FR `tx_sector_descr_nl` et `tx_sector_descr_fr`) ;
-- Les quartiers monitoring pour Bruxelles (colonne `MDRC` et leurs noms
-  en NL et FR `NAME_DUT` et `NAME_FRE` ) ;
-- Les codes INS des communes, arrondissements, provinces et regions
-  (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les
-  appelations classiques de Statbel ;
-- Toute une série d’indicateurs sur la qualité de la localisation (voir
-  point suivant [Performances et
-  fiabilité](#performances-et-fiabilit%C3%A9)).
+-   Les secteurs statistiques (colonne `cd_sector` et leurs noms en NL
+    et FR `tx_sector_descr_nl` et `tx_sector_descr_fr`) ;
+-   Les quartiers monitoring pour Bruxelles (colonne `MDRC` et leurs
+    noms en NL et FR `NAME_DUT` et `NAME_FRE` ) ;
+-   Les codes INS des communes, arrondissements, provinces et regions
+    (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les
+    appelations classiques de Statbel ;
+-   Toute une série d’indicateurs sur la qualité de la localisation
+    (voir point suivant [Performances et
+    fiabilité](#performances-et-fiabilit%C3%A9)).
 
 Le résultat du géocodage est une liste (au sens de R). Il comprend trois
 objets :
 
-- `data_geocoded` : la base de données originale à laquelle sont
-  ajoutées les informations précitées ;
-- `data_geocoded_sf` : [un objet `sf`](https://r-spatial.github.io/sf/)
-  produit à partir des adresses pour lesquelles des coordonnées ont
-  effectivement été trouvées (le nombre de lignes reprises dans l’objet
-  dépend donc du taux de géocodage). Cet objet est exportable en .gpkg
-  (ou autre format vectoriel) à l’aide de la fonction
-  [st_write](https://r-spatial.github.io/sf/reference/st_write.html) ou
-  peut directement être cartographié avec la fonction `phaco_map_s` ;
-- `summary` : un tableau avec quelques statistiques synthétiques
-  indiquant la performance du géocodage.
+-   `data_geocoded` : la base de données originale à laquelle sont
+    ajoutées les informations précitées ;
+-   `data_geocoded_sf` : [un objet
+    `sf`](https://r-spatial.github.io/sf/) produit à partir des adresses
+    pour lesquelles des coordonnées ont effectivement été trouvées (le
+    nombre de lignes reprises dans l’objet dépend donc du taux de
+    géocodage). Cet objet est exportable en .gpkg (ou autre format
+    vectoriel) à l’aide de la fonction
+    [st_write](https://r-spatial.github.io/sf/reference/st_write.html)
+    ou peut directement être cartographié avec la fonction `phaco_map_s`
+    ;
+-   `summary` : un tableau avec quelques statistiques synthétiques
+    indiquant la performance du géocodage.
 
 Le tableau ci-dessous schématise l’ensemble des opérations réalisées et
 expliquées précédemment :
@@ -404,25 +406,26 @@ il est conseillé de vérifier plusieurs éléments (la synthèse des
 indicateurs de qualité du géocodage est disponible au point [Colonnes
 créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 
-- Vérifier globalement que les corrections orthographiques ont bien
-  fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et
-  corrigée, et `recode` indique les types de corrections réalisées) ;
-- Comparer les rues détectées par `phacochr` (la colonne
-  `street_FINAL_detected`) avec les rues d’origine pour les erreurs les
-  plus élevées dans la jointure inexacte (la colonne `dist_fuzzy`
-  indique le nombre d’erreurs nécessaires pour faire la jointure avec
-  les données BeST. `0` signifie que le matching est exact) ;
-- Procéder à la même comparaison pour les rues dont la détection a
-  nécessité un élargissement aux communes adjacentes (colonne
-  `type_geocoding == elargissement_adj`). Une rue au même nom aurait pu
-  être trouvée dans une commune voisine ;
-- Vérifier la proportion des adresses qui ont nécessité une localisation
-  géographique à un autre numéro si celui renseigné n’a pas été trouvé,
-  ainsi que l’ampleur de cette approximation (colonne `approx_num`) ;
-- Vérifier la proportion des adresses qui ont demandé une localisation
-  au numéro médian de la rue au code postal indiqué si aucune autre
-  localisation plus précise n’a plus être réalisée (colonne
-  `type_geocoding == mid_street`).
+-   Vérifier globalement que les corrections orthographiques ont bien
+    fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et
+    corrigée, et `recode` indique les types de corrections réalisées) ;
+-   Comparer les rues détectées par `phacochr` (la colonne
+    `street_FINAL_detected`) avec les rues d’origine pour les erreurs
+    les plus élevées dans la jointure inexacte (la colonne `dist_fuzzy`
+    indique le nombre d’erreurs nécessaires pour faire la jointure avec
+    les données BeST. `0` signifie que le matching est exact) ;
+-   Procéder à la même comparaison pour les rues dont la détection a
+    nécessité un élargissement aux communes adjacentes (colonne
+    `type_geocoding == elargissement_adj`). Une rue au même nom aurait
+    pu être trouvée dans une commune voisine ;
+-   Vérifier la proportion des adresses qui ont nécessité une
+    localisation géographique à un autre numéro si celui renseigné n’a
+    pas été trouvé, ainsi que l’ampleur de cette approximation (colonne
+    `approx_num`) ;
+-   Vérifier la proportion des adresses qui ont demandé une localisation
+    au numéro médian de la rue au code postal indiqué si aucune autre
+    localisation plus précise n’a plus être réalisée (colonne
+    `type_geocoding == mid_street`).
 
 Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré
 la *distance* (euclidienne, en mètres) entre la géolocalisation opérée
@@ -498,10 +501,11 @@ En voici une liste exhaustive et commentée:
 
 ## Autres géocodeurs libres
 
-- [Nominatim](https://nominatim.org/): le géocodeur de OpenStreetMap.
-- [BHiGIS – Brussels Historical Geographical Information
-  System](https://ebxl.be/les-outils/bhigis/): un géocodeur développé
-  par l’IGEAT permettant de géocoder des données anciennes à Bruxelles.
+-   [Nominatim](https://nominatim.org/): le géocodeur de OpenStreetMap.
+-   [BHiGIS – Brussels Historical Geographical Information
+    System](https://ebxl.be/les-outils/bhigis/): un géocodeur développé
+    par l’IGEAT permettant de géocoder des données anciennes à
+    Bruxelles.
 
 ## Contact
 
