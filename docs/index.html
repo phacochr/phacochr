@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">phacochr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0.8</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -256,7 +256,7 @@
 <p><strong>3. Le numéro de rue, la rue et le code postal sont intégrés dans la même colonne :</strong> dans ce format, il faut renseigner l’argument <code>colonne_num_rue_code_postal</code>. Le géocodeur reconstitue le numéro de rue, la rue (comme la situation précédente) mais aussi le code postal dans des colonnes séparées. Cette situation fonctionne également très bien, à condition d’observer cette règle : le numéro doit être le premier nombre et le code postal être en fin de champ (situations les plus courantes).</p>
 <table class="table">
 <colgroup>
-<col width="26%">
+<col width="25%">
 <col width="5%">
 <col width="68%">
 </colgroup>
@@ -297,9 +297,9 @@
 <td align="left"></td>
 </tr>
 <tr class="even">
-<td align="left">71, rue Belliard <span style="color: #FF0000">BXL</span> 1040</td>
+<td align="left">71, rue Belliard <span style="color: #FF0000">Bruxel</span> 1040</td>
 <td align="center"><span class="emoji" data-emoji="x">❌</span></td>
-<td align="left"><em>Ici le nom de la commune est mal orthographié : “BXL” au lieu de “Bruxelles” : le code postal est détecté (car en fin de champ), mais <code>phacochr</code> ne supprime pas le nom “BXL” du champ de rue et trouve moins facilement (ou pas du tout) celle-ci.</em></td>
+<td align="left"><em>Ici le nom de la commune est mal orthographié : “Bruxel” au lieu de “Bruxelles” : le code postal est détecté (car en fin de champ), mais <code>phacochr</code> ne supprime pas le nom “Bruxel” du champ de rue et trouve moins facilement (ou pas du tout) celle-ci.</em></td>
 </tr>
 </tbody>
 </table>
