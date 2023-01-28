@@ -151,7 +151,7 @@ phaco_geocode <- function(data_to_geocode,
 
   if(sum(names(data_to_geocode) %in% forbidden_names) > 0){
     cat("\n")
-    stop(paste0("\u2716"," des noms de colonnes de votre fichier sont similaires ","\u00e0"," certains utilis","\u00e9"," en interne par phaco_geocode(). Changez les noms de colonnes suivants : ", paste(intersect(names(data_to_geocode), forbiden_names), collapse = ", ")))
+    stop(paste0("\u2716"," des noms de colonnes de votre fichier sont similaires ","\u00e0"," certains utilis","\u00e9"," en interne par phaco_geocode(). Changez les noms de colonnes suivants : ", paste(intersect(names(data_to_geocode), forbidden_names), collapse = ", ")))
     }
 
 
@@ -993,8 +993,7 @@ phaco_geocode <- function(data_to_geocode,
 
   FULL_GEOCODING <- FULL_GEOCODING %>%
     bind_rows(MISSING) %>%
-    arrange(ID_address) %>%
-    select(-rue_to_geocode)
+    arrange(ID_address)
 
   # On enleve address_join_geocoding dans un if statement car la colonne n'existe pas pour les situations sans numeros
   if (situation != "no_num_rue_postal_s" & situation != "no_num_rue_postal_i") {
@@ -1033,9 +1032,11 @@ phaco_geocode <- function(data_to_geocode,
   ) %>%
     group_by(Region) %>%
     summarise("n" = n(),
-              "Rue detect.(%)" = round((sum(!is.na(street_FINAL_detected))/n())*100,1),
+              "Valid rue(%)" = round((sum(!is.na(rue_to_geocode))/n())*100, 1),
+              "Rue detect.(% rue)" = round((sum(!is.na(street_FINAL_detected))/sum(!is.na(rue_to_geocode)))*100,1),
               "stringdist (moy)" = mean(dist_fuzzy, na.rm = T),
-              "Geocode(%)" = round((sum(!is.na(x_31370))/n())*100, 1),
+              "Geocode(% tot)" = round((sum(!is.na(x_31370))/n())*100, 1),
+              "Geocode(% rue)" = round((sum(!is.na(x_31370))/sum(!is.na(rue_to_geocode)))*100, 1),
               #"Approx (% geocodes)" = (sum(approx_num > 0, na.rm = T)/(sum(!is.na(x_31370))))*100,
               "Approx.(n)" = sum(approx_num > 0, na.rm = T),
               "Elarg.(n)" = (sum(str_detect(type_geocoding, "elargissement_adj"), na.rm = T)),
@@ -1048,10 +1049,12 @@ phaco_geocode <- function(data_to_geocode,
               "Dupliques" = sum(duplicated(ID_address)))
 
   Summary_original <- tibble(Region = "Total (original)",
+                             "Valid rue(%)",
                              "n" = nrow(data_to_geocode),
-                             "Rue detect.(%)" = NA,
+                             "Rue detect.(% rue)" = NA,
                              "stringdist (moy)" = NA,
-                             "Geocode(%)" = NA,
+                             "Geocode(% tot)" = NA,
+                             "Geocode(% rue)" = NA,
                              #"Approx (% geocodes)" = NA,
                              "Approx.(n)"=NA,
                              "Elarg.(n)" = NA,
@@ -1068,8 +1071,9 @@ phaco_geocode <- function(data_to_geocode,
     slice(match(c("Total (original)", "Bruxelles", "Flandre", "Wallonie", NA, "Total"), Region))
 
   # J'enleve la region et les arrondissements, car doublon avec jointure dans le point precedent => pas ideal, mais necessaire pour importer les CSV par arrond avec map_dfr, pour le summary et au debut pour detecter les regions et ne pas executer si pas BE => optimiser ?
+  # J'enleve aussi rue_to_geocode => plus besoin
   FULL_GEOCODING <- FULL_GEOCODING %>%
-    select(-Region, -arrond)
+    select(-Region, -arrond, -rue_to_geocode)
 
 
   ## 3) Anonymisation potentielle -----------------------------------------------------------------------------------------------------------
@@ -1111,26 +1115,26 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 4) Creation de l'objet SF avec les coordonnees -----------------------------------------------------------------------------------------
 
-  if (anonymous == FALSE) {
-
-    if (length(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)])) > 0){
+  if (anonymous == FALSE) { # si anonymat enclenche => pas d'objet sf
+    if (sum(!is.na(FULL_GEOCODING$x_31370)) > 0){ # On cree un objet sf uniquement s'il y a des coordonnees
       # NOTE : l'objet sf ne peut pas contenir de NA pour les coordonnees
       FULL_GEOCODING_sf <- FULL_GEOCODING %>%
         filter(!is.na(x_31370)) %>%
         st_as_sf(coords = c("x_31370", "y_31370")) %>%  # on cree l'objet sf
         st_set_crs(31370) # on definit le systeme de projection
     }
-
   }
 
   result <- list()
   result$summary <- Summary_full
   result$data_geocoded <- FULL_GEOCODING
-  if (anonymous == FALSE) {
-    result$data_geocoded_sf <- FULL_GEOCODING_sf
+  if (anonymous == FALSE) { # si anonymat enclenche => pas d'objet sf
+    if (sum(!is.na(FULL_GEOCODING$x_31370)) > 0){ # On cree un objet sf uniquement s'il y a des coordonnees
+      result$data_geocoded_sf <- FULL_GEOCODING_sf
+    }
   }
   # remplacer par 0 les NA (pas tres propre)
-  result$summary$`Approx.(n)`[is.na(result$summary$`Approx.(n)`)]<-0
+  result$summary$`Approx.(n)`[is.na(result$summary$`Approx.(n)`)] <- 0
 
   # On stoppe la parallelisation
   parallel::stopCluster(cl = my.cluster)
@@ -1141,9 +1145,9 @@ phaco_geocode <- function(data_to_geocode,
 
   end_time <- Sys.time()
 
-  tab<-knitr::kable(result$summary[2:nrow(result$summary),c(1:3,6:8,5)],
+  tab<-knitr::kable(result$summary[2:nrow(result$summary),c("Region", "n", "Valid rue(%)", "Rue detect.(% rue)", "Approx.(n)", "Elarg.(n)", "Mid.(n)", "Geocode(% rue)", "Geocode(% tot)")],
                     format = "pipe",
-                    align="lrccccc")
+                    align="lrccccccc")
   cat("\n",tab, sep="\n" )
 
   cat(paste0("\n",colourise("\u2139", fg= "blue"), " Temps de calcul total : ", round(difftime(end_time, start_time, units = "secs")[[1]], digits = 1), " s
