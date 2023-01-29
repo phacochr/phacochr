@@ -671,6 +671,7 @@ phaco_geocode <- function(data_to_geocode,
   ### ii) Boucle de jointure par commune ----------------------------------------------------------------------------------------------------
 
   # /!\ NOTE : la cle de jointure est en minuscule (d'ou les str_to_lower() avant), car stringdist identifie la diff de case comme une diff !
+  # /!\ NOTE2 : la jointure cree les colonnes de postal_street, meme si 0 match ! Important pour la suite, notamment le if statement pour la creation de l'objet sf
   res <- tibble()
   res <- foreach (i = unique(data_to_geocode$code_postal_to_geocode),
                   .combine = 'bind_rows',
