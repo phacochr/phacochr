@@ -263,6 +263,12 @@ phaco_geocode <- function(data_to_geocode,
       mutate(rue_to_geocode = data_to_geocode[[colonne_rue_code_postal]])
   }
 
+  # Les rues vides "" sont recodees en NA
+  data_to_geocode <- data_to_geocode %>%
+    mutate(rue_to_geocode = str_squish(rue_to_geocode),
+           rue_to_geocode = ifelse(rue_to_geocode == "", NA, rue_to_geocode)
+           )
+
   # Un stop() si la colonne contenant la rue ne possede que des NA
   if(
     sum(is.na(data_to_geocode$rue_to_geocode))/sum(nrow(data_to_geocode)) == 1
@@ -365,7 +371,7 @@ phaco_geocode <- function(data_to_geocode,
     # On cree rue_recoded qui contient toutes les corrections et sera l'objet du fuzzy matching apres
     data_to_geocode <- data_to_geocode %>%
       mutate(rue_recoded = ifelse(!is.na(rue_to_geocode),
-                                  paste0(str_squish(rue_to_geocode),"   "),
+                                  paste0(rue_to_geocode,"   "),
                                   NA),
              rue_recoded_commune = NA, # Pour la compatibilite avec la suite si le code postal n'est pas integre et supprime
              rue_recoded_code_postal = NA) # Pour la compatibilite avec la suite si le code postal n'est pas integre et supprime
