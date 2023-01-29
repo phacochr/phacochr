@@ -1,6 +1,6 @@
 Package: phacochr
 Title: Geocoder for Belgium - Geocodeur pour la Belgique
-Version: 0.9.0.8
+Version: 0.9.0.9
 Authors@R: 
     c(person("Joel", "Gires", email = "jgires@ccc.brussels", role = c("aut", "cre")),
     person("Hugo", "Perilleux", email = "hugo.perilleux@ulb.be", role = "aut"))
