@@ -137,7 +137,7 @@
 
 
 <dt>anonymous</dt>
-<dd><p>Paramètre qui anonymise les résultats en supprimant toute les informations indiquant l'adresse. Par défaut: FALSE.</p></dd>
+<dd><p>Anonymisation des résultats en n'ajoutant pas aux données les coordonnées, mais uniquement les informations des entités administratives (secteurs statistiques, quartiers, (sous-)communes, etc.). De plus, toutes les informations relatives à l'adresse dans les données originales sont supprimées. Par défaut: FALSE.</p></dd>
 
 
 <dt>path_data</dt>
@@ -147,17 +147,18 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>nom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Observatoire de la Sant"</span>,<span class="st">"\u00e9"</span>,<span class="st">" et du Social"</span><span class="op">)</span>, <span class="st">"ULB"</span><span class="op">)</span>,</span>
-<span>rue <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rue Belliard"</span>,<span class="st">"avenue Antoine Depage"</span><span class="op">)</span>,</span>
-<span>num <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"71"</span>, <span class="st">"30"</span><span class="op">)</span>,</span>
-<span>code_postal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1040"</span>,<span class="st">"1000"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">phaco_geocode</span><span class="op">(</span>data_to_geocode <span class="op">=</span> <span class="va">x</span>,</span>
-<span>colonne_rue <span class="op">=</span> <span class="st">"rue"</span>,</span>
-<span>colonne_num <span class="op">=</span> <span class="st">"num"</span>,</span>
-<span>colonne_code_postal <span class="op">=</span> <span class="st">"code_postal"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>nom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Observatoire de la Sant"</span>,<span class="st">"\u00e9"</span>,<span class="st">" et du Social"</span><span class="op">)</span>, <span class="st">"ULB"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>rue <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rue Belliard"</span>,<span class="st">"avenue Antoine Depage"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>num <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"71"</span>, <span class="st">"30"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>code_postal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1040"</span>,<span class="st">"1000"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu">phaco_geocode</span><span class="op">(</span>data_to_geocode <span class="op">=</span> <span class="va">x</span>,</span></span>
+<span class="r-in"><span>colonne_rue <span class="op">=</span> <span class="st">"rue"</span>,</span></span>
+<span class="r-in"><span>colonne_num <span class="op">=</span> <span class="st">"num"</span>,</span></span>
+<span class="r-in"><span>colonne_code_postal <span class="op">=</span> <span class="st">"code_postal"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+</code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
