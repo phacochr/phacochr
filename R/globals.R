@@ -23,7 +23,7 @@ globalVariables(unique(c(
   "street_FINAL_detected_full", "street_id_phaco", "type_geocoding",
   "x_31370", "y_31370", "export_table", "dist_fuzzy",
   "mid_arrond", "mid_cd_sector", "mid_num", "mid_postcode", "mid_x_31370", "mid_y_31370",
-  "type_geocoding2", "forbiden_names",
+  "type_geocoding2", "forbiden_names", "cd_sector_x_31370", "cd_sector_y_31370",
   # phaco_best_data_update:
   "arrond2", "cd_country", "cd_dstr_refnis", "cd_munty_refnis", "cd_nuts_lvl1",
   "cd_nuts_lvl2", "cd_nuts_lvl3", "code_postal", "Count", "dt_situation", "geom",
@@ -33,12 +33,13 @@ globalVariables(unique(c(
   "tx_munty_descr_de", "tx_prov_descr_de", "tx_rgn_descr_de", "tx_rgn_descr_fr",
   "tx_sector_descr_de", "voisin", "cp_n_eng", "cp_n_fr", "cp_n_nl", "Gemeentenaam",
   "n_cp_eng", "n_cp_fr", "n_cp_nl", "name", "name_eng", "Nom commune",
-  "name_abv", "cp_n_abv", "n_cp_abv", "CP_NAME",
+  "name_abv", "cp_n_abv", "n_cp_abv", "CP_NAME", ".", "cd_sector_x_31370",
+  "cd_sector_y_31370",
   # phaco_best_data_update : extract_street:
   "key_street_unique",
   # phaco_best_data_update : select_id_street:
   "house_number", "postcode", "street_name", "streetname_de", "streetname_fr",
   "streetname_nl",
   # phaco_map_s:
-  "cd_rgn_refnis"
+  "cd_rgn_refnis", "CARTO_weight", "n_cd_sector"
 )))

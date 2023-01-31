@@ -147,7 +147,8 @@ phaco_geocode <- function(data_to_geocode,
                        "mid_x_31370", "mid_y_31370", "mid_cd_sector", "dist_fuzzy", "min", "address_join", "address_join_street", "distance_jw", "min_jw", "type_geocoding", "Refnis code",
                        "house_number_sans_lettre", "x_31370", "y_31370", "cd_sector", "address_join_geocoding", "approx_num", "type_geocoding2", "tx_sector_descr_nl", "tx_sector_descr_fr",
                        "cd_sub_munty", "tx_sub_munty_nl", "tx_sub_munty_fr", "tx_munty_dstr", "cd_munty_refnis", "tx_munty_descr_nl", "tx_munty_descr_fr", "cd_dstr_refnis", "tx_adm_dstr_descr_nl",
-                       "tx_adm_dstr_descr_fr", "cd_prov_refnis", "tx_prov_descr_nl", "tx_prov_descr_fr", "cd_rgn_refnis", "tx_rgn_descr_nl", "tx_rgn_descr_fr", "MDRC", "NAME_FRE", "NAME_DUT")
+                       "tx_adm_dstr_descr_fr", "cd_prov_refnis", "tx_prov_descr_nl", "tx_prov_descr_fr", "cd_rgn_refnis", "tx_rgn_descr_nl", "tx_rgn_descr_fr", "MDRC", "NAME_FRE", "NAME_DUT",
+                       "cd_sector_x_31370", "cd_sector_y_31370", "phaco_anonymous")
 
   if(sum(names(data_to_geocode) %in% forbidden_names) > 0){
     cat("\n")
