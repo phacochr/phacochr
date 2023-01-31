@@ -682,7 +682,7 @@ phaco_geocode <- function(data_to_geocode,
   res <- tibble()
   res <- foreach (i = unique(data_to_geocode$code_postal_to_geocode),
                   .combine = 'bind_rows',
-                  .packages=c("tidyverse","fuzzyjoin"))  %dopar% {
+                  .packages=c("dplyr","fuzzyjoin"))  %dopar% {
 
                     data_to_geocode_i <- data_to_geocode %>%
                       filter(code_postal_to_geocode == i)
@@ -767,7 +767,7 @@ phaco_geocode <- function(data_to_geocode,
       res_adj <- tibble()
       res_adj <- foreach (i = unique(ADDRESS_last_tentative$`Refnis code`),
                           .combine = 'bind_rows',
-                          .packages=c("tidyverse","fuzzyjoin"))  %dopar% {
+                          .packages=c("dplyr","fuzzyjoin"))  %dopar% {
 
                             # On calcule un vecteur reprenant les communes adjacentes par commune i
                             com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == i]
