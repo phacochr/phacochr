@@ -16,7 +16,7 @@
 #' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE.
 #' @param mid_street Indique les coordonnées du milieu de la rue si les coordonnées du numéro ne sont pas trouvée. Par défaut: TRUE.
 #' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE").
-#' @param anonymous Anonymisation des résultats en n'ajoutant pas aux données les coordonnées, mais uniquement les informations des entités administratives (secteurs statistiques, quartiers, (sous-)communes, etc.). De plus, toutes les informations relatives à l'adresse dans les données originales sont supprimées. Par défaut: FALSE.
+#' @param anonymous Anonymisation des résultats en ajoutant uniquement les informations des entités administratives (secteurs statistiques, quartiers, (sous-)communes, etc.). Dans ce cas, les coordonnées X-Y indiquées sont le centroïde du secteur statistique. De plus, toutes les informations relatives à l'adresse dans les données originales sont supprimées. Par défaut: FALSE.
 #' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
 #'
 #' @import dplyr
