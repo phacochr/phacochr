@@ -46,14 +46,14 @@ phaco_best_data_update <- function(force=FALSE) {
   }
 
   # Mise a jour si pas deja il y a moins de 7 jours
-  cat(paste0(" -- Mise ","\u00e0", " jour des donn","\u00e9","es BeST pour PhacochR --"))
+  cat(paste0(" -- Mise ","\u00e0", " jour des donn","\u00e9","es BeST pour PhacochR --\n"))
 
 
   # Premiere fois
   if (!file.exists(paste0(path_data, "BeST/openaddress/log.csv"))){
     log <- data.frame(update = "0001-01-01 00:00:00 UTC")
     write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"), progress=F)
-    }
+  }
 
 
   log <- readr::read_delim(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",", progress= F, show_col_types = FALSE)
@@ -74,8 +74,8 @@ phaco_best_data_update <- function(force=FALSE) {
                   paste0(path_data,"BeST/openaddress/openaddress-bevlg.zip"),
                   paste0(path_data,"BeST/openaddress/openaddress-bebru.zip"),
                   paste0(path_data,"BeST/openaddress/openaddress-bewal.zip")
-                  )
-      ) != 4) {
+      )
+    ) != 4) {
       cat("\n")
       stop(paste0("\u2716"," les fichiers n'ont pas pu", " \u00ea", "tre download","\u00e9","s : relancez phaco_update() ou v","\u00e9","rifiez votre connexion"))
     }
@@ -129,13 +129,13 @@ phaco_best_data_update <- function(force=FALSE) {
                      names_to = "langue_FINAL_detected") %>%
         filter(!is.na(street_FINAL_detected)) %>%
         mutate(langue_FINAL_detected = recode(langue_FINAL_detected,
-                                             "street_fr" = "FR",
-                                             "street_nl" = "NL",
-                                             "street_de" ="DE"),
+                                              "street_fr" = "FR",
+                                              "street_nl" = "NL",
+                                              "street_de" ="DE"),
                key_street_unique = paste(street_FINAL_detected, postal_id)) %>%
         distinct(key_street_unique, .keep_all = TRUE) %>%
         select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected, key_street_unique) %>%
-      return(temp)
+        return(temp)
     }
 
     Brussels_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
@@ -158,9 +158,7 @@ phaco_best_data_update <- function(force=FALSE) {
         rename("x_31370" = "EPSG:31370_x",
                "y_31370" = "EPSG:31370_y") %>%
         filter(x_31370 != "0.00000") %>%
-        mutate(x_31370 = round(as.numeric(x_31370), 0),
-               y_31370 = round(as.numeric(y_31370), 0),
-               house_number_sans_lettre = str_extract(house_number, regex("[0-9]+", ignore_case = TRUE))) %>%
+        mutate(house_number_sans_lettre = str_extract(house_number, regex("[0-9]+", ignore_case = TRUE))) %>%
         select(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, x_31370, y_31370) %>%
         distinct(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, .keep_all = TRUE) %>%
         pivot_longer(cols=  c("streetname_de", "streetname_fr", "streetname_nl"),
@@ -182,7 +180,7 @@ phaco_best_data_update <- function(force=FALSE) {
         st_join(BE_SS_lite_sector_arrond) %>%
         as.data.frame() %>%
         select(- geometry) %>%
-      return(temp)
+        return(temp)
     }
 
     # Charger le fichier secteurs statistiques
@@ -241,7 +239,7 @@ phaco_best_data_update <- function(force=FALSE) {
           str_c(
             "\\b(?<!\\-)(",
             str_c(prenoms$TX_FST_NAME,
-              collapse = "|"
+                  collapse = "|"
             ),
             ")\\b(?!\\-)"
           )
@@ -251,7 +249,7 @@ phaco_best_data_update <- function(force=FALSE) {
           str_c(
             "\\b(?<!\\-)(",
             str_c(prenoms$TX_FST_NAME,
-              collapse = "|"
+                  collapse = "|"
             ),
             ")\\b(?!\\-)"
           ),
@@ -260,7 +258,7 @@ phaco_best_data_update <- function(force=FALSE) {
             str_c(
               "\\b(?<!\\-)(",
               str_c(prenoms$TX_FST_NAME,
-                collapse = "|"
+                    collapse = "|"
               ),
               ")\\b(?!\\-)"
             )
@@ -278,7 +276,7 @@ phaco_best_data_update <- function(force=FALSE) {
              Last = str_detect(street_FINAL_detected, regex("(\\s|'|-)[A-Z]$", ignore_case = TRUE)),
              Last_double = str_detect(street_FINAL_detected, regex("((\\s|'|-)[A-Z][A-Z]$)", ignore_case = TRUE)),
              King = str_detect(street_FINAL_detected_Origin, regex("1er$|II|Roi\\s|Koning(|in)\\s", ignore_case = TRUE))
-             ) %>%
+      ) %>%
       filter(Last == FALSE) %>%
       filter(Last_double == FALSE) %>%
       filter(Count >= 10 & Count <= 25) %>%
@@ -313,7 +311,9 @@ phaco_best_data_update <- function(force=FALSE) {
       unique()
 
     belgium_street_abv<-belgium_street_abv %>%
-      left_join(num_mid, by=c("street_id_phaco", "postal_id"))
+      left_join(num_mid, by=c("street_id_phaco", "postal_id")) %>%
+      mutate(mid_x_31370 = round(as.numeric(mid_x_31370), 0),
+             mid_y_31370 = round(as.numeric(mid_y_31370), 0))
 
 
     #write_csv2(belgium_street, paste0(path_data, "BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"))
@@ -406,7 +406,7 @@ phaco_best_data_update <- function(force=FALSE) {
              CP_NAME = str_replace_all(CP_NAME, "[e\u00e8\u00e9\u00ea\u00eb]", "[e\u00e8\u00e9\u00ea\u00eb]"),
              CP_NAME = str_replace_all(CP_NAME, "[u\u00fb\u00fc]", "[u\u00fb\u00fc]"),
              CP_NAME = str_replace_all(CP_NAME, "[c\u00e7]", "[c\u00e7]")
-             )
+      )
 
 
     write_csv2(table_postal_com_name, paste0(path_data, "BeST/PREPROCESSED/table_postal_com_name.csv"), progress=F)
@@ -435,6 +435,8 @@ phaco_best_data_update <- function(force=FALSE) {
     cat(paste0("\n", "\u29D7"," Export des fichiers BeST par arrondissement"))
 
     openaddress_be <- rename(openaddress_be, "arrond2" = "arrond") %>%
+      mutate(x_31370 = round(as.numeric(x_31370), 0),
+             y_31370 = round(as.numeric(y_31370), 0)) %>%
       left_join(select(table_postal_arrond, postcode, arrond), by = "postcode")
 
     # Verif = pas toujours convergent ! => On penche plutot pour des erreurs des coordonnees que du code postal
@@ -468,8 +470,21 @@ phaco_best_data_update <- function(force=FALSE) {
       as.data.frame() %>%
       select(cd_sector, MDRC, NAME_FRE, NAME_DUT)
 
+    # On calcule les centroides des secteurs stats (en cas d'anonymisation des donnees)
+    BE_SS_coord <- BE_SS %>%
+      st_point_on_surface() %>%
+      dplyr::mutate(cd_sector_x_31370 = sf::st_coordinates(.)[,1],
+                    cd_sector_y_31370 = sf::st_coordinates(.)[,2],
+                    cd_sector_x_31370 = str_replace(cd_sector_x_31370, ",", "."),
+                    cd_sector_y_31370 = str_replace(cd_sector_y_31370, ",", "."),
+                    cd_sector_x_31370 = round(as.numeric(cd_sector_x_31370), 0),
+                    cd_sector_y_31370 = round(as.numeric(cd_sector_y_31370), 0)) %>%
+      as.data.frame() %>%
+      select(cd_sector, cd_sector_x_31370, cd_sector_y_31370)
+
     table_secteurs_prov_commune_quartier <- BE_SS %>%
       left_join(BXL_QUARTIERS, by="cd_sector") %>%
+      left_join(BE_SS_coord, by="cd_sector") %>%
       as.data.frame() %>%
       select(-tx_sector_descr_de, -tx_munty_descr_de, -tx_adm_dstr_descr_de,
              -tx_rgn_descr_de, -cd_country,- cd_nuts_lvl1, -cd_nuts_lvl2, -cd_nuts_lvl3,
