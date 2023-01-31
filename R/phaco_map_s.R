@@ -179,7 +179,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
       if(zoom_geocoded == TRUE){
         mf_map(x = FULL_GEOCODING_sf_carto,
              col = alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
-             cex = 0.8,
+             cex = 0.6,
              pch = 16,
              add = TRUE)
       } else {
