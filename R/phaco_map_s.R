@@ -176,19 +176,11 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
         add = TRUE
       )
     } else {
-      if(zoom_geocoded == TRUE){
-        mf_map(x = FULL_GEOCODING_sf_carto,
+      mf_map(x = FULL_GEOCODING_sf_carto,
              col = alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
-             cex = 0.6,
+             cex = 0.4,
              pch = 16,
              add = TRUE)
-      } else {
-        mf_map(x = FULL_GEOCODING_sf_carto,
-               col = alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
-               cex = 0.4,
-               pch = 16,
-               add = TRUE)
-      }
     }
     if(nom_admin == TRUE){
       mf_label(
