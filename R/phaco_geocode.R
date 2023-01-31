@@ -1117,8 +1117,19 @@ phaco_geocode <- function(data_to_geocode,
     FULL_GEOCODING <- FULL_GEOCODING %>%
       mutate(phaco_anonymous = ifelse(!is.na(cd_sector), 1, NA),  # On cree cette colonne pour signifier a phaco_map que c'est anonyme
              x_31370 = as.numeric(cd_sector_x_31370), # Dans le cas d'une anonymisation : les coordonnees = centroides des secteurs
-             y_31370 = as.numeric(cd_sector_y_31370)) %>%
-      select(-rue_recoded, -recode, -street_FINAL_detected, -num_rue_clean, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector, -house_number_sans_lettre, -cd_sector_x_31370, -cd_sector_y_31370)
+             y_31370 = as.numeric(cd_sector_y_31370))
+
+    # On enleve les colonnes referant a l'adresse
+    if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {
+      FULL_GEOCODING <- FULL_GEOCODING %>%
+        select(-rue_recoded, -recode, -street_FINAL_detected, -num_rue_clean, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector, -house_number_sans_lettre, -cd_sector_x_31370, -cd_sector_y_31370)
+    }
+
+    # Le cas est particulier si pas de num, les colonnes de num n'existant pas !
+    if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
+      FULL_GEOCODING <- FULL_GEOCODING %>%
+        select(-rue_recoded, -recode, -street_FINAL_detected,                 -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num,                                                                        -cd_sector_x_31370, -cd_sector_y_31370)
+    }
 
   }
 
