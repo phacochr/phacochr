@@ -27,6 +27,10 @@ navbar:
     href: index.html
   - text: Reference
     href: reference/index.html
+  - text: Articles
+    menu:
+    - text: Géocodage anonymisé
+      href: articles/anonymous_geocoding.html
   - text: Géocoder
     href: articles/shiny_app.html
   right:

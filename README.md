@@ -72,20 +72,27 @@ du programme.
 ## Installation
 
 Vous pouvez installer le package `phacochr` depuis
-[GitHub](https://github.com/). Il est indispensable lors de la première
-utilisation d’installer les données nécessaires à son utilisation via la
-fonction `phaco_setup_data()`. Ces fichiers (+/- 265Mo) sont téléchargés
-et stockés de manière permanente dans un répertoire de travail sur
+[GitHub](https://github.com/). Pour cela, il vous faut d’abord installer
+et charger le package `devtools` :
+
+``` r
+# Installer devtools si celui-ci n'est pas installé et charger le package
+install.packages("devtools")
+library(devtools)
+
+# Installer phacochr
+devtools::install_github("phacochr/phacochr")
+```
+
+Il est indispensable lors de la première utilisation d’installer les
+données nécessaires à son utilisation via la fonction
+`phaco_setup_data()`. Ces fichiers (+/- 265Mo) sont téléchargés et
+stockés de manière permanente dans un répertoire de travail sur
 l’ordinateur (dépendant du système d’exploitation et renseigné par la
 fonction lors de l’installation).
 
 ``` r
-# Installer devtools si celui-ci n'est pas installé
-install.packages("devtools")
-library(devtools)
-
-# Installer et charger phacochr
-devtools::install_github("phacochr/phacochr")
+# Charger phacochr
 library(phacochr)
 
 # Installer les données nécessaires à phacochr
@@ -103,7 +110,8 @@ phaco_best_data_update()
 
 ## Exemple de géocodage
 
-Voici un exemple de géocodage à partir des données d’exemples `snacks`
+Voici un exemple de géocodage à partir des [données d’exemples
+`snacks`](https://phacochr.github.io/phacochr/reference/snacks.html)
 contenues dans `phacochr` :
 
 ``` r
@@ -156,8 +164,9 @@ result$data_geocoded [1:8,c("nom", "x_31370", "y_31370", "cd_sector")]
 #> 8        Snack fransman  148389  174242 21004E74-
 ```
 
-Un tableau synthétisant les résultats du géocodage est accessible dans
-l’objet `summary` créé par `phaco_geocode()` :
+Un tableau synthétisant quelques résultats du géocodage est affiché à la
+fin de l’opération. Une version complète de ces résultats est accessible
+dans l’objet `summary` créé par `phaco_geocode()` :
 
 ``` r
 knitr::kable(result$summary, caption = "Résumé du géocodage")
@@ -444,14 +453,15 @@ créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
   nécessité un élargissement aux communes adjacentes (colonne
   `type_geocoding == elargissement_adj`). Une rue au même nom aurait pu
   être trouvée dans une commune voisine ;
-- Vérifier le nombre d’adresses qui ont nécessité une localisation
-  géographique à un autre numéro si celui renseigné n’a pas été trouvé.
-  Examinez plus spécifiquement les adresses qui ont demandé les
-  approximations les plus amples (colonne `approx_num`) ;
-- Vérifier le nombre d’adresses qui ont demandé une localisation au
-  numéro médian de la rue au code postal encodé. Examinez plus
-  spécifiquement les adresses qui ont demandé une localisation à la rue
-  (colonne `type_geocoding == mid_street`).
+- Vérifier dans le tableau des résultats le nombre d’adresses qui ont
+  nécessité une localisation géographique à un autre numéro si celui
+  renseigné n’a pas été trouvé. Examinez plus spécifiquement les
+  adresses qui ont demandé les approximations les plus amples (colonne
+  `approx_num`) ;
+- Vérifier dans le tableau des résultats le nombre d’adresses qui ont
+  demandé une localisation au numéro médian de la rue au code postal
+  encodé. Examinez par précaution les adresses qui ont demandé une
+  localisation à la rue (colonne `type_geocoding == mid_street`).
 
 Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré
 la *distance* (euclidienne, en mètres) entre la géolocalisation opérée

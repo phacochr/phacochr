@@ -33,15 +33,21 @@ Le programme fonctionne avec les données publiques [BeST Address](https://opend
 
 ## Installation
 
-Vous pouvez installer le package `phacochr` depuis [GitHub](https://github.com/). Il est indispensable lors de la première utilisation d'installer les données nécessaires à son utilisation via la fonction `phaco_setup_data()`. Ces fichiers (+/- 265Mo) sont téléchargés et stockés de manière permanente dans un répertoire de travail sur l'ordinateur (dépendant du système d'exploitation et renseigné par la fonction lors de l'installation).
+Vous pouvez installer le package `phacochr` depuis [GitHub](https://github.com/). Pour cela, il vous faut d'abord installer et charger le package `devtools` :
 
 ``` r
-# Installer devtools si celui-ci n'est pas installé
+# Installer devtools si celui-ci n'est pas installé et charger le package
 install.packages("devtools")
 library(devtools)
 
-# Installer et charger phacochr
+# Installer phacochr
 devtools::install_github("phacochr/phacochr")
+```
+
+Il est indispensable lors de la première utilisation d'installer les données nécessaires à son utilisation via la fonction `phaco_setup_data()`. Ces fichiers (+/- 265Mo) sont téléchargés et stockés de manière permanente dans un répertoire de travail sur l'ordinateur (dépendant du système d'exploitation et renseigné par la fonction lors de l'installation).
+
+```r
+# Charger phacochr
 library(phacochr)
 
 # Installer les données nécessaires à phacochr
@@ -57,7 +63,7 @@ phaco_best_data_update()
 
 ## Exemple de géocodage
 
-Voici un exemple de géocodage à partir des données d'exemples `snacks` contenues dans `phacochr` :
+Voici un exemple de géocodage à partir des [données d'exemples `snacks`](https://phacochr.github.io/phacochr/reference/snacks.html) contenues dans `phacochr` :
 
 ```{r, include=FALSE}
 library(phacochr)
@@ -82,7 +88,7 @@ result <- phaco_geocode(data_to_geocode = x,
 result$data_geocoded [1:8,c("nom", "x_31370", "y_31370", "cd_sector")]
 ```
 
-Un tableau synthétisant les résultats du géocodage est accessible dans l'objet `summary` créé par `phaco_geocode()` :
+Un tableau synthétisant quelques résultats du géocodage est affiché à la fin de l'opération. Une version complète de ces résultats est accessible dans l'objet `summary` créé par `phaco_geocode()` :
 
 ```{r}
 knitr::kable(result$summary, caption = "Résumé du géocodage")
@@ -199,8 +205,8 @@ Ces résultats sur la performance sont à nuancer par le fait qu'il y a probable
 * Vérifier globalement que les corrections orthographiques ont bien fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et corrigée, et `recode` indique les types de corrections réalisées) ;
 * Comparer les rues détectées par `phacochr` (la colonne `street_FINAL_detected`) avec les rues d'origine pour les erreurs les plus élevées dans la jointure inexacte (la colonne `dist_fuzzy` indique le nombre d'erreurs nécessaires pour faire la jointure avec les données BeST. `0` signifie que le matching est exact) ;
 * Procéder à la même comparaison pour les rues dont la détection a nécessité un élargissement aux communes adjacentes (colonne `type_geocoding == elargissement_adj`). Une rue au même nom aurait pu être trouvée dans une commune voisine ;
-* Vérifier le nombre d'adresses qui ont nécessité une localisation géographique à un autre numéro si celui renseigné n'a pas été trouvé. Examinez plus spécifiquement les adresses qui ont demandé les approximations les plus amples (colonne `approx_num`) ;
-* Vérifier le nombre d'adresses qui ont demandé une localisation au numéro médian de la rue au code postal encodé. Examinez plus spécifiquement les adresses qui ont demandé une localisation à la rue (colonne `type_geocoding == mid_street`).
+* Vérifier dans le tableau des résultats le nombre d'adresses qui ont nécessité une localisation géographique à un autre numéro si celui renseigné n'a pas été trouvé. Examinez plus spécifiquement les adresses qui ont demandé les approximations les plus amples (colonne `approx_num`) ;
+* Vérifier dans le tableau des résultats le nombre d'adresses qui ont demandé une localisation au numéro médian de la rue au code postal encodé. Examinez par précaution les adresses qui ont demandé une localisation à la rue (colonne `type_geocoding == mid_street`).
 
 Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré la *distance* (euclidienne, en mètres) entre la géolocalisation opérée par `phacochr` avec ses réglages par défaut et les coordonnées spatiales déjà présentes dans deux bases de données : celle des écoles néérlandophones et celle des pharmacies, les deux pour toute la Belgique. Cette distance peut être interprétée comme l'*erreur dans la géolocalisation* (bien qu'il est possible que les coordonnées déjà présentes dans ces deux bases de données ne soient pas précises : nous n'avons pas investigué la manière dont elles ont été produites). Le tableau suivant montre la répartition en pourcentages de cette erreur par classe de distance. On voit ainsi que 97,6% des adresses géocodées sont localisées à moins de 100m de leurs coordonnées "réelles", montrant un degré de fiabilité tout à fait satisfaisant.
 
