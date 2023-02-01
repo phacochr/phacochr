@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">phacochr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,32 +109,142 @@
 <div class="section level2">
 <h2 id="exemple-de-géocodage">Exemple de géocodage<a class="anchor" aria-label="anchor" href="#exemple-de-g%C3%A9ocodage"></a>
 </h2>
-<p>Voici un exemple de géocodage d’un data.frame contenant deux adresses :</p>
+<p>Voici un exemple de géocodage à partir des données d’exemples <code>snacks</code> contenues dans <code>phacochr</code> :</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>nom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Observatoire de la Santé et du Social"</span>, <span class="st">"ULB"</span><span class="op">)</span>,</span>
-<span>                rue <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"rue Belliard"</span>, <span class="st">"avenue Antoine Depage"</span><span class="op">)</span>,</span>
-<span>                num <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"71"</span>, <span class="st">"30"</span><span class="op">)</span>,</span>
-<span>                code_postal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1040"</span>, <span class="st">"1000"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">x</span></span>
-<span><span class="co">#&gt;                                     nom                   rue num code_postal</span></span>
-<span><span class="co">#&gt; 1 Observatoire de la Santé et du Social          rue Belliard  71        1040</span></span>
-<span><span class="co">#&gt; 2                                   ULB avenue Antoine Depage  30        1000</span></span></code></pre></div>
-<p>Le géocodage se lance simplement avec la fonction <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code> appliquée à ce data.frame. Nous indiquons dans cet exemple 3 paramètres : les colonnes contenant la rue, le numéro de rue et le code postal, disponibles séparément dans la base de données. Il s’agit de la situation idéale, mais le programme est compatible avec d’autres configurations : celles-ci sont renseignée plus bas au point <a href="#format-des-donn%C3%A9es-%C3%A0-g%C3%A9ocoder">Format des données à géocoder</a>. Mentionnons déjà que le numéro peut ne pas être renseigné ; <code>phacochr</code> trouve alors les coordonnées du numéro médian de la rue au code postal indiqué. La fonction dispose de plusieurs options, voir le dictionnaire des fonctions : <a href="https://phacochr.github.io/phacochr/reference/index.html" class="uri">https://phacochr.github.io/phacochr/reference/index.html</a>.</p>
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="va">snacks</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">x</span>, <span class="fl">8</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 8 × 4</span></span>
+<span><span class="co">#&gt;   nom                   rue                         num   code_postal</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                 &lt;chr&gt;                       &lt;chr&gt; &lt;chr&gt;      </span></span>
+<span><span class="co">#&gt; 1 Snack Baraka          Boulevard Maurice Lemonnier 32    1000       </span></span>
+<span><span class="co">#&gt; 2 Snack Les frères      Rue Marie-Christine         121   1020       </span></span>
+<span><span class="co">#&gt; 3 Snack Adil            Rue Marie-Christine         132   1020       </span></span>
+<span><span class="co">#&gt; 4 Efes Fritures         Rue Marie-Christine         66    1020       </span></span>
+<span><span class="co">#&gt; 5 Snack 2001            Rue Marie-Christine         28    1020       </span></span>
+<span><span class="co">#&gt; 6 snack friterie Chérif Rue Stéphanie               165   1020       </span></span>
+<span><span class="co">#&gt; 7 Chez les grecs        Rue Marie-Christine         44    1020       </span></span>
+<span><span class="co">#&gt; 8 Snack fransman        Rue Fransman                39    1020</span></span></code></pre></div>
+<p>Il s’agit des snacks à Bruxelles. Le géocodage se lance simplement avec la fonction <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code> appliquée au data.frame. Nous indiquons dans cet exemple 3 paramètres : les colonnes contenant la rue, le numéro de rue et le code postal, disponibles séparément dans la base de données. Il s’agit de la situation idéale, mais le programme est compatible avec d’autres configurations : celles-ci sont renseignée plus bas au point <a href="#format-des-donn%C3%A9es-%C3%A0-g%C3%A9ocoder">Format des données à géocoder</a>. Mentionnons déjà que le numéro peut ne pas être renseigné ; <code>phacochr</code> trouve alors les coordonnées du numéro médian de la rue au code postal indiqué. La fonction dispose de plusieurs options, voir le dictionnaire des fonctions : <a href="https://phacochr.github.io/phacochr/reference/index.html" class="uri">https://phacochr.github.io/phacochr/reference/index.html</a>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/phaco_geocode.html">phaco_geocode</a></span><span class="op">(</span>data_to_geocode <span class="op">=</span> <span class="va">x</span>,</span>
-<span>                        colonne_rue <span class="op">=</span> <span class="st">"rue"</span>,</span>
 <span>                        colonne_num <span class="op">=</span> <span class="st">"num"</span>,</span>
+<span>                        colonne_rue <span class="op">=</span> <span class="st">"rue"</span>,</span>
 <span>                        colonne_code_postal <span class="op">=</span> <span class="st">"code_postal"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">result</span><span class="op">$</span><span class="va">data_geocoded</span> <span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ID_address"</span>, <span class="st">"x_31370"</span>, <span class="st">"y_31370"</span>, <span class="st">"cd_sector"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;   ID_address x_31370 y_31370 cd_sector</span></span>
-<span><span class="co">#&gt; 1          1  150373  170090 21004B13-</span></span>
-<span><span class="co">#&gt; 2          2  151105  166831 21004C61-</span></span></code></pre></div>
-<p>Le package dispose également d’une fonction de cartographie des adresses géocodées (reposant sur le packageR <a href="https://riatelab.github.io/mapsf/" class="external-link">mapsf</a> et des shapefiles intégrés aux données téléchargées). <code><a href="reference/phaco_map_s.html">phaco_map_s()</a></code> produit des cartes statiques à partir des données géocodées : il suffit de passer à la fonction l’objet <code>data_geocoded_sf</code> créé précédemment par <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code>. La fonction dessine alors les coordonnées des adresses sur une carte dont les frontières administratives sont également affichées. Si les adresses se restreignent à Bruxelles, la carte se limite automatiquement à la Région bruxelloise. Les options de la fonction <a href="https://phacochr.github.io/phacochr/reference/index.html">sont également renseignées dans le dictionnaire des fonctions</a>.</p>
+<code class="sourceCode R"><span><span class="va">result</span><span class="op">$</span><span class="va">data_geocoded</span> <span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nom"</span>, <span class="st">"x_31370"</span>, <span class="st">"y_31370"</span>, <span class="st">"cd_sector"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;                     nom x_31370 y_31370 cd_sector</span></span>
+<span><span class="co">#&gt; 1          Snack Baraka  148367  170405 21004A03-</span></span>
+<span><span class="co">#&gt; 2      Snack Les frères  148897  173945 21004E70-</span></span>
+<span><span class="co">#&gt; 3            Snack Adil  148904  173910 21004E70-</span></span>
+<span><span class="co">#&gt; 4         Efes Fritures  149115  173779 21004E72-</span></span>
+<span><span class="co">#&gt; 5            Snack 2001  149226  173709 21004E72-</span></span>
+<span><span class="co">#&gt; 6 snack friterie Chérif  148605  174121 21004E70-</span></span>
+<span><span class="co">#&gt; 7        Chez les grecs  149171  173744 21004E72-</span></span>
+<span><span class="co">#&gt; 8        Snack fransman  148389  174242 21004E74-</span></span></code></pre></div>
+<p>Un tableau synthétisant les résultats du géocodage est accessible dans l’objet <code>summary</code> créé par <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code> :</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary</span>, caption <span class="op">=</span> <span class="st">"Résumé du géocodage"</span><span class="op">)</span></span></code></pre></div>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="8%">
+<col width="2%">
+<col width="6%">
+<col width="10%">
+<col width="8%">
+<col width="7%">
+<col width="8%">
+<col width="5%">
+<col width="5%">
+<col width="4%">
+<col width="5%">
+<col width="3%">
+<col width="3%">
+<col width="3%">
+<col width="9%">
+<col width="5%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Region</th>
+<th align="right">n</th>
+<th align="right">Valid rue(%)</th>
+<th align="right">Rue detect.(%valid)</th>
+<th align="right">stringdist (moy)</th>
+<th align="right">Geocode(%tot)</th>
+<th align="right">Geocode(%valid)</th>
+<th align="right">Approx.(n)</th>
+<th align="right">Elarg.(n)</th>
+<th align="right">Mid.(n)</th>
+<th align="right">Abrev.(n)</th>
+<th align="right">Rue FR</th>
+<th align="right">Rue NL</th>
+<th align="right">Rue DE</th>
+<th align="right">Coord non valides</th>
+<th align="right">Dupliques</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Total (original)</td>
+<td align="right">484</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Bruxelles</td>
+<td align="right">484</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td align="right">0.0165289</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">100</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">Total</td>
+<td align="right">484</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td align="right">0.0165289</td>
+<td align="right">100</td>
+<td align="right">100</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">100</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>Résumé du géocodage</p>
+<p>Le package dispose également d’une fonction de cartographie des adresses géocodées (reposant sur le packageR <a href="https://riatelab.github.io/mapsf/" class="external-link">mapsf</a> et des shapefiles intégrés aux données téléchargées). <code><a href="reference/phaco_map_s.html">phaco_map_s()</a></code> produit des cartes statiques à partir des données géocodées : il suffit de passer à la fonction l’objet <code>data_geocoded_sf</code> créé précédemment par <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code>. La fonction dessine alors les coordonnées des adresses sur une carte dont les frontières administratives sont également affichées. Si les adresses se restreignent à Bruxelles, la carte se limite automatiquement à la Région bruxelloise, comme c’est le cas pour cet exemple. Les options de la fonction <a href="https://phacochr.github.io/phacochr/reference/index.html">sont également renseignées dans le dictionnaire des fonctions</a>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/phaco_map_s.html">phaco_map_s</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">data_geocoded_sf</span>,</span>
-<span>            title_carto <span class="op">=</span> <span class="st">"Institutions des auteurs"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
+<span>            title_carto <span class="op">=</span> <span class="st">"Snacks à Bruxelles"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="format-des-données-à-géocoder">Format des données à géocoder<a class="anchor" aria-label="anchor" href="#format-des-donn%C3%A9es-%C3%A0-g%C3%A9ocoder"></a>
@@ -390,8 +500,8 @@ Graphique du pourcentage d’adresses géocodées
 <li>Vérifier globalement que les corrections orthographiques ont bien fonctionné (la colonne <code>rue_recoded</code> comprend la rue nettoyée et corrigée, et <code>recode</code> indique les types de corrections réalisées) ;</li>
 <li>Comparer les rues détectées par <code>phacochr</code> (la colonne <code>street_FINAL_detected</code>) avec les rues d’origine pour les erreurs les plus élevées dans la jointure inexacte (la colonne <code>dist_fuzzy</code> indique le nombre d’erreurs nécessaires pour faire la jointure avec les données BeST. <code>0</code> signifie que le matching est exact) ;</li>
 <li>Procéder à la même comparaison pour les rues dont la détection a nécessité un élargissement aux communes adjacentes (colonne <code>type_geocoding == elargissement_adj</code>). Une rue au même nom aurait pu être trouvée dans une commune voisine ;</li>
-<li>Vérifier la proportion des adresses qui ont nécessité une localisation géographique à un autre numéro si celui renseigné n’a pas été trouvé, ainsi que l’ampleur de cette approximation (colonne <code>approx_num</code>) ;</li>
-<li>Vérifier la proportion des adresses qui ont demandé une localisation au numéro médian de la rue au code postal indiqué si aucune autre localisation plus précise n’a plus être réalisée (colonne <code>type_geocoding == mid_street</code>).</li>
+<li>Vérifier le nombre d’adresses qui ont nécessité une localisation géographique à un autre numéro si celui renseigné n’a pas été trouvé. Examinez plus spécifiquement les adresses qui ont demandé les approximations les plus amples (colonne <code>approx_num</code>) ;</li>
+<li>Vérifier le nombre d’adresses qui ont demandé une localisation au numéro médian de la rue au code postal encodé. Examinez plus spécifiquement les adresses qui ont demandé une localisation à la rue (colonne <code>type_geocoding == mid_street</code>).</li>
 </ul>
 <p>Malgré cette mise en garde, <code>phacochr</code> reste fiable. Nous avons mesuré la <em>distance</em> (euclidienne, en mètres) entre la géolocalisation opérée par <code>phacochr</code> avec ses réglages par défaut et les coordonnées spatiales déjà présentes dans deux bases de données : celle des écoles néérlandophones et celle des pharmacies, les deux pour toute la Belgique. Cette distance peut être interprétée comme l’<em>erreur dans la géolocalisation</em> (bien qu’il est possible que les coordonnées déjà présentes dans ces deux bases de données ne soient pas précises : nous n’avons pas investigué la manière dont elles ont été produites). Le tableau suivant montre la répartition en pourcentages de cette erreur par classe de distance. On voit ainsi que 97,6% des adresses géocodées sont localisées à moins de 100m de leurs coordonnées “réelles”, montrant un degré de fiabilité tout à fait satisfaisant.</p>
 <figure><img src="reference/figures/erreur.png" width="500" alt="Graphique de la répartition de l’erreur de géolocalisation"><figcaption aria-hidden="true">

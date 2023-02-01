@@ -103,45 +103,73 @@ phaco_best_data_update()
 
 ## Exemple de géocodage
 
-Voici un exemple de géocodage d’un data.frame contenant deux adresses :
+Voici un exemple de géocodage à partir des données d’exemples `snacks`
+contenues dans `phacochr` :
 
 ``` r
-x <- data.frame(nom = c("Observatoire de la Santé et du Social", "ULB"),
-                rue = c("rue Belliard", "avenue Antoine Depage"),
-                num = c("71", "30"),
-                code_postal = c("1040", "1000"))
-x
-#>                                     nom                   rue num code_postal
-#> 1 Observatoire de la Santé et du Social          rue Belliard  71        1040
-#> 2                                   ULB avenue Antoine Depage  30        1000
+x <- snacks
+
+head(x, 8)
+#> # A tibble: 8 × 4
+#>   nom                   rue                         num   code_postal
+#>   <chr>                 <chr>                       <chr> <chr>      
+#> 1 Snack Baraka          Boulevard Maurice Lemonnier 32    1000       
+#> 2 Snack Les frères      Rue Marie-Christine         121   1020       
+#> 3 Snack Adil            Rue Marie-Christine         132   1020       
+#> 4 Efes Fritures         Rue Marie-Christine         66    1020       
+#> 5 Snack 2001            Rue Marie-Christine         28    1020       
+#> 6 snack friterie Chérif Rue Stéphanie               165   1020       
+#> 7 Chez les grecs        Rue Marie-Christine         44    1020       
+#> 8 Snack fransman        Rue Fransman                39    1020
 ```
 
-Le géocodage se lance simplement avec la fonction `phaco_geocode()`
-appliquée à ce data.frame. Nous indiquons dans cet exemple 3 paramètres
-: les colonnes contenant la rue, le numéro de rue et le code postal,
-disponibles séparément dans la base de données. Il s’agit de la
-situation idéale, mais le programme est compatible avec d’autres
-configurations : celles-ci sont renseignée plus bas au point [Format des
-données à géocoder](#format-des-donn%C3%A9es-%C3%A0-g%C3%A9ocoder).
-Mentionnons déjà que le numéro peut ne pas être renseigné ; `phacochr`
-trouve alors les coordonnées du numéro médian de la rue au code postal
-indiqué. La fonction dispose de plusieurs options, voir le dictionnaire
-des fonctions :
-<https://phacochr.github.io/phacochr/reference/index.html>.
+Il s’agit des snacks à Bruxelles. Le géocodage se lance simplement avec
+la fonction `phaco_geocode()` appliquée au data.frame. Nous indiquons
+dans cet exemple 3 paramètres : les colonnes contenant la rue, le numéro
+de rue et le code postal, disponibles séparément dans la base de
+données. Il s’agit de la situation idéale, mais le programme est
+compatible avec d’autres configurations : celles-ci sont renseignée plus
+bas au point [Format des données à
+géocoder](#format-des-donn%C3%A9es-%C3%A0-g%C3%A9ocoder). Mentionnons
+déjà que le numéro peut ne pas être renseigné ; `phacochr` trouve alors
+les coordonnées du numéro médian de la rue au code postal indiqué. La
+fonction dispose de plusieurs options, voir le dictionnaire des
+fonctions : <https://phacochr.github.io/phacochr/reference/index.html>.
 
 ``` r
 result <- phaco_geocode(data_to_geocode = x,
-                        colonne_rue = "rue",
                         colonne_num = "num",
+                        colonne_rue = "rue",
                         colonne_code_postal = "code_postal")
 ```
 
 ``` r
-result$data_geocoded [,c("ID_address", "x_31370", "y_31370", "cd_sector")]
-#>   ID_address x_31370 y_31370 cd_sector
-#> 1          1  150373  170090 21004B13-
-#> 2          2  151105  166831 21004C61-
+result$data_geocoded [1:8,c("nom", "x_31370", "y_31370", "cd_sector")]
+#>                     nom x_31370 y_31370 cd_sector
+#> 1          Snack Baraka  148367  170405 21004A03-
+#> 2      Snack Les frères  148897  173945 21004E70-
+#> 3            Snack Adil  148904  173910 21004E70-
+#> 4         Efes Fritures  149115  173779 21004E72-
+#> 5            Snack 2001  149226  173709 21004E72-
+#> 6 snack friterie Chérif  148605  174121 21004E70-
+#> 7        Chez les grecs  149171  173744 21004E72-
+#> 8        Snack fransman  148389  174242 21004E74-
 ```
+
+Un tableau synthétisant les résultats du géocodage est accessible dans
+l’objet `summary` créé par `phaco_geocode()` :
+
+``` r
+knitr::kable(result$summary, caption = "Résumé du géocodage")
+```
+
+| Region           |   n | Valid rue(%) | Rue detect.(%valid) | stringdist (moy) | Geocode(%tot) | Geocode(%valid) | Approx.(n) | Elarg.(n) | Mid.(n) | Abrev.(n) | Rue FR | Rue NL | Rue DE | Coord non valides | Dupliques |
+|:-----------------|----:|-------------:|--------------------:|-----------------:|--------------:|----------------:|-----------:|----------:|--------:|----------:|-------:|-------:|-------:|------------------:|----------:|
+| Total (original) | 484 |           NA |                  NA |               NA |            NA |              NA |          0 |        NA |      NA |        NA |     NA |     NA |     NA |                NA |         0 |
+| Bruxelles        | 484 |          100 |                 100 |        0.0165289 |           100 |             100 |          2 |         0 |       0 |         2 |    100 |      0 |      0 |                 0 |         0 |
+| Total            | 484 |          100 |                 100 |        0.0165289 |           100 |             100 |          2 |         0 |       0 |         2 |    100 |      0 |      0 |                 0 |         0 |
+
+Résumé du géocodage
 
 Le package dispose également d’une fonction de cartographie des adresses
 géocodées (reposant sur le packageR
@@ -152,16 +180,16 @@ l’objet `data_geocoded_sf` créé précédemment par `phaco_geocode()`. La
 fonction dessine alors les coordonnées des adresses sur une carte dont
 les frontières administratives sont également affichées. Si les adresses
 se restreignent à Bruxelles, la carte se limite automatiquement à la
-Région bruxelloise. Les options de la fonction [sont également
-renseignées dans le dictionnaire des
+Région bruxelloise, comme c’est le cas pour cet exemple. Les options de
+la fonction [sont également renseignées dans le dictionnaire des
 fonctions](https://phacochr.github.io/phacochr/reference/index.html).
 
 ``` r
 phaco_map_s(result$data_geocoded_sf,
-            title_carto = "Institutions des auteurs")
+            title_carto = "Snacks à Bruxelles")
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
 ## Format des données à géocoder
 
@@ -324,33 +352,31 @@ différentes informations utiles. On y trouve notamment (la liste
 complète est disponible au point [Colonnes
 créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 
--   Les secteurs statistiques (colonne `cd_sector` et leurs noms en NL
-    et FR `tx_sector_descr_nl` et `tx_sector_descr_fr`) ;
--   Les quartiers monitoring pour Bruxelles (colonne `MDRC` et leurs
-    noms en NL et FR `NAME_DUT` et `NAME_FRE` ) ;
--   Les codes INS des communes, arrondissements, provinces et regions
-    (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les
-    appelations classiques de Statbel ;
--   Toute une série d’indicateurs sur la qualité de la localisation
-    (voir point suivant [Performances et
-    fiabilité](#performances-et-fiabilit%C3%A9)).
+- Les secteurs statistiques (colonne `cd_sector` et leurs noms en NL et
+  FR `tx_sector_descr_nl` et `tx_sector_descr_fr`) ;
+- Les quartiers monitoring pour Bruxelles (colonne `MDRC` et leurs noms
+  en NL et FR `NAME_DUT` et `NAME_FRE` ) ;
+- Les codes INS des communes, arrondissements, provinces et regions
+  (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les
+  appelations classiques de Statbel ;
+- Toute une série d’indicateurs sur la qualité de la localisation (voir
+  point suivant [Performances et
+  fiabilité](#performances-et-fiabilit%C3%A9)).
 
 Le résultat du géocodage est une liste (au sens de R). Il comprend trois
 objets :
 
--   `data_geocoded` : la base de données originale à laquelle sont
-    ajoutées les informations précitées ;
--   `data_geocoded_sf` : [un objet
-    `sf`](https://r-spatial.github.io/sf/) produit à partir des adresses
-    pour lesquelles des coordonnées ont effectivement été trouvées (le
-    nombre de lignes reprises dans l’objet dépend donc du taux de
-    géocodage). Cet objet est exportable en .gpkg (ou autre format
-    vectoriel) à l’aide de la fonction
-    [st_write](https://r-spatial.github.io/sf/reference/st_write.html)
-    ou peut directement être cartographié avec la fonction `phaco_map_s`
-    ;
--   `summary` : un tableau avec quelques statistiques synthétiques
-    indiquant la performance du géocodage.
+- `data_geocoded` : la base de données originale à laquelle sont
+  ajoutées les informations précitées ;
+- `data_geocoded_sf` : [un objet `sf`](https://r-spatial.github.io/sf/)
+  produit à partir des adresses pour lesquelles des coordonnées ont
+  effectivement été trouvées (le nombre de lignes reprises dans l’objet
+  dépend donc du taux de géocodage). Cet objet est exportable en .gpkg
+  (ou autre format vectoriel) à l’aide de la fonction
+  [st_write](https://r-spatial.github.io/sf/reference/st_write.html) ou
+  peut directement être cartographié avec la fonction `phaco_map_s` ;
+- `summary` : un tableau avec quelques statistiques synthétiques
+  indiquant la performance du géocodage.
 
 Le tableau ci-dessous schématise l’ensemble des opérations réalisées et
 expliquées précédemment :
@@ -406,26 +432,26 @@ il est conseillé de vérifier plusieurs éléments (la synthèse des
 indicateurs de qualité du géocodage est disponible au point [Colonnes
 créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 
--   Vérifier globalement que les corrections orthographiques ont bien
-    fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et
-    corrigée, et `recode` indique les types de corrections réalisées) ;
--   Comparer les rues détectées par `phacochr` (la colonne
-    `street_FINAL_detected`) avec les rues d’origine pour les erreurs
-    les plus élevées dans la jointure inexacte (la colonne `dist_fuzzy`
-    indique le nombre d’erreurs nécessaires pour faire la jointure avec
-    les données BeST. `0` signifie que le matching est exact) ;
--   Procéder à la même comparaison pour les rues dont la détection a
-    nécessité un élargissement aux communes adjacentes (colonne
-    `type_geocoding == elargissement_adj`). Une rue au même nom aurait
-    pu être trouvée dans une commune voisine ;
--   Vérifier la proportion des adresses qui ont nécessité une
-    localisation géographique à un autre numéro si celui renseigné n’a
-    pas été trouvé, ainsi que l’ampleur de cette approximation (colonne
-    `approx_num`) ;
--   Vérifier la proportion des adresses qui ont demandé une localisation
-    au numéro médian de la rue au code postal indiqué si aucune autre
-    localisation plus précise n’a plus être réalisée (colonne
-    `type_geocoding == mid_street`).
+- Vérifier globalement que les corrections orthographiques ont bien
+  fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et
+  corrigée, et `recode` indique les types de corrections réalisées) ;
+- Comparer les rues détectées par `phacochr` (la colonne
+  `street_FINAL_detected`) avec les rues d’origine pour les erreurs les
+  plus élevées dans la jointure inexacte (la colonne `dist_fuzzy`
+  indique le nombre d’erreurs nécessaires pour faire la jointure avec
+  les données BeST. `0` signifie que le matching est exact) ;
+- Procéder à la même comparaison pour les rues dont la détection a
+  nécessité un élargissement aux communes adjacentes (colonne
+  `type_geocoding == elargissement_adj`). Une rue au même nom aurait pu
+  être trouvée dans une commune voisine ;
+- Vérifier le nombre d’adresses qui ont nécessité une localisation
+  géographique à un autre numéro si celui renseigné n’a pas été trouvé.
+  Examinez plus spécifiquement les adresses qui ont demandé les
+  approximations les plus amples (colonne `approx_num`) ;
+- Vérifier le nombre d’adresses qui ont demandé une localisation au
+  numéro médian de la rue au code postal encodé. Examinez plus
+  spécifiquement les adresses qui ont demandé une localisation à la rue
+  (colonne `type_geocoding == mid_street`).
 
 Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré
 la *distance* (euclidienne, en mètres) entre la géolocalisation opérée
@@ -501,11 +527,10 @@ En voici une liste exhaustive et commentée:
 
 ## Autres géocodeurs libres
 
--   [Nominatim](https://nominatim.org/): le géocodeur de OpenStreetMap.
--   [BHiGIS – Brussels Historical Geographical Information
-    System](https://ebxl.be/les-outils/bhigis/): un géocodeur développé
-    par l’IGEAT permettant de géocoder des données anciennes à
-    Bruxelles.
+- [Nominatim](https://nominatim.org/): le géocodeur de OpenStreetMap.
+- [BHiGIS – Brussels Historical Geographical Information
+  System](https://ebxl.be/les-outils/bhigis/): un géocodeur développé
+  par l’IGEAT permettant de géocoder des données anciennes à Bruxelles.
 
 ## Contact
 

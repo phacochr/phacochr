@@ -1057,8 +1057,8 @@ phaco_geocode <- function(data_to_geocode,
               "Dupliques" = sum(duplicated(ID_address)))
 
   Summary_original <- tibble(Region = "Total (original)",
-                             "Valid rue(%)",
                              "n" = nrow(data_to_geocode),
+                             "Valid rue(%)" = NA,
                              "Rue detect.(%valid)" = NA,
                              "stringdist (moy)" = NA,
                              "Geocode(%tot)" = NA,

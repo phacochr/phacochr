@@ -1,6 +1,6 @@
 Package: phacochr
 Title: Geocoder for Belgium - Geocodeur pour la Belgique
-Version: 0.9.1.4
+Version: 0.9.1.5
 Authors@R: 
     c(person("Joel", "Gires", email = "jgires@ccc.brussels", role = c("aut", "cre")),
     person("Hugo", "Perilleux", email = "hugo.perilleux@ulb.be", role = "aut"))
@@ -14,3 +14,5 @@ Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, purrr, stats,
     readr, readxl, stringdist, sf, sp, spdep, knitr, 
     stringr, tidyr, rappdirs, utils, mapsf, scales
 Language: fr
+LazyData: true
+Depends: R (>= 3.5.0)
