@@ -2,7 +2,7 @@
 % Please edit documentation in R/phaco_best_data_update.R
 \name{phaco_best_data_update}
 \alias{phaco_best_data_update}
-\title{phaco_best_data_update : Mise à jour des données BeST et des fichier connexes}
+\title{phaco_best_data_update : Mise à jour des données BeST et des fichiers connexes}
 \usage{
 phaco_best_data_update(force = FALSE)
 }

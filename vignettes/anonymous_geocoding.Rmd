@@ -1,5 +1,5 @@
 ---
-title: "anonymous_geocoding"
+title: "Géocodage anonymisé"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{anonymous_geocoding}
@@ -13,6 +13,8 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+## Géocodage au secteur statistique
 
 `phacochr` a d'abord été pensé pour fonctionner en local : il devait donc être léger, rapide et portable. Cette spécificité permet notamment de géocoder des données sensibles qui ne peuvent pas être envoyées sur un serveur via une API de géocodage. Des options supplémentaires ont de ce fait été intégrées afin d'anonymiser les données qui lui sont passées. Nous en montrons un exemple sur cette page.
 
@@ -34,11 +36,11 @@ Cette option a la particularité de produire des coordonnées X-Y qui ne sont pa
 c("num", "rue") %in% names(result_anonym$data_geocoded)
 ```
 
-Lorsque cette option est enclenchée, une nouvelle colonne `phaco_anonymous` est ajoutée au résultat. La présence de cette colonne indique à la fonction `phaco_map_s()` que celle-ci doit changer sa manière de cartographier les résultats. Dans la mesure où les adresses sont localisées au centroïde du secteur statistique, les points se superposeraient dans la cartographie classiquement prévue par `phaco_map_s()`. Dans le cas d'une anonymisation, ce sont alors des cercles de taille proportionnelle au nombre d'adresses localisées dans le secteur statistique qui sont affichées :
+## Cartographie anonymisée
+
+Lorsque cette option est enclenchée, une nouvelle colonne `phaco_anonymous` est ajoutée au résultat. La présence de cette colonne indique à la fonction `phaco_map_s()` que celle-ci doit changer sa manière de cartographier les résultats. Dans la mesure où les adresses sont localisées au centroïde du secteur statistique, les points se superposeraient dans la cartographie classiquement prévue par `phaco_map_s()`. Dans le cas d'une anonymisation, ce sont alors des cercles de taille proportionnelle au nombre d'adresses localisées dans le secteur statistique qui sont affichées. L'anonymisation n'empêche donc pas une cartographie exploratoire rapide des résultats :
 
 ```{r fig.width=6, fig.height=6, warning = FALSE, message = FALSE, results='hide'}
 phaco_map_s(result_anonym$data_geocoded_sf,
             title_carto = "Snacks à Bruxelles (anonymisés)")
 ```
-
-L'anonymisation n'empêche dont pas une cartographie exploratoire rapide des résultats.

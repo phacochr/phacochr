@@ -153,98 +153,54 @@
 <span><span class="co">#&gt; 8        Snack fransman  148389  174242 21004E74-</span></span></code></pre></div>
 <p>Un tableau synthétisant quelques résultats du géocodage est affiché à la fin de l’opération. Une version complète de ces résultats est accessible dans l’objet <code>summary</code> créé par <code><a href="reference/phaco_geocode.html">phaco_geocode()</a></code> :</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary</span>, caption <span class="op">=</span> <span class="st">"Résumé du géocodage"</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Region"</span>, <span class="st">"n"</span>, <span class="st">"Valid rue(%)"</span>, <span class="st">"Rue detect.(%valid)"</span>, <span class="st">"Approx.(n)"</span>, <span class="st">"Elarg.(n)"</span>, <span class="st">"Mid.(n)"</span>, <span class="st">"Geocode(%valid)"</span>, <span class="st">"Geocode(%tot)"</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  caption <span class="op">=</span> <span class="st">"Résumé du géocodage"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<table class="table">
 <colgroup>
-<col width="8%">
-<col width="2%">
-<col width="6%">
-<col width="10%">
-<col width="8%">
-<col width="7%">
-<col width="8%">
-<col width="5%">
-<col width="5%">
-<col width="4%">
-<col width="5%">
-<col width="3%">
-<col width="3%">
-<col width="3%">
 <col width="9%">
-<col width="5%">
+<col width="4%">
+<col width="12%">
+<col width="18%">
+<col width="10%">
+<col width="9%">
+<col width="7%">
+<col width="14%">
+<col width="13%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Region</th>
 <th align="right">n</th>
 <th align="right">Valid rue(%)</th>
 <th align="right">Rue detect.(%valid)</th>
-<th align="right">stringdist (moy)</th>
-<th align="right">Geocode(%tot)</th>
-<th align="right">Geocode(%valid)</th>
 <th align="right">Approx.(n)</th>
 <th align="right">Elarg.(n)</th>
 <th align="right">Mid.(n)</th>
-<th align="right">Abrev.(n)</th>
-<th align="right">Rue FR</th>
-<th align="right">Rue NL</th>
-<th align="right">Rue DE</th>
-<th align="right">Coord non valides</th>
-<th align="right">Dupliques</th>
+<th align="right">Geocode(%valid)</th>
+<th align="right">Geocode(%tot)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Total (original)</td>
-<td align="right">484</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
 <td align="left">Bruxelles</td>
 <td align="right">484</td>
 <td align="right">100</td>
 <td align="right">100</td>
-<td align="right">0.0165289</td>
-<td align="right">100</td>
-<td align="right">100</td>
 <td align="right">2</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">2</td>
 <td align="right">100</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
+<td align="right">100</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Total</td>
 <td align="right">484</td>
 <td align="right">100</td>
 <td align="right">100</td>
-<td align="right">0.0165289</td>
-<td align="right">100</td>
-<td align="right">100</td>
 <td align="right">2</td>
 <td align="right">0</td>
 <td align="right">0</td>
-<td align="right">2</td>
 <td align="right">100</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
+<td align="right">100</td>
 </tr>
 </tbody>
 </table>

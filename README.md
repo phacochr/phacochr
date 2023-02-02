@@ -169,14 +169,15 @@ fin de l’opération. Une version complète de ces résultats est accessible
 dans l’objet `summary` créé par `phaco_geocode()` :
 
 ``` r
-knitr::kable(result$summary, caption = "Résumé du géocodage")
+knitr::kable(result$summary[2:nrow(result$summary), c("Region", "n", "Valid rue(%)", "Rue detect.(%valid)", "Approx.(n)", "Elarg.(n)", "Mid.(n)", "Geocode(%valid)", "Geocode(%tot)")],
+  caption = "Résumé du géocodage"
+)
 ```
 
-| Region           |   n | Valid rue(%) | Rue detect.(%valid) | stringdist (moy) | Geocode(%tot) | Geocode(%valid) | Approx.(n) | Elarg.(n) | Mid.(n) | Abrev.(n) | Rue FR | Rue NL | Rue DE | Coord non valides | Dupliques |
-|:-----------------|----:|-------------:|--------------------:|-----------------:|--------------:|----------------:|-----------:|----------:|--------:|----------:|-------:|-------:|-------:|------------------:|----------:|
-| Total (original) | 484 |           NA |                  NA |               NA |            NA |              NA |          0 |        NA |      NA |        NA |     NA |     NA |     NA |                NA |         0 |
-| Bruxelles        | 484 |          100 |                 100 |        0.0165289 |           100 |             100 |          2 |         0 |       0 |         2 |    100 |      0 |      0 |                 0 |         0 |
-| Total            | 484 |          100 |                 100 |        0.0165289 |           100 |             100 |          2 |         0 |       0 |         2 |    100 |      0 |      0 |                 0 |         0 |
+| Region    |   n | Valid rue(%) | Rue detect.(%valid) | Approx.(n) | Elarg.(n) | Mid.(n) | Geocode(%valid) | Geocode(%tot) |
+|:----------|----:|-------------:|--------------------:|-----------:|----------:|--------:|----------------:|--------------:|
+| Bruxelles | 484 |          100 |                 100 |          2 |         0 |       0 |             100 |           100 |
+| Total     | 484 |          100 |                 100 |          2 |         0 |       0 |             100 |           100 |
 
 Résumé du géocodage
 

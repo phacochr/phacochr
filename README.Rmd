@@ -91,7 +91,9 @@ result$data_geocoded [1:8,c("nom", "x_31370", "y_31370", "cd_sector")]
 Un tableau synthétisant quelques résultats du géocodage est affiché à la fin de l'opération. Une version complète de ces résultats est accessible dans l'objet `summary` créé par `phaco_geocode()` :
 
 ```{r}
-knitr::kable(result$summary, caption = "Résumé du géocodage")
+knitr::kable(result$summary[2:nrow(result$summary), c("Region", "n", "Valid rue(%)", "Rue detect.(%valid)", "Approx.(n)", "Elarg.(n)", "Mid.(n)", "Geocode(%valid)", "Geocode(%tot)")],
+  caption = "Résumé du géocodage"
+)
 ```
 
 Le package dispose également d'une fonction de cartographie des adresses géocodées (reposant sur le packageR [mapsf](https://riatelab.github.io/mapsf/) et des shapefiles intégrés aux données téléchargées). `phaco_map_s()` produit des cartes statiques à partir des données géocodées : il suffit de passer à la fonction l'objet `data_geocoded_sf` créé précédemment par `phaco_geocode()`. La fonction dessine alors les coordonnées des adresses sur une carte dont les frontières administratives sont également affichées. Si les adresses se restreignent à Bruxelles, la carte se limite automatiquement à la Région bruxelloise, comme c'est le cas pour cet exemple. Les options de la fonction [sont également renseignées dans le dictionnaire des fonctions](https://phacochr.github.io/phacochr/reference/index.html).
