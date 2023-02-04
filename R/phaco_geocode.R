@@ -1117,8 +1117,8 @@ phaco_geocode <- function(data_to_geocode,
 
     FULL_GEOCODING <- FULL_GEOCODING %>%
       mutate(phaco_anonymous = ifelse(!is.na(cd_sector), 1, NA),  # On cree cette colonne pour signifier a phaco_map que c'est anonyme
-             x_31370 = as.numeric(cd_sector_x_31370), # Dans le cas d'une anonymisation : les coordonnees = centroides des secteurs
-             y_31370 = as.numeric(cd_sector_y_31370))
+             x_31370 = cd_sector_x_31370, # Dans le cas d'une anonymisation : les coordonnees = centroides des secteurs
+             y_31370 = cd_sector_y_31370)
 
     # On enleve les colonnes referant a l'adresse
     if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {

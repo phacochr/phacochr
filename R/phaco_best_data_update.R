@@ -1,8 +1,9 @@
 #' phaco_best_data_update : Mise à jour des données BeST et des fichiers connexes
 #'
-#' Cette fonction met à jour les données BeST Address vers la dernière version disponible sur le site de BOSA : https://opendata.bosa.be ainsi que les fichiers connexes nécessaire au géocodage.
+#' Cette fonction met à jour les données BeST Address vers la dernière version disponible sur le site de BOSA : https://opendata.bosa.be ainsi que les fichiers connexes nécessaires au géocodage.
 #'
 #' @param force Force la mise à jour même si les données sont à jour. Par défaut: FALSE.
+#' @param precision Indique la précision des coordonnées désirées. Par défaut : "m". Choix possibles : "m", "dm", "cm", "mm".
 #'
 #' @import rappdirs
 #' @import readr
@@ -24,8 +25,26 @@
 #'
 #'
 
-phaco_best_data_update <- function(force=FALSE) {
+phaco_best_data_update <- function(force=FALSE,
+                                   precision="m") {
   options(warn=-1) # supprime les warnings
+
+  if(precision=="m"){
+    precision_digits = 0
+    precision_label = "meter"
+  }
+  if(precision=="dm"){
+    precision_digits = 1
+    precision_label = "decimeter"
+  }
+  if(precision=="cm"){
+    precision_digits = 2
+    precision_label = "centimeter"
+  }
+  if(precision=="mm"){
+    precision_digits = 3
+    precision_label = "millimeter"
+  }
 
 
   # 0. Mise a jour --------------------------------------------------------------------------------------------------------------------------
@@ -48,11 +67,13 @@ phaco_best_data_update <- function(force=FALSE) {
   # Mise a jour si pas deja il y a moins de 7 jours
   cat(paste0(" -- Mise ","\u00e0", " jour des donn","\u00e9","es BeST pour PhacochR --\n"))
 
+  cat(paste0("\n",colourise("\u2139", fg= "blue")," Pr","\u00e9","cision choisie : ", precision_label, "\n"))
+
 
   # Premiere fois
   if (!file.exists(paste0(path_data, "BeST/openaddress/log.csv"))){
     log <- data.frame(update = "0001-01-01 00:00:00 UTC")
-    write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"), progress=F)
+    write_delim(log, paste0(path_data, "BeST/openaddress/log.csv"), delim = ";", progress=F)
   }
 
 
@@ -111,7 +132,7 @@ phaco_best_data_update <- function(force=FALSE) {
     }
 
     log[nrow(log)+1,] <- Sys.time()
-    write_csv2(log, paste0(path_data, "BeST/openaddress/log.csv"), progress=F)
+    write_delim(log, paste0(path_data, "BeST/openaddress/log.csv"), delim = ";", progress=F)
 
     cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","compression des donn","\u00e9","es BeST"))
 
@@ -312,12 +333,12 @@ phaco_best_data_update <- function(force=FALSE) {
 
     belgium_street_abv<-belgium_street_abv %>%
       left_join(num_mid, by=c("street_id_phaco", "postal_id")) %>%
-      mutate(mid_x_31370 = round(as.numeric(mid_x_31370), 0),
-             mid_y_31370 = round(as.numeric(mid_y_31370), 0))
+      mutate(mid_x_31370 = round(as.numeric(mid_x_31370), precision_digits),
+             mid_y_31370 = round(as.numeric(mid_y_31370), precision_digits))
 
 
     #write_csv2(belgium_street, paste0(path_data, "BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"))
-    write_csv2(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), progress=F)
+    write_delim(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress=F)
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
 
@@ -346,7 +367,7 @@ phaco_best_data_update <- function(force=FALSE) {
     table_postal_arrond$Region[table_postal_arrond$Region == paste0("R", "\u00e9", "gion wallonne")] <- "Wallonie"
 
 
-    write_csv2(table_postal_arrond, paste0(path_data, "BeST/PREPROCESSED/table_postal_arrond.csv"), progress=F)
+    write_delim(table_postal_arrond, paste0(path_data, "BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress=F)
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
@@ -409,7 +430,7 @@ phaco_best_data_update <- function(force=FALSE) {
       )
 
 
-    write_csv2(table_postal_com_name, paste0(path_data, "BeST/PREPROCESSED/table_postal_com_name.csv"), progress=F)
+    write_delim(table_postal_com_name, paste0(path_data, "BeST/PREPROCESSED/table_postal_com_name.csv"), delim = ";", progress=F)
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table 'codes postaux - nom des communes' (Statbel)"))
 
@@ -425,7 +446,7 @@ phaco_best_data_update <- function(force=FALSE) {
       distinct()
 
 
-    write_csv2(table_INS_recod_code_postal, paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), progress=F)
+    write_delim(table_INS_recod_code_postal, paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";", progress=F)
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - codes INS recod", "\u00e9", "es' (Statbel)"))
 
@@ -435,8 +456,8 @@ phaco_best_data_update <- function(force=FALSE) {
     cat(paste0("\n", "\u29D7"," Export des fichiers BeST par arrondissement"))
 
     openaddress_be <- rename(openaddress_be, "arrond2" = "arrond") %>%
-      mutate(x_31370 = round(as.numeric(x_31370), 0),
-             y_31370 = round(as.numeric(y_31370), 0)) %>%
+      mutate(x_31370 = round(as.numeric(x_31370), precision_digits),
+             y_31370 = round(as.numeric(y_31370), precision_digits)) %>%
       left_join(select(table_postal_arrond, postcode, arrond), by = "postcode")
 
     # Verif = pas toujours convergent ! => On penche plutot pour des erreurs des coordonnees que du code postal
@@ -452,7 +473,7 @@ phaco_best_data_update <- function(force=FALSE) {
       temp <- openaddress_be %>%
         filter(arrond == i) %>%
         select(-postcode, -arrond)
-      write_csv2(temp, paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".csv"), na = "", progress=F)
+      write_delim(temp, paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".csv"), delim = ";", na = "", progress=F)
     }
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Export des fichiers BeST par arrondissement"))
@@ -477,8 +498,8 @@ phaco_best_data_update <- function(force=FALSE) {
                     cd_sector_y_31370 = sf::st_coordinates(.)[,2],
                     cd_sector_x_31370 = str_replace(cd_sector_x_31370, ",", "."),
                     cd_sector_y_31370 = str_replace(cd_sector_y_31370, ",", "."),
-                    cd_sector_x_31370 = round(as.numeric(cd_sector_x_31370), 0),
-                    cd_sector_y_31370 = round(as.numeric(cd_sector_y_31370), 0)) %>%
+                    cd_sector_x_31370 = round(as.numeric(cd_sector_x_31370), precision_digits),
+                    cd_sector_y_31370 = round(as.numeric(cd_sector_y_31370), precision_digits)) %>%
       as.data.frame() %>%
       select(cd_sector, cd_sector_x_31370, cd_sector_y_31370)
 
@@ -491,7 +512,7 @@ phaco_best_data_update <- function(force=FALSE) {
              -ms_area_ha, -ms_perimeter_m, -dt_situation, -geom, -tx_prov_descr_de) # NOTE : dans BE_SS version gpkg, le champ geometrie = "geom" et non "geometry" => PKOI ?
 
 
-    write_csv2(table_secteurs_prov_commune_quartier, paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), na = "", progress=F)
+    write_delim(table_secteurs_prov_commune_quartier, paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", na = "", progress=F)
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers Urbis)"))
 
@@ -520,7 +541,7 @@ phaco_best_data_update <- function(force=FALSE) {
       select(-voisin)
 
 
-    write_csv2(mat, paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.csv"), progress=F)
+    write_delim(mat, paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.csv"), delim = ";", progress=F)
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))
 

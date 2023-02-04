@@ -31,6 +31,8 @@ navbar:
     menu:
     - text: Géocodage anonymisé
       href: articles/anonymous_geocoding.html
+    - text: Structure et mise à jour des données BeST
+      href: articles/data_phacochr.html
   - text: Géocoder
     href: articles/shiny_app.html
   right:

@@ -1,0 +1,73 @@
+---
+title: "Structure et mise à jour des données BeST"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{data_phacochr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Données séparées
+
+Le package `phacochr` a la particularité de ne pas contenir directement les données nécessaires au géocodage. C'est la raison pour laquelle il faut lancer la fonction `phaco_setup_data()` après l'installation du package pour que les fonctions du package puissent fonctionner :
+
+```r
+# Charger phacochr
+library(phacochr)
+
+# Installer les données nécessaires à phacochr
+phaco_setup_data()
+```
+
+La fonction `phaco_setup_data()` télécharge les fichiers nécessaires (90Mo), qui sont alors décompressés et stockés de manière permanente dans un répertoire de travail sur l'ordinateur. Une fois décompressés, ces fichiers occupent une place de 265Mo sur le disque dur. Le chemin du répertoire dépend du système d'exploitation ; il est renseigné par la fonction lors de l'installation. Pour Windows, ce chemin est `C:\Users\USERNAME\AppData\Local\phacochr`. Voici en résumé ce que contiennent ces fichiers. L'utilisateur/trice peut consulter le répertoire d'installation pour prendre connaissance plus précisément de leur contenu. **Attention : ces fichier ne peuvent pas être modifiés !**
+
+| **Type de données** | **Descriptif** | **Taille** |
+|---------------------|----------------|------------|
+| **Données BeST** | Les rues [BeST Address](https://opendata.bosa.be/) et leurs coordonnées par numéro issues des données régionales Urbis (Région de Bruxelles-Capitale), CRAB (Région flamande) et ICAR (Région wallonne). | 140Mo |
+| **Données géospatiales Statbel et Urbis** | Des données géospatiales [Statbel](https://statbel.fgov.be/fr/open-data?category=209) et [Urbis](https://datastore.brussels/web/data/dataset/9651e420-2c8d-48ec-b4a1-6a43a3f6a40f) permettant d'une part d'ajouter des informations administratives au géocodage (secteurs statistiques, quartiers du monitoring, (sous-)communes...), d'autre part de fournir les limites spatiales pour pouvoir produire des cartographies des données géocodées. | 110Mo |
+| **Données de prénom Statbel** | Une liste de tous les [prénoms en Belgique](https://data.gov.be/fr/dataset/06b90ef7bfb3797bdafb36ec69ee8f2576b5e9e0), permettant de recoder les rues BeST contenant des prénoms pour créer des alias avec prénom abrégé (les rues étant usuellement écrites de cette manière). | 8Mo |
+| **Tables de conversion** | Des tables de conversion nécessaires au processus de géocodage pour lier les différentes données. Il s'agit de tables permettant de passer du code postal à la commune, l'arrondissement ou la région, du secteur statistique au quartier monitoring de Bruxelles, d'une table faisant la liste des communes adjacentes pour chaque commune, etc. | 5Mo |
+
+Le fait que les données ne soient pas intégrées a deux avantages :
+
+1. Il permettra de soumettre notre package au dépôt CRAN, la taille des packages acceptés étant limitée.
+2. Il donne à l'utilisateur/trice la possibilité de mettre à jour lui/elle-même les données. Nous développons cet élément dans le point suivant.
+
+## Mise à jour des données
+
+Si `phacochr` repose essentiellement sur les données BeST, les données utilisées par le package ne sont pas directement celles que l'on peut télécharger sur le site où elles sont mises à disposition : https://opendata.bosa.be/. Les données BeST sur lesquelles est construit `phacochr` sont en effet transformées dans le but d'ajouter des options au, et d'augmenter la vitesse du géocodage.
+
+Voici quelques éléments constituant les transformations opérées. L'utilisateur/trice peut prendre connaissance de l'ensemble de ces transformations en consultant le [code de la fonction `phaco_best_data_update()` sur Github](https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R).
+
+* La distinction de numéros de boite différents pour le même numéro de rue est supprimée. *Par exemple, les numéros 52a et 52b sont tous deux ramenés au 52.*
+* Les rues sont doublées par langue, pour simplifier l'écriture du code de la fonction de géocodage. C'est notamment le cas pour Bruxelles, dont toutes les rues sont traduites en français et néérlandais. La même rue bruxelloise est sonc située sur deux lignes dans la base de données (une en fr, l'autre en nl).
+* Les numéros de rue avec coordonnées manquantes sont supprimées. *Ce problème de coordonnées manquantes concerne uniquement la Wallonie.*
+* Les coordonnées des milieux de rues sont calculées.
+* Des alias des rues avec prénoms sont créés pour que celles-ci existent dans une version avec prénom abrégé (les rues étant usuellement écrites de cette manière).
+* Les secteurs statistiques sont ajoutés aux données BeST à l'aide d'une jointure spatiale avec les données géospatiales. C'est notamment par le biais des secteurs statistiques que toutes les informations sont ajoutées aux adresses géocodées en fin de géocodage.
+* Les fichiers BeST sont simplifiés au maximum afin d'augmenter la vitesse du géocodage. Les fichiers BeST originaux font 960Mo ; nous les avons réduits à 140Mo. *Nous avons notamment diminué la précision des coordonnées au mètre pour diminuer la taille des fichiers.*
+* Les fichiers sont en outre scindés par arrondissement, afin de pouvoir charger uniquement les fichiers nécessaires lors du géocodage, réduisant significativement le temps de chargement pour géocoder les bases de données d'adresses ne couvrant pas tout le territoire belge.
+
+Ces opérations sont réalisées par le package lui-même à travers la fonction `phaco_best_data_update()`. La fonction télécharge les dernières données BeST sur le site officiel, les transforme, y intègre les secteurs statistiques à partir des données géospatiales et sauvegarde le résultat dans le répertoire de travail de `phacochr` pour être utilisées lors du géocodage. En outre, la fonction crée toutes les tables de conversions nécessaires au géocodage pour lier les divers éléments sur base de données effectivement utilisées par le package (dernières données BeST téléchargées et données géospatiales que nous avons intégrées).
+
+Cette manière de faire a l'avantage majeur que l'utilisateur/trice peut réaliser lui/elle-même la mise à jour des données. Les données BeST sont en effet mises à jour de manière hebdomadaire, et il aurait été beaucoup trop contraignant pour nous de mettre le package à jour toutes les semaines pour suivre ce rythme. La fonction de mise à jour se lance simplement de cette façon :
+
+``` r
+phaco_best_data_update()
+```
+
+La fonction détecte automatiquement si les données installées ont plus d'une semaine, pour éviter de faire une mise à jour pour rien. Si c'est bien le cas, elle procède alors aux téléchargements et calculs nécessaires pour créer les données. Les opérations sont nombreuses et peuvent prendre une dizaine de minutes pour être réalisées. L'avancement des opérations est indiqué par différents messages successifs dans la console.
+
+L'utilisateur/trice peut par ailleurs choisir le degré de précision des coordonnées X-Y lors de cette mise à jour avec le paramètre `précision` (par défaut réglé sur `"m"` - mètre). Si l'utilisateur/trice veut changer le degré de précision alors que les données ont moins d'une semaine, il/elle doit indiquer l'argument `force = TRUE`, forçant la mise à jour. Attention : augmenter le degré de précision diminue la vitesse de géocodage. Les arguments possibles de la fonction sont renseignés [dans le dictionnaire des fonctions](https://phacochr.github.io/phacochr/reference/phaco_best_data_update.html).
+
+``` r
+phaco_best_data_update(precision = "cm",
+                       force = TRUE)
+```
