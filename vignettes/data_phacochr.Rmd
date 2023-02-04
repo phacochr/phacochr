@@ -65,6 +65,9 @@ phaco_best_data_update()
 
 La fonction détecte automatiquement si les données installées ont plus d'une semaine, pour éviter de faire une mise à jour pour rien. Si c'est bien le cas, elle procède alors aux téléchargements et calculs nécessaires pour créer les données. Les opérations sont nombreuses et peuvent prendre une dizaine de minutes pour être réalisées. L'avancement des opérations est indiqué par différents messages successifs dans la console.
 
+
+## Précision du géocodage
+
 L'utilisateur/trice peut par ailleurs choisir le degré de précision des coordonnées X-Y lors de cette mise à jour avec le paramètre `précision` (par défaut réglé sur `"m"` - mètre). Si l'utilisateur/trice veut changer le degré de précision alors que les données ont moins d'une semaine, il/elle doit indiquer l'argument `force = TRUE`, forçant la mise à jour. Attention : augmenter le degré de précision diminue la vitesse de géocodage. Les arguments possibles de la fonction sont renseignés [dans le dictionnaire des fonctions](https://phacochr.github.io/phacochr/reference/phaco_best_data_update.html).
 
 ``` r

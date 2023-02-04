@@ -20,14 +20,14 @@ niveau de précision du géocodage est celui du bâtiment. Le package est
 très rapide pour géocoder de longues listes (la vitesse d’exécution se
 situe entre 0,4 et 0,8 secondes pour 100 adresses sur un ordinateur de
 puissance moyenne) et le taux de succès pour le géocodage est élevé
-(médiane de 97%). Voir plus bas le point [Performances et
-fiabilité](#performances-et-fiabilit%C3%A9) pour le détail des
-performances. Par ailleurs, le géocodage est réalisé entièrement en
-local, permettant une confidentialité maximale dans le cas d’adresses
-qui ne peuvent pas être envoyées sur des serveurs externes. `phacochr`
-constitue donc une alternative très performante face aux solutions
-existantes tout en reposant entièrement sur des données publiques et des
-procédures libres.
+(médiane de 97%). Voir la page [Performances et
+fiabilité](https://phacochr.github.io/phacochr/articles/performances.html)
+pour le détail des performances. Par ailleurs, le géocodage est réalisé
+entièrement en local, permettant une confidentialité maximale dans le
+cas d’adresses qui ne peuvent pas être envoyées sur des serveurs
+externes. `phacochr` constitue donc une alternative très performante
+face aux solutions existantes tout en reposant entièrement sur des
+données publiques et des procédures libres.
 
 Le programme fonctionne avec les données publiques [BeST
 Address](https://opendata.bosa.be/) compilées par BOSA à partir des
@@ -102,7 +102,10 @@ phaco_setup_data()
 Il est également possible pour l’utilisateur de mettre à jour lui-même
 les données [BeST Address](https://opendata.bosa.be/) (actualisées de
 manière hebdomadaire par BOSA) vers les dernières données disponibles en
-ligne avec la fonction `phaco_best_data_update()` :
+ligne avec la fonction `phaco_best_data_update()`. Voir la page dédiée à
+la [structure et la mise à jour des
+données](https://phacochr.github.io/phacochr/articles/data_phacochr.html)
+pour plus de précisions.
 
 ``` r
 phaco_best_data_update()
@@ -296,9 +299,9 @@ par `phacochr`. Celui-ci repose sur les données BeST Address, que nous
 avons reformatées pour optimiser le traitement. Nous avons également
 utilisé des données produites par Statbel et Urbis dans ce reformatage.
 Nous ne rentrons pas dans l’explication de ces modifications ici, et
-renvoyons au [code de la fonction `phaco_best_data_update()` disponible
-sur
-Github](https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R).
+renvoyons à la page dédiée à la [structure et la mise à jour des
+données](https://phacochr.github.io/phacochr/articles/data_phacochr.html)
+pour plus de précisions.
 
 Nous nous concentrons ici sur les opérations réalisées par la fonction
 `phaco_geocode()`, fonction de géocodage à proprement parler. Si l’on
@@ -369,9 +372,7 @@ créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 - Les codes INS des communes, arrondissements, provinces et regions
   (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les
   appelations classiques de Statbel ;
-- Toute une série d’indicateurs sur la qualité de la localisation (voir
-  point suivant [Performances et
-  fiabilité](#performances-et-fiabilit%C3%A9)).
+- Toute une série d’indicateurs sur la qualité de la localisation.
 
 Le résultat du géocodage est une liste (au sens de R). Il comprend trois
 objets :
@@ -398,48 +399,17 @@ alt="Tableau schématique du traitement opéré par phacochr" />
 par phacochr</figcaption>
 </figure>
 
-## Performances et fiabilité
+## Vérification du géocodage
 
-Nous présentons ici quelques mesures des performances de `phacochr`.
-Nous avons réalisé des tests sur 18 bases de données réelles fournies
-par des collègues (merci à elles et eux).
-
-La vitesse d’exécution par adresse suit une fonction inverse (1/x).
-`phacochr` est bien meilleur avec un nombre conséquent d’adresses. Ceci
-vient entre autre du fait qu’il doit charger des données volumineuses
-avant de réaliser les traitements : le “coût” marginal en temps de ce
-chargement est d’autant plus faible que les données sont nombreuses à
-géocoder. A partir de 2000 adresses, la vitesse d’exécution se situe
-entre 0,4 et 0,8 secondes / 100 adresses. A titre d’exemple, 2 adresses
-sont trouvées en 16s, géocoder 300 adresses prend environ 20s, 1000
-adresses 25s, 20 000 adresses 140s.
-
-<figure>
-<img src="man/figures/graph_temps_calcul.png" width="500"
-alt="Graphique du temps de calcul nécessaire pour géocoder avec phacochr selon le nombre d’adresses à géocoder" />
-<figcaption aria-hidden="true">Graphique du temps de calcul nécessaire
-pour géocoder avec phacochr selon le nombre d’adresses à
-géocoder</figcaption>
-</figure>
-
-`phacochr` possède une bonne capacité à trouver les adresses. Sur le
-même set de 18 bases de données, la médiane du pourcentage d’adresses
-trouvées est de 97%. Pour 7 bases de données sur les 18, `phacochr`
-trouve les coordonnées à plus de 98%, pour 6 bases de données entre 96%
-et 98% et pour 5 bases de données entre 90% et 96%.
-
-<figure>
-<img src="man/figures/graph_match_rate.png" width="500"
-alt="Graphique du pourcentage d’adresses géocodées" />
-<figcaption aria-hidden="true">Graphique du pourcentage d’adresses
-géocodées</figcaption>
-</figure>
-
-Ces résultats sur la performance sont à nuancer par le fait qu’il y a
-probablement des “faux positifs” (normalement peu nombreux avec les
-réglages par défaut). Pour avoir une idée de la qualité des résultats,
-il est conseillé de vérifier plusieurs éléments (la synthèse des
-indicateurs de qualité du géocodage est disponible au point [Colonnes
+Il peut possiblement y avoir de “faux positifs” lors du géocodage,
+c’est-à-dire que `phacochr` peut parfois associer une mauvaise rue à
+l’adresse encodée si celle-ci est trop mal orthographiée. Ces erreurs
+sont normalement peu nombreuses avec les réglages par défaut : voir la
+page [Performances et
+fiabilité](https://phacochr.github.io/phacochr/articles/performances.html).
+Pour avoir une idée de la qualité des résultats, il est malgré tout
+conseillé de vérifier plusieurs éléments (la synthèse des indicateurs de
+qualité du géocodage est disponible au point [Colonnes
 créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 
 - Vérifier globalement que les corrections orthographiques ont bien
@@ -463,27 +433,6 @@ créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
   demandé une localisation au numéro médian de la rue au code postal
   encodé. Examinez par précaution les adresses qui ont demandé une
   localisation à la rue (colonne `type_geocoding == mid_street`).
-
-Malgré cette mise en garde, `phacochr` reste fiable. Nous avons mesuré
-la *distance* (euclidienne, en mètres) entre la géolocalisation opérée
-par `phacochr` avec ses réglages par défaut et les coordonnées spatiales
-déjà présentes dans deux bases de données : celle des écoles
-néérlandophones et celle des pharmacies, les deux pour toute la
-Belgique. Cette distance peut être interprétée comme l’*erreur dans la
-géolocalisation* (bien qu’il est possible que les coordonnées déjà
-présentes dans ces deux bases de données ne soient pas précises : nous
-n’avons pas investigué la manière dont elles ont été produites). Le
-tableau suivant montre la répartition en pourcentages de cette erreur
-par classe de distance. On voit ainsi que 97,6% des adresses géocodées
-sont localisées à moins de 100m de leurs coordonnées “réelles”, montrant
-un degré de fiabilité tout à fait satisfaisant.
-
-<figure>
-<img src="man/figures/erreur.png" width="500"
-alt="Graphique de la répartition de l’erreur de géolocalisation" />
-<figcaption aria-hidden="true">Graphique de la répartition de l’erreur
-de géolocalisation</figcaption>
-</figure>
 
 ## Colonnes créées
 
@@ -535,6 +484,9 @@ En voici une liste exhaustive et commentée:
 | **MDRC**                     | Code du quartier monitoring pour Bruxelles (Urbis).                                                                                                                                                                                                                                                                                                     |
 | **NAME_FRE**                 | Nom du quartier monitoring pour Bruxelles en FR (Urbis).                                                                                                                                                                                                                                                                                                |
 | **NAME_DUT**                 | Nom du quartier monitoring pour Bruxelles en NL (Urbis).                                                                                                                                                                                                                                                                                                |
+| **phaco_anonymous**          | Colonne créée dans le cas où l’option d’anonymisation des résultats est enclenchée. Voir la page [Géocodage anonymisé](https://phacochr.github.io/phacochr/articles/anonymous_geocoding.html) pour plus de précisions.                                                                                                                                  |
+| **cd_sector_x\_31370**       | Les coordonnée X (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                          |
+| **cd_sector_y\_31370**       | Les coordonnée Y (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                          |
 
 ## Autres géocodeurs libres
 
