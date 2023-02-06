@@ -25,9 +25,11 @@ fiabilité](https://phacochr.github.io/phacochr/articles/performances.html)
 pour le détail des performances. Par ailleurs, le géocodage est réalisé
 entièrement en local, permettant une confidentialité maximale dans le
 cas d’adresses qui ne peuvent pas être envoyées sur des serveurs
-externes. `phacochr` constitue donc une alternative très performante
-face aux solutions existantes tout en reposant entièrement sur des
-données publiques et des procédures libres.
+externes (permettant notamment un [Géocodage
+anonymisé](https://phacochr.github.io/phacochr/articles/anonymous_geocoding.html)).
+`phacochr` constitue donc une alternative très performante face aux
+solutions existantes tout en reposant entièrement sur des données
+publiques et des procédures libres.
 
 Le programme fonctionne avec les données publiques [BeST
 Address](https://opendata.bosa.be/) compilées par BOSA à partir des
@@ -118,9 +120,7 @@ Voici un exemple de géocodage à partir des [données d’exemples
 contenues dans `phacochr` :
 
 ``` r
-x <- snacks
-
-head(x, 8)
+head(snacks, 8)
 #> # A tibble: 8 × 4
 #>   nom                   rue                         num   code_postal
 #>   <chr>                 <chr>                       <chr> <chr>      
@@ -148,7 +148,7 @@ fonction dispose de plusieurs options, voir le dictionnaire des
 fonctions : <https://phacochr.github.io/phacochr/reference/index.html>.
 
 ``` r
-result <- phaco_geocode(data_to_geocode = x,
+result <- phaco_geocode(data_to_geocode = snacks,
                         colonne_num = "num",
                         colonne_rue = "rue",
                         colonne_code_postal = "code_postal")
@@ -292,76 +292,23 @@ l’argument `colonne_rue_code_postal`.
 | rue Belliard <span style="color: #0000FF">1040</span> | :heavy_check_mark: | Lorsqu’un champ contient la rue et le code postal, ce dernier doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (peu courant). |
 | <span style="color: #FF0000">1040</span> rue Belliard |        :x:         | *Ici le code postal est au début du champ : il n’est donc pas repéré.*                                                                                              |
 
-## Logique du géocodage
+## Résultats et vérification du géocodage
 
-Nous expliquons ici avec plus de détail la logique du traitement réalisé
-par `phacochr`. Celui-ci repose sur les données BeST Address, que nous
-avons reformatées pour optimiser le traitement. Nous avons également
-utilisé des données produites par Statbel et Urbis dans ce reformatage.
-Nous ne rentrons pas dans l’explication de ces modifications ici, et
-renvoyons à la page dédiée à la [structure et la mise à jour des
-données](https://phacochr.github.io/phacochr/articles/data_phacochr.html)
-pour plus de précisions.
+Notre fonction de géocodage `phaco_geocode()` consiste à réaliser une
+multitude d’opérations à la suite pour pouvoir associer la bonne adresse
+des données BeST (comprenant les coordonnées) à chaque adresse encodée,
+malgré la présence potentielle de fautes d’orthographe ou de coquilles.
+Nous renvoyons à la page [Logique du
+géocodage](https://phacochr.github.io/phacochr/articles/geocoding_logic.html)
+pour mieux comprendre les opérations effectuées, et donc savoir
+déterminer les meilleurs réglages en fonction de la structure spécifique
+des données à géocoder.
 
-Nous nous concentrons ici sur les opérations réalisées par la fonction
-`phaco_geocode()`, fonction de géocodage à proprement parler. Si l’on
-schématise, ces opérations se classent en trois grandes familles :
-
-1)  **Formatage des données :** le programme détecte d’abord la
-    configuration des données à géocoder, et créé les colonnes nettoyées
-    de numéro de rue (si disponible, ce qui est souvent le cas), de rue
-    et de code postal. Des corrections sont faites pour chacun de ces
-    champs, afin de maximiser les chances de trouver l’adresse dans la
-    suite des opérations.
-
-2)  **Détection des rues :** `phacochr` procède alors à une *jointure
-    inexacte* entre chacune des rues (nettoyées au point précédent) et
-    l’ensemble des rue de BeST Address *au sein du code postal indiqué*.
-    Un matching inexact est nécessaire pour pouvoir apparier la rue des
-    données BeST (disons *Rue Belliard* au code postal 1040) avec la
-    même rue telle qu’elle est écrite concrètement dans la base de
-    données à géocoder, potentiellement avec des coquilles ou fautes
-    d’orthographe (par exemple *Rue Beliar* avec un seul *l* et sans
-    *d*, également au code postal 1040). Le matching inexact est
-    parallélisé sur les n-1 cores du CPU afin d’augmenter la vitesse du
-    traitement (de nombreuses combinaisons devant être calculées). Le
-    paramètre `error_max` permet d’indiquer l’erreur acceptable par
-    l’utilisateur. Celle-ci est réglée par défaut à `4`, ce qui permet
-    de trouver des rues mal orthographiées, sans les confondre avec
-    d’autres, avec un très bon taux de succès. Augmenter ce paramètre
-    accroît le pourcentage de rues trouvées, mais aussi d’erreurs
-    réalisées. Dans le cas où la langue dans laquelle les adresses sont
-    inscrites est connue, elle peut être renseignée via l’argument
-    `lang_encoded`, ce qui augmente la vitesse et la fiabilité du
-    processus en limitant le matching à la langue définie. Si la rue
-    n’est pas trouvée, le programme étend sa recherche à la commune
-    entière et à toutes les communes limitrophes. Cette procédure
-    optionnelle peut être désactivée avec le paramètre
-    `elargissement_com_adj = FALSE`.
-
-3)  **Jointure avec les coordonnées géographiques :** une fois les rues
-    trouvées, il est désormais possible de réaliser une *jointure
-    exacte* avec les données BeST géolocalisées au niveau du numéro,
-    celles-ci comprenant les coordonnées X-Y de l’ensemble des adresses
-    en Belgique. Pour ce faire, seuls les arrondissements dans lesquels
-    sont présents les codes postaux des données à géocoder sont chargés
-    en RAM, pour augmenter la vitesse du traitement et soulager
-    l’ordinateur. Les coordonnées des adresses qui ne sont pas trouvées
-    sont approximées en trouvant les coordonnées connues de l’adresse la
-    plus proche du même côté de la rue. L’amplitude maximale de cette
-    approximation est réglable avec le paramètre `approx_num_max` (réglé
-    par défaut à `50` ; indiquer `0` pour désactiver l’approximation).
-    Dans le cas où les coordonnées ne sont pas trouvées, ce sont celles
-    du numéro médian de la rue (proxy du milieu de la rue) qui sont
-    indiquées (option activée par défaut et désactivable avec l’argument
-    `mid_street = FALSE`). Si les données ne possèdent pas de numéro,
-    c’est cette information qui est indiquée comme résultat du
-    géocodage.
-
-La procédure de géocodage est alors terminée. Les coordonnées X-Y
-produites se trouvent dans les colonnes `x_31370` et `y_31370` au format
-Lambert 72. Outre ces coordonnées, sont jointes à chaque adresse trouvée
-différentes informations utiles. On y trouve notamment (la liste
+A l’issue du processus, le géocodage produit un dataframe identique à
+celui qui a été introduit en entrée mais incorporant désormais de
+nombreuses informations spatiales. Les principales sont les coordonnées
+X-Y qui se trouvent dans les colonnes `x_31370` et `y_31370` au format
+Lambert 72. Outre ces coordonnées, on trouve notamment (la liste
 complète est disponible au point [Colonnes
 créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 
@@ -372,7 +319,8 @@ créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
 - Les codes INS des communes, arrondissements, provinces et regions
   (ainsi que leurs noms en FR et NL) dans des colonnes qui suivent les
   appelations classiques de Statbel ;
-- Toute une série d’indicateurs sur la qualité de la localisation.
+- Toute une série d’indicateurs sur la qualité de la localisation (voir
+  plus bas).
 
 Le résultat du géocodage est une liste (au sens de R). Il comprend trois
 objets :
@@ -389,18 +337,6 @@ objets :
 - `summary` : un tableau avec quelques statistiques synthétiques
   indiquant la performance du géocodage.
 
-Le tableau ci-dessous schématise l’ensemble des opérations réalisées et
-expliquées précédemment :
-
-<figure>
-<img src="man/figures/phacochr4.png" width="580"
-alt="Tableau schématique du traitement opéré par phacochr" />
-<figcaption aria-hidden="true">Tableau schématique du traitement opéré
-par phacochr</figcaption>
-</figure>
-
-## Vérification du géocodage
-
 Il peut possiblement y avoir de “faux positifs” lors du géocodage,
 c’est-à-dire que `phacochr` peut parfois associer une mauvaise rue à
 l’adresse encodée si celle-ci est trop mal orthographiée. Ces erreurs
@@ -410,7 +346,7 @@ fiabilité](https://phacochr.github.io/phacochr/articles/performances.html).
 Pour avoir une idée de la qualité des résultats, il est malgré tout
 conseillé de vérifier plusieurs éléments (la synthèse des indicateurs de
 qualité du géocodage est disponible au point [Colonnes
-créées](#colonnes-cr%C3%A9%C3%A9es) en fin de page) :
+créées](#colonnes-cr%C3%A9%C3%A9es) ci-dessous) :
 
 - Vérifier globalement que les corrections orthographiques ont bien
   fonctionné (la colonne `rue_recoded` comprend la rue nettoyée et
@@ -442,51 +378,51 @@ spatiales (coordonnées X-Y et des informations administratives sur les
 entités spatiales) mais également d’indices sur la qualité du géocodage.
 En voici une liste exhaustive et commentée:
 
-| **Colonne créée**            | **Signification**                                                                                                                                                                                                                                                                                                                                       |
-|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **ID_address**               | Un identifiant unique par ligne du tableau original créé pour le bon fonctionnement de `phacochr`. Le nombre maximal de cet identifiant est égal au nombre de lignes du tableau.                                                                                                                                                                        |
-| **rue_recoded**              | La rue extraite, nettoyée et corrigée à partir du champ original contenant la rue. C’est par le biais de cette colonne qu’est réalisé le matching inexact pour la rue.                                                                                                                                                                                  |
-| **recode**                   | Indique les diffétents nettoyages / corrections réalisés pour obtenir `rue_recoded`.                                                                                                                                                                                                                                                                    |
-| **street_FINAL_detected**    | La rue détectée par `phacochr` issue des données BeST. *`NA` si aucune rue n’a été détectée*.                                                                                                                                                                                                                                                           |
-| **num_rue_clean**            | Le numéro de rue nettoyé (un nombre unique est extrait, sans lettres ou caractères typographiques).                                                                                                                                                                                                                                                     |
-| **code_postal_to_geocode**   | Le code postal nettoyé (sans nom de commune s’il était présent dans le champ original). Si la rue est trouvée dans une commune adjacente, le code postal où se trouve cette rue remplace le code postal original dans cette colonne.                                                                                                                    |
-| **street_id_phaco**          | L’identifiant numérique des rues BeST propre à `phacochr`. Cet identifiant est créé lors du géocodage. Ce champ n’est pas utile pour l’utilisateur.                                                                                                                                                                                                     |
-| **langue_FINAL_detected**    | La langue détectée d’écriture de la rue (`FR`, `NL` ou `DE`). *`NA` si aucune rue n’a été détectée*.                                                                                                                                                                                                                                                    |
-| **nom_propre_abv**           | Une valeur `1` indique que `phacochr` a détecté un nom propre abrégé dans le champ de rue original (*`NA` dans le cas contraire*). Cette information est produite durant le processus de détection des rues dans le but de maximiser la détection des rues dont les noms propres sont orthographiés avec des abréviations.                              |
-| **mid_num**                  | Le numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                    |
-| **mid_x\_31370**             | La coordonnée X (format: Lambert 72) du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                               |
-| **mid_y\_31370**             | La coordonnée Y (format: Lambert 72) du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                               |
-| **mid_cd_sector**            | Le secteur statistique du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                             |
-| **dist_fuzzy**               | Indique le nombre d’erreurs qui ont été nécessaires pour faire la jointure avec les données de rue BeST. La valeur maximale est égal à `error_max` (`4` par défaut); `0` signifie que le matching est exact. *`NA` si aucune rue n’a été détectée*.                                                                                                     |
-| **type_geocoding**           | Indique la nature du géocodage. Les rues dont la détection a nécessité un élargissement aux communes adjacentes sont indiquées par la valeur `elargissement_adj`. Les adresses qui ont demandé une localisation au numéro médian de la rue au code postal indiqué sont signalées par la valeur `mid_street`. Les autres cas présentent une valeur vide. |
-| **house_number_sans_lettre** | Le numéro qui a été géolocalisé dans les données BeST.                                                                                                                                                                                                                                                                                                  |
-| **x_31370**                  | Les coordonnée X (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (`type_geocoding == mid_street`), la valeur est la même que `mid_x_31370`. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                       |
-| **y_31370**                  | Les coordonnée Y (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (`type_geocoding == mid_street`), la valeur est la même que `mid_y_31370`. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                       |
-| **cd_sector**                | Le secteur statistique. Si la localisation n’a pu se faire qu’au numéro médian de la rue (`type_geocoding == mid_street`), la valeur est la même que `mid_cd_sector`. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                      |
-| **approx_num**               | Indique si la localisation n’a pas pu se faire au numéro indiqué. La valeur indique la distance entre le numéro “réel” indiqué et celui effectivement localisé. `0` si la localisation est exacte au numéro. *`NA` si aucune coordonnée n’a été trouvée au numéro exact ou approximé* (elles ont cependant pu l’être pour le milieu de la rue).         |
-| **tx_sector_descr_nl**       | Le nom du secteur statistique en NL (Statbel).                                                                                                                                                                                                                                                                                                          |
-| **tx_sector_descr_fr**       | Le nom du secteur statistique en FR (Statbel).                                                                                                                                                                                                                                                                                                          |
-| **cd_sub_munty**             | Code Refnis des subdivisions des communes (Statbel).                                                                                                                                                                                                                                                                                                    |
-| **tx_sub_munty_nl**          | Nom des subdivisions des communes en NL (Statbel).                                                                                                                                                                                                                                                                                                      |
-| **tx_sub_munty_fr**          | Nom des subdivisions des communes en FR (Statbel).                                                                                                                                                                                                                                                                                                      |
-| **cd_munty_refnis**          | Code Refnis des communes (Statbel).                                                                                                                                                                                                                                                                                                                     |
-| **tx_munty_descr_nl**        | Nom des subdivisions des communes en NL (Statbel).                                                                                                                                                                                                                                                                                                      |
-| **tx_munty_descr_fr**        | Nom des subdivisions des communes en FR (Statbel).                                                                                                                                                                                                                                                                                                      |
-| **cd_dstr_refnis**           | Code Refnis de l’arrondissement (Statbel).                                                                                                                                                                                                                                                                                                              |
-| **tx_adm_dstr_descr_nl**     | Nom de l’arrondissement en NL (Statbel).                                                                                                                                                                                                                                                                                                                |
-| **tx_adm_dstr_descr_fr**     | Nom de l’arrondissement en FR (Statbel).                                                                                                                                                                                                                                                                                                                |
-| **cd_prov_refnis**           | Code Refnis de la province (Statbel).                                                                                                                                                                                                                                                                                                                   |
-| **tx_prov_descr_nl**         | Nom de la province en NL (Statbel).                                                                                                                                                                                                                                                                                                                     |
-| **tx_prov_descr_fr**         | Nom de la province en FR (Statbel).                                                                                                                                                                                                                                                                                                                     |
-| **cd_rgn_refnis**            | Code Refnis de la région (Statbel).                                                                                                                                                                                                                                                                                                                     |
-| **tx_rgn_descr_nl**          | Nom de la région en NL (Statbel).                                                                                                                                                                                                                                                                                                                       |
-| **tx_rgn_descr_fr**          | Nom de la région en FR (Statbel).                                                                                                                                                                                                                                                                                                                       |
-| **MDRC**                     | Code du quartier monitoring pour Bruxelles (Urbis).                                                                                                                                                                                                                                                                                                     |
-| **NAME_FRE**                 | Nom du quartier monitoring pour Bruxelles en FR (Urbis).                                                                                                                                                                                                                                                                                                |
-| **NAME_DUT**                 | Nom du quartier monitoring pour Bruxelles en NL (Urbis).                                                                                                                                                                                                                                                                                                |
-| **phaco_anonymous**          | Colonne créée dans le cas où l’option d’anonymisation des résultats est enclenchée. Voir la page [Géocodage anonymisé](https://phacochr.github.io/phacochr/articles/anonymous_geocoding.html) pour plus de précisions.                                                                                                                                  |
-| **cd_sector_x\_31370**       | Les coordonnée X (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                          |
-| **cd_sector_y\_31370**       | Les coordonnée Y (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                          |
+| **Colonne créée**            | **Signification**                                                                                                                                                                                                                                                                                                                                                                                      |
+|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **ID_address**               | Un identifiant unique par ligne du tableau original créé pour le bon fonctionnement de `phacochr`. Le nombre maximal de cet identifiant est égal au nombre de lignes du tableau.                                                                                                                                                                                                                       |
+| **rue_recoded**              | La rue extraite, nettoyée et corrigée à partir du champ original contenant la rue. C’est par le biais de cette colonne qu’est réalisé le matching inexact pour la rue.                                                                                                                                                                                                                                 |
+| **recode**                   | Indique les diffétents nettoyages / corrections réalisés pour obtenir `rue_recoded`.                                                                                                                                                                                                                                                                                                                   |
+| **street_FINAL_detected**    | La rue détectée par `phacochr` issue des données BeST. *`NA` si aucune rue n’a été détectée*.                                                                                                                                                                                                                                                                                                          |
+| **num_rue_clean**            | Le numéro de rue nettoyé (un nombre unique est extrait, sans lettres ou caractères typographiques).                                                                                                                                                                                                                                                                                                    |
+| **code_postal_to_geocode**   | Le code postal nettoyé (sans nom de commune s’il était présent dans le champ original). Si la rue est trouvée dans une commune adjacente, le code postal où se trouve cette rue remplace le code postal original dans cette colonne.                                                                                                                                                                   |
+| **street_id_phaco**          | L’identifiant numérique des rues BeST propre à `phacochr`. Cet identifiant est créé lors du géocodage. Ce champ n’est pas utile pour l’utilisateur.                                                                                                                                                                                                                                                    |
+| **langue_FINAL_detected**    | La langue détectée d’écriture de la rue (`FR`, `NL` ou `DE`). *`NA` si aucune rue n’a été détectée*.                                                                                                                                                                                                                                                                                                   |
+| **nom_propre_abv**           | Une valeur `1` indique que `phacochr` a détecté un nom propre abrégé dans le champ de rue original (*`NA` dans le cas contraire*). Cette information est produite durant le processus de détection des rues dans le but de maximiser la détection des rues dont les noms propres sont orthographiés avec des abréviations.                                                                             |
+| **mid_num**                  | Le numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                                                                   |
+| **mid_x\_31370**             | La coordonnée X (format: Lambert 72) du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                              |
+| **mid_y\_31370**             | La coordonnée Y (format: Lambert 72) du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                              |
+| **mid_cd_sector**            | Le secteur statistique du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                                            |
+| **dist_fuzzy**               | Indique le nombre d’erreurs qui ont été nécessaires pour faire la jointure avec les données de rue BeST. La valeur maximale est égal à `error_max` (`4` par défaut); `0` signifie que le matching est exact. *`NA` si aucune rue n’a été détectée*.                                                                                                                                                    |
+| **type_geocoding**           | Indique la nature du géocodage. Les rues dont la détection a nécessité un élargissement aux communes adjacentes sont indiquées par la valeur `elargissement_adj`. Les adresses qui ont demandé une localisation au numéro médian de la rue au code postal indiqué sont signalées par la valeur `mid_street`. Les autres cas présentent une valeur vide.                                                |
+| **house_number_sans_lettre** | Le numéro qui a été géolocalisé dans les données BeST.                                                                                                                                                                                                                                                                                                                                                 |
+| **x_31370**                  | La coordonnée X (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (`type_geocoding == mid_street`), la valeur est la même que `mid_x_31370`. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                       |
+| **y_31370**                  | La coordonnée Y (format: Lambert 72) du numéro indiqué. Si la localisation n’a pu se faire qu’au numéro médian de la rue (`type_geocoding == mid_street`), la valeur est la même que `mid_y_31370`. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                       |
+| **cd_sector**                | Le secteur statistique. Si la localisation n’a pu se faire qu’au numéro médian de la rue (`type_geocoding == mid_street`), la valeur est la même que `mid_cd_sector`. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                     |
+| **approx_num**               | Indique si la localisation n’a pas pu se faire au numéro indiqué. La valeur indique la distance entre le numéro “réel” indiqué et celui effectivement localisé. `0` si la localisation est exacte au numéro. *`NA` si aucune coordonnée n’a été trouvée au numéro exact ou approximé* (elles ont cependant pu l’être pour le milieu de la rue).                                                        |
+| **tx_sector_descr_nl**       | Le nom du secteur statistique en NL (Statbel).                                                                                                                                                                                                                                                                                                                                                         |
+| **tx_sector_descr_fr**       | Le nom du secteur statistique en FR (Statbel).                                                                                                                                                                                                                                                                                                                                                         |
+| **cd_sub_munty**             | Code Refnis des subdivisions des communes (Statbel).                                                                                                                                                                                                                                                                                                                                                   |
+| **tx_sub_munty_nl**          | Nom des subdivisions des communes en NL (Statbel).                                                                                                                                                                                                                                                                                                                                                     |
+| **tx_sub_munty_fr**          | Nom des subdivisions des communes en FR (Statbel).                                                                                                                                                                                                                                                                                                                                                     |
+| **cd_munty_refnis**          | Code Refnis des communes (Statbel).                                                                                                                                                                                                                                                                                                                                                                    |
+| **tx_munty_descr_nl**        | Nom des subdivisions des communes en NL (Statbel).                                                                                                                                                                                                                                                                                                                                                     |
+| **tx_munty_descr_fr**        | Nom des subdivisions des communes en FR (Statbel).                                                                                                                                                                                                                                                                                                                                                     |
+| **cd_dstr_refnis**           | Code Refnis de l’arrondissement (Statbel).                                                                                                                                                                                                                                                                                                                                                             |
+| **tx_adm_dstr_descr_nl**     | Nom de l’arrondissement en NL (Statbel).                                                                                                                                                                                                                                                                                                                                                               |
+| **tx_adm_dstr_descr_fr**     | Nom de l’arrondissement en FR (Statbel).                                                                                                                                                                                                                                                                                                                                                               |
+| **cd_prov_refnis**           | Code Refnis de la province (Statbel).                                                                                                                                                                                                                                                                                                                                                                  |
+| **tx_prov_descr_nl**         | Nom de la province en NL (Statbel).                                                                                                                                                                                                                                                                                                                                                                    |
+| **tx_prov_descr_fr**         | Nom de la province en FR (Statbel).                                                                                                                                                                                                                                                                                                                                                                    |
+| **cd_rgn_refnis**            | Code Refnis de la région (Statbel).                                                                                                                                                                                                                                                                                                                                                                    |
+| **tx_rgn_descr_nl**          | Nom de la région en NL (Statbel).                                                                                                                                                                                                                                                                                                                                                                      |
+| **tx_rgn_descr_fr**          | Nom de la région en FR (Statbel).                                                                                                                                                                                                                                                                                                                                                                      |
+| **MDRC**                     | Code du quartier monitoring pour Bruxelles (Urbis).                                                                                                                                                                                                                                                                                                                                                    |
+| **NAME_FRE**                 | Nom du quartier monitoring pour Bruxelles en FR (Urbis).                                                                                                                                                                                                                                                                                                                                               |
+| **NAME_DUT**                 | Nom du quartier monitoring pour Bruxelles en NL (Urbis).                                                                                                                                                                                                                                                                                                                                               |
+| **phaco_anonymous**          | Colonne créée dans le cas où l’option d’anonymisation des résultats est enclenchée. `1` signifie que le géocodage a été réalisé (même si le numéro a été approximé ou que l’adresse a été située au milieu de la rue). *`NA` si aucune coordonnée n’a été trouvée*. Voir la page [Géocodage anonymisé](https://phacochr.github.io/phacochr/articles/anonymous_geocoding.html) pour plus de précisions. |
+| **cd_sector_x\_31370**       | La coordonnée X (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                                                                          |
+| **cd_sector_y\_31370**       | La coordonnée Y (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                                                                          |
 
 ## Autres géocodeurs libres
 

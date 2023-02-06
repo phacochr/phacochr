@@ -29,12 +29,14 @@ navbar:
     href: reference/index.html
   - text: Articles
     menu:
+    - text: Logique du géocodage
+      href: articles/geocoding_logic.html
     - text: Structure et mise à jour des données BeST
       href: articles/data_phacochr.html
-    - text: Géocodage anonymisé
-      href: articles/anonymous_geocoding.html
     - text: Performances et fiabilité
       href: articles/performances.html
+    - text: Géocodage anonymisé
+      href: articles/anonymous_geocoding.html
   - text: Géocoder
     href: articles/shiny_app.html
   right:
