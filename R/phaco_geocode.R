@@ -74,6 +74,94 @@ phaco_geocode <- function(data_to_geocode,
     path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
   }
 
+  # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/
+  `%ni%` <- Negate(`%in%`)
+
+  # Ne pas lancer la fonction si les arguments ne sont pas corrects
+  # NOTE : on pourrait tester qu'on n'introduit pas un vecteur avec plusieurs valeurs au lieu d'une => mais c'est une erreur moins probable
+  if(!is.null(colonne_rue)) {
+    if(!is.character(colonne_rue)){
+      cat("\n")
+      stop(paste0("\u2716"," colonne_rue doit etre un vecteur string"))
+    }
+  }
+  if(!is.null(colonne_num)) {
+    if(!is.character(colonne_num)){
+      cat("\n")
+      stop(paste0("\u2716"," colonne_num doit etre un vecteur string"))
+    }
+  }
+  if(!is.null(colonne_code_postal)) {
+    if(!is.character(colonne_code_postal)){
+      cat("\n")
+      stop(paste0("\u2716"," colonne_code_postal doit etre un vecteur string"))
+    }
+  }
+  if(!is.null(colonne_num_rue)) {
+    if(!is.character(colonne_num_rue)){
+      cat("\n")
+      stop(paste0("\u2716"," colonne_num_rue doit etre un vecteur string"))
+    }
+  }
+  if(!is.null(colonne_num_rue_code_postal)) {
+    if(!is.character(colonne_num_rue_code_postal)){
+      cat("\n")
+      stop(paste0("\u2716"," colonne_num_rue_code_postal doit etre un vecteur string"))
+    }
+  }
+  if(!is.null(colonne_rue_code_postal)) {
+    if(!is.character(colonne_rue_code_postal)){
+      cat("\n")
+      stop(paste0("\u2716"," colonne_rue_code_postal doit etre un vecteur string"))
+    }
+  }
+  if(!is.character(method_stringdist)) {
+    cat("\n")
+    stop(paste0("\u2716"," method_stringdist doit etre un vecteur string"))
+  }
+  if(sum(method_stringdist %in% c("osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw", "soundex")) == 0) {
+    cat("\n")
+    stop(paste0("\u2716"," method_stringdist doit prendre une des valeurs : 'osa', 'lv', 'dl', 'hamming', 'lcs', 'qgram', 'cosine', 'jaccard', 'jw', 'soundex'"))
+  }
+  if(!is.logical(corrections_REGEX)) {
+    cat("\n")
+    stop(paste0("\u2716"," corrections_REGEX doit etre une valeur logique"))
+  }
+  if(!is.numeric(error_max)) {
+    cat("\n")
+    stop(paste0("\u2716"," corrections_REGEX doit etre une valeur numerique"))
+  }
+  if(!is.numeric(approx_num_max)) {
+    cat("\n")
+    stop(paste0("\u2716"," approx_num_max doit etre une valeur numerique"))
+  }
+  if(!is.logical(elargissement_com_adj)) {
+    cat("\n")
+    stop(paste0("\u2716"," elargissement_com_adj doit etre une valeur logique"))
+  }
+  if(!is.logical(mid_street)) {
+    cat("\n")
+    stop(paste0("\u2716"," mid_street doit etre une valeur logique"))
+  }
+  if(!is.character(lang_encoded)) {
+    cat("\n")
+    stop(paste0("\u2716"," lang_encoded doit etre un vecteur string"))
+  }
+  if(sum(lang_encoded %in% c("FR", "NL", "DE")) == 0) {
+    cat("\n")
+    stop(paste0("\u2716"," lang_encoded doit prendre une des valeurs : 'FR', 'NL', 'DE'"))
+  }
+  if(!is.logical(anonymous)) {
+    cat("\n")
+    stop(paste0("\u2716"," anonymous doit etre une valeur logique"))
+  }
+  if(!is.null(path_data)) {
+    if(!is.character(path_data)){
+      cat("\n")
+      stop(paste0("\u2716"," path_data doit etre une valeur string"))
+    }
+  }
+
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
   if(sum(
     file.exists(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"),
@@ -168,9 +256,6 @@ phaco_geocode <- function(data_to_geocode,
 
 
   ## 1. Formatage des donnees -----------------------------------------------------------------------------------------------------------------
-
-  # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/
-  `%ni%` <- Negate(`%in%`)
 
   colourise("\u2139", fg= "blue")
 
