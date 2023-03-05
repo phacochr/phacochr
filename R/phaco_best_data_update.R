@@ -27,6 +27,20 @@
 
 phaco_best_data_update <- function(force=FALSE,
                                    precision="m") {
+
+  if(!is.logical(force)) {
+    cat("\n")
+    stop(paste0("\u2716"," force doit etre une valeur logique"))
+  }
+  if(!is.character(precision)) {
+    cat("\n")
+    stop(paste0("\u2716"," precision doit etre un vecteur string"))
+  }
+  if(sum(precision %in% c("m", "dm", "cm", "mm")) == 0) {
+    cat("\n")
+    stop(paste0("\u2716"," precision doit prendre une des valeurs : 'm', 'dm', 'cm', 'mm'"))
+  }
+
   options(warn=-1) # supprime les warnings
 
   if(precision=="m"){

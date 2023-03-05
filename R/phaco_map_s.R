@@ -20,10 +20,35 @@
 #'
 phaco_map_s <- function(FULL_GEOCODING_sf,
                         colonne_ponderation = NULL,
-                        title_carto = paste0("adresses geocodees"),
+                        title_carto = "adresses geocodees",
                         filter_bxl = FALSE,
                         zoom_geocoded = FALSE,
                         nom_admin = TRUE){
+
+  # Ne pas lancer la fonction si les arguments ne sont pas corrects
+  # NOTE : on pourrait tester qu'on n'introduit pas un vecteur avec plusieurs valeurs au lieu d'une => mais c'est une erreur moins probable
+  if(!is.null(colonne_ponderation)) {
+    if(!is.character(colonne_ponderation)){
+      cat("\n")
+      stop(paste0("\u2716"," colonne_ponderation doit etre un vecteur string"))
+    }
+  }
+  if(!is.character(title_carto)) {
+    cat("\n")
+    stop(paste0("\u2716"," title_carto doit etre un vecteur string"))
+  }
+  if(!is.logical(filter_bxl)) {
+    cat("\n")
+    stop(paste0("\u2716"," filter_bxl doit etre une valeur logique"))
+  }
+  if(!is.logical(zoom_geocoded)) {
+    cat("\n")
+    stop(paste0("\u2716"," zoom_geocoded doit etre une valeur logique"))
+  }
+  if(!is.logical(nom_admin)) {
+    cat("\n")
+    stop(paste0("\u2716"," nom_admin doit etre une valeur logique"))
+  }
 
   # Definition du chemin ou se trouve les donnees
   path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows

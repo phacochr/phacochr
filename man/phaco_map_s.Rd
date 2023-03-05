@@ -7,7 +7,7 @@
 phaco_map_s(
   FULL_GEOCODING_sf,
   colonne_ponderation = NULL,
-  title_carto = paste0("adresses geocodees"),
+  title_carto = "adresses geocodees",
   filter_bxl = FALSE,
   zoom_geocoded = FALSE,
   nom_admin = TRUE

@@ -51,7 +51,7 @@ Voici quelques éléments constituant les transformations opérées. L'utilisate
 * Les numéros de rue avec coordonnées manquantes sont supprimées. *Ce problème de coordonnées manquantes concerne uniquement la Wallonie.*
 * Les coordonnées des milieux de rues sont calculées.
 * Des alias des rues avec prénoms sont créés pour que celles-ci existent dans une version avec prénom abrégé (les rues étant usuellement écrites de cette manière).
-* Les secteurs statistiques sont ajoutés aux données BeST à l'aide d'une jointure spatiale avec les données géospatiales. C'est notamment par le biais des secteurs statistiques que toutes les informations sont ajoutées aux adresses géocodées en fin de géocodage.
+* Les secteurs statistiques sont ajoutés aux données BeST à l'aide d'une jointure spatiale avec les données de Statbel. C'est par le biais des secteurs statistiques que les autres informations administratives (quartiers du monitoring, (sous-)communes...) sont ajoutées aux adresses géocodées en fin de géocodage.
 * Les fichiers BeST sont simplifiés au maximum afin d'augmenter la vitesse du géocodage. Les fichiers BeST originaux font 960Mo ; nous les avons réduits à 140Mo. *Nous avons notamment diminué la précision des coordonnées au mètre pour diminuer la taille des fichiers.*
 * Les fichiers sont en outre scindés par arrondissement, afin de pouvoir charger uniquement les fichiers nécessaires lors du géocodage, réduisant significativement le temps de chargement pour géocoder les bases de données d'adresses ne couvrant pas tout le territoire belge.
 
