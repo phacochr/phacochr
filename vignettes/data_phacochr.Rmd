@@ -42,7 +42,7 @@ Le fait que les données ne soient pas intégrées a deux avantages :
 
 ## Mise à jour des données
 
-Si `phacochr` repose essentiellement sur les données BeST, les données utilisées par le package ne sont pas directement celles que l'on peut télécharger sur le site où elles sont mises à disposition : https://opendata.bosa.be/. Les données BeST sur lesquelles est construit `phacochr` sont en effet transformées dans le but d'ajouter des options au, et d'augmenter la vitesse du géocodage.
+Bien que `phacochr` repose essentiellement sur les données BeST, les données utilisées par le package ne sont pas directement celles que l'on peut télécharger sur le site où elles sont mises à disposition : https://opendata.bosa.be/. Les données BeST sur lesquelles est construit `phacochr` sont en effet transformées dans le but d'ajouter des options au, et d'augmenter la vitesse du géocodage.
 
 Voici quelques éléments constituant les transformations opérées. L'utilisateur/trice peut prendre connaissance de l'ensemble de ces transformations en consultant le [code de la fonction `phaco_best_data_update()` sur Github](https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R).
 
@@ -55,7 +55,7 @@ Voici quelques éléments constituant les transformations opérées. L'utilisate
 * Les fichiers BeST sont simplifiés au maximum afin d'augmenter la vitesse du géocodage. Les fichiers BeST originaux font 960Mo ; nous les avons réduits à 140Mo. *Nous avons notamment diminué la précision des coordonnées au mètre pour diminuer la taille des fichiers.*
 * Les fichiers sont en outre scindés par arrondissement, afin de pouvoir charger uniquement les fichiers nécessaires lors du géocodage, réduisant significativement le temps de chargement pour géocoder les bases de données d'adresses ne couvrant pas tout le territoire belge.
 
-Ces opérations sont réalisées par le package lui-même à travers la fonction `phaco_best_data_update()`. La fonction télécharge les dernières données BeST sur le site officiel, les transforme, y intègre les secteurs statistiques à partir des données de Statbel et sauvegarde le résultat dans le répertoire de travail de `phacochr` pour être utilisées lors du géocodage. En outre, la fonction crée toutes les tables de conversions nécessaires au géocodage pour lier les divers éléments sur base de données effectivement utilisées par le package (dernières données BeST téléchargées et données géospatiales que nous avons intégrées).
+Ces opérations sont réalisées par le package lui-même à travers la fonction `phaco_best_data_update()`. La fonction télécharge les dernières données BeST sur le site officiel, les transforme, y intègre les secteurs statistiques à partir des données de Statbel et sauvegarde le résultat dans le répertoire de travail de `phacochr` pour être utilisées lors du géocodage. En outre, la fonction crée toutes les tables de conversion nécessaires au géocodage.
 
 Cette manière de faire a l'avantage majeur que l'utilisateur/trice peut réaliser lui/elle-même la mise à jour des données. Les données BeST sont en effet mises à jour de manière hebdomadaire, et il aurait été beaucoup trop contraignant pour nous de mettre le package à jour toutes les semaines pour suivre ce rythme. La fonction de mise à jour se lance simplement de cette façon :
 
