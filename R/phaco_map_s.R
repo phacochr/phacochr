@@ -120,17 +120,19 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     mf_map(x = BXL_communes, col = NA, border = "gray40", lwd = 1.5, add = TRUE)
     mf_map(x = BRUXELLES, col = NA, border = "black", lwd = 2, add = TRUE)
     if("phaco_anonymous" %in% names(FULL_GEOCODING_sf_carto)){
-      mf_map(
-        x = st_point_on_surface(BXL_SS),
-        var = "n_cd_sector",
-        type = "prop",
-        inches = 0.10,
-        col = "#fa6096",
-        border = "#a00b3f",
-        leg_pos = "topleft",
-        leg_title = "Nombre d'adresses",
-        leg_val_rnd = 0,
-        add = TRUE
+      suppressWarnings(
+        mf_map(
+          x = st_point_on_surface(BXL_SS[!is.na(BXL_SS$n_cd_sector),]),
+          var = "n_cd_sector",
+          type = "prop",
+          inches = 0.10,
+          col = "#fa6096",
+          border = "#a00b3f",
+          leg_pos = "topleft",
+          leg_title = "Nombre d'adresses",
+          leg_val_rnd = 0,
+          add = TRUE
+        )
       )
     } else {
       mf_map(x = FULL_GEOCODING_sf_carto,
@@ -140,14 +142,16 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
              add = TRUE)
     }
     if(nom_admin == TRUE){
-      mf_label(
-       x = st_point_on_surface(BXL_communes),
-       var = "tx_munty_descr_fr",
-       col= "#18707b",
-       halo = TRUE,
-       overlap = FALSE,
-       lines = FALSE
-     )
+      suppressWarnings(
+        mf_label(
+         x = st_point_on_surface(BXL_communes),
+         var = "tx_munty_descr_fr",
+         col= "#18707b",
+         halo = TRUE,
+         overlap = FALSE,
+         lines = FALSE
+       )
+      )
     }
     mf_layout(
       title = paste("Cartographie :", title_carto),
@@ -188,17 +192,19 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     mf_map(x = BE_regions, col = NA, border = "black", lwd = 2, add = TRUE)
     #mf_map(x = BELGIQUE, col = NA, border = "black", lwd = 2.5, add = TRUE)
     if("phaco_anonymous" %in% names(FULL_GEOCODING_sf_carto)){
-      mf_map(
-        x = st_point_on_surface(BE_SS),
-        var = "n_cd_sector",
-        type = "prop",
-        inches = 0.04,
-        col = "#fa6096",
-        border = "#a00b3f",
-        leg_pos = "topleft",
-        leg_title = "Nombre d'adresses",
-        leg_val_rnd = 0,
-        add = TRUE
+      suppressWarnings(
+        mf_map(
+          x = st_point_on_surface(BE_SS[!is.na(BE_SS$n_cd_sector),]),
+          var = "n_cd_sector",
+          type = "prop",
+          inches = 0.04,
+          col = "#fa6096",
+          border = "#a00b3f",
+          leg_pos = "topleft",
+          leg_title = "Nombre d'adresses",
+          leg_val_rnd = 0,
+          add = TRUE
+        )
       )
     } else {
       mf_map(x = FULL_GEOCODING_sf_carto,
@@ -208,14 +214,16 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
              add = TRUE)
     }
     if(nom_admin == TRUE){
-      mf_label(
-       x = st_point_on_surface(BE_provinces),
-       var = "tx_prov_descr_fr",
-       col= "#18707b",
-       halo = TRUE,
-       overlap = FALSE,
-       lines = FALSE
-       )
+      suppressWarnings(
+        mf_label(
+         x = st_point_on_surface(BE_provinces),
+         var = "tx_prov_descr_fr",
+         col= "#18707b",
+         halo = TRUE,
+         overlap = FALSE,
+         lines = FALSE
+         )
+      )
     }
     mf_layout(
       title = paste("Cartographie :", title_carto),
