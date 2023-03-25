@@ -79,6 +79,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # Ne pas lancer la fonction si les arguments ne sont pas corrects
   # NOTE : on pourrait tester qu'on n'introduit pas un vecteur avec plusieurs valeurs au lieu d'une => mais c'est une erreur moins probable
+  # NOTE2 : simplification avec une boucle ?
   if(!is.null(colonne_rue)) {
     if(!is.character(colonne_rue)){
       cat("\n")
@@ -119,6 +120,7 @@ phaco_geocode <- function(data_to_geocode,
     cat("\n")
     stop(paste0("\u2716"," method_stringdist doit etre un vecteur string"))
   }
+  method_stringdist <- str_to_lower(method_stringdist) # Au cas ou l'utilisateur aurait introduit les langues en majuscule
   if(sum(method_stringdist %in% c("osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw", "soundex")) == 0) {
     cat("\n")
     stop(paste0("\u2716"," method_stringdist doit prendre une des valeurs : 'osa', 'lv', 'dl', 'hamming', 'lcs', 'qgram', 'cosine', 'jaccard', 'jw', 'soundex'"))
@@ -147,6 +149,7 @@ phaco_geocode <- function(data_to_geocode,
     cat("\n")
     stop(paste0("\u2716"," lang_encoded doit etre un vecteur string"))
   }
+  lang_encoded <- str_to_upper(lang_encoded) # Au cas ou l'utilisateur aurait introduit les langues en minuscule
   if(sum(lang_encoded %in% c("FR", "NL", "DE")) == 0) {
     cat("\n")
     stop(paste0("\u2716"," lang_encoded doit prendre une des valeurs : 'FR', 'NL', 'DE'"))

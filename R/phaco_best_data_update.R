@@ -36,6 +36,7 @@ phaco_best_data_update <- function(force=FALSE,
     cat("\n")
     stop(paste0("\u2716"," precision doit etre un vecteur string"))
   }
+  precision <- str_to_lower(precision) # Au cas ou l'utilisateur aurait introduit la precision en majuscule
   if(sum(precision %in% c("m", "dm", "cm", "mm")) == 0) {
     cat("\n")
     stop(paste0("\u2716"," precision doit prendre une des valeurs : 'm', 'dm', 'cm', 'mm'"))
