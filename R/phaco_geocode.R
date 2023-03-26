@@ -161,7 +161,7 @@ phaco_geocode <- function(data_to_geocode,
   if(!is.null(path_data)) {
     if(!is.character(path_data)){
       cat("\n")
-      stop(paste0("\u2716"," path_data doit etre une valeur string"))
+      stop(paste0("\u2716"," path_data doit etre un vecteur string"))
     }
   }
 
