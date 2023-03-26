@@ -131,7 +131,7 @@ phaco_geocode <- function(data_to_geocode,
   }
   if(!is.numeric(error_max)) {
     cat("\n")
-    stop(paste0("\u2716"," corrections_REGEX doit etre une valeur numerique"))
+    stop(paste0("\u2716"," error_max doit etre une valeur numerique"))
   }
   if(!is.numeric(approx_num_max)) {
     cat("\n")
