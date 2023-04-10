@@ -45,7 +45,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     }
   }
 
-  # Ici plus de boucle, pas nécessaire
+  # Ici plus de boucle, pas necessaire
   if(!is.null(colonne_ponderation)) {
     if(length(colonne_ponderation) > 1) {
       cat("\n")

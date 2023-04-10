@@ -130,7 +130,7 @@ phaco_geocode <- function(data_to_geocode,
     }
   }
 
-  # Ici plus de boucle, pas nécessaire
+  # Ici plus de boucle, pas necessaire
   if(length(method_stringdist) > 1) {
     cat("\n")
     stop(paste0("\u2716 "," method_stringdist doit etre un vecteur de longueur 1"))
