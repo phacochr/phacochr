@@ -9,6 +9,7 @@ phaco_map_s(
   colonne_ponderation = NULL,
   title_carto = "adresses geocodees",
   filter_bxl = FALSE,
+  aggreg_sector = FALSE,
   zoom_geocoded = FALSE,
   nom_admin = TRUE
 )
@@ -21,6 +22,8 @@ phaco_map_s(
 \item{title_carto}{Le titre de la carte produite.}
 
 \item{filter_bxl}{Afficher uniquement Bruxelles.}
+
+\item{aggreg_sector}{Procède à l'agrégation des points par secteur statistique pour réaliser la cartographie.}
 
 \item{zoom_geocoded}{Zoomer sur les points.}
 

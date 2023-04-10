@@ -6,6 +6,7 @@
 #' @param title_carto Le titre de la carte produite.
 #' @param colonne_ponderation Un poids pour les points a cartographier.
 #' @param filter_bxl Afficher uniquement Bruxelles.
+#' @param aggreg_sector Procède à l'agrégation des points par secteur statistique pour réaliser la cartographie.
 #' @param zoom_geocoded Zoomer sur les points.
 #' @param nom_admin Afficher les noms des entités administratives sur la carte.
 #'
@@ -22,32 +23,46 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
                         colonne_ponderation = NULL,
                         title_carto = "adresses geocodees",
                         filter_bxl = FALSE,
+                        aggreg_sector = FALSE,
                         zoom_geocoded = FALSE,
                         nom_admin = TRUE){
 
   # Ne pas lancer la fonction si les arguments ne sont pas corrects
-  # NOTE : on pourrait tester qu'on n'introduit pas un vecteur avec plusieurs valeurs au lieu d'une => mais c'est une erreur moins probable
+  # La logique : une boucle sur les arguments de la fonction stockes dans une liste (pour ne pas changer leur type : string, logical...)
+  list_arg_logical <- list(filter_bxl = filter_bxl,
+                           aggreg_sector = aggreg_sector,
+                           zoom_geocoded = zoom_geocoded,
+                           nom_admin = nom_admin)
+
+  for (i in seq_along(list_arg_logical)) {
+    if(length(list_arg_logical[[i]]) > 1) {
+      cat("\n")
+      stop(paste0("\u2716 ", names(list_arg_logical[i]), " doit etre un vecteur de longueur 1"))
+    }
+    if(!is.logical(list_arg_logical[[i]])) {
+      cat("\n")
+      stop(paste0("\u2716 ", names(list_arg_logical[i]), " doit etre une valeur logique"))
+    }
+  }
+
+  # Ici plus de boucle, pas nécessaire
   if(!is.null(colonne_ponderation)) {
+    if(length(colonne_ponderation) > 1) {
+      cat("\n")
+      stop(paste0("\u2716 "," colonne_ponderation doit etre un vecteur de longueur 1"))
+    }
     if(!is.character(colonne_ponderation)){
       cat("\n")
       stop(paste0("\u2716"," colonne_ponderation doit etre un vecteur string"))
     }
   }
+  if(length(title_carto) > 1) {
+    cat("\n")
+    stop(paste0("\u2716 "," title_carto doit etre un vecteur de longueur 1"))
+  }
   if(!is.character(title_carto)) {
     cat("\n")
     stop(paste0("\u2716"," title_carto doit etre un vecteur string"))
-  }
-  if(!is.logical(filter_bxl)) {
-    cat("\n")
-    stop(paste0("\u2716"," filter_bxl doit etre une valeur logique"))
-  }
-  if(!is.logical(zoom_geocoded)) {
-    cat("\n")
-    stop(paste0("\u2716"," zoom_geocoded doit etre une valeur logique"))
-  }
-  if(!is.logical(nom_admin)) {
-    cat("\n")
-    stop(paste0("\u2716"," nom_admin doit etre une valeur logique"))
   }
 
   # Definition du chemin ou se trouve les donnees
@@ -85,8 +100,13 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
       mutate(CARTO_weight = 1)
   }
 
-  # On cree un calcul des effectifs par sect stat en cas d'anonymisation (joint avec BXL_SS ou BE_SS)
+  # Si la colonne phaco_anonymous existe dans les donnees => agregation par secteur stat activee
   if("phaco_anonymous" %in% names(FULL_GEOCODING_sf_carto)){
+    aggreg_sector <- TRUE
+  }
+
+  # On cree un calcul des effectifs par sect stat en cas d'anonymisation (joint avec BXL_SS ou BE_SS)
+  if(aggreg_sector == TRUE){
     n_geocoding <- FULL_GEOCODING_sf_carto %>%
       as.data.frame() %>%
       select(-geometry) %>%
@@ -105,7 +125,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     # a) Geopackages --------------------------------------------------------------------------------------------------------------------------
 
     BXL_communes <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BXL_communes_PREPROCESSED.gpkg"), quiet=T)
-    if("phaco_anonymous" %in% names(FULL_GEOCODING_sf_carto)){
+    if(aggreg_sector == TRUE){
       BXL_SS <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BXL_SS_PREPROCESSED.gpkg"), quiet=T) %>%
         left_join(n_geocoding, by = "cd_sector") # Je joins les effectifs par sect stat
     } else {
@@ -119,7 +139,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     mf_map(x = BXL_SS, col = "white", border = "gray85")
     mf_map(x = BXL_communes, col = NA, border = "gray40", lwd = 1.5, add = TRUE)
     mf_map(x = BRUXELLES, col = NA, border = "black", lwd = 2, add = TRUE)
-    if("phaco_anonymous" %in% names(FULL_GEOCODING_sf_carto)){
+    if(aggreg_sector == TRUE){
       mf_map(
         x = suppressWarnings(st_point_on_surface(BXL_SS[!is.na(BXL_SS$n_cd_sector),])),
         var = "n_cd_sector",
@@ -167,7 +187,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     BE_communes <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_communes_PREPROCESSED.gpkg"), quiet=T)
     BE_provinces <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_provinces_PREPROCESSED.gpkg"), quiet=T)
     BE_regions <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_regions_PREPROCESSED.gpkg"), quiet=T)
-    if("phaco_anonymous" %in% names(FULL_GEOCODING_sf_carto)){
+    if(aggreg_sector == TRUE){
       BE_SS <- st_read(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg"), quiet=T, crs= 31370) %>%
         st_set_crs(31370) %>%
         st_zm(drop = TRUE) %>%
@@ -187,7 +207,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     mf_map(x = BE_provinces, col = NA, border = "gray60", lwd = 1.5, add = TRUE)
     mf_map(x = BE_regions, col = NA, border = "black", lwd = 2, add = TRUE)
     #mf_map(x = BELGIQUE, col = NA, border = "black", lwd = 2.5, add = TRUE)
-    if("phaco_anonymous" %in% names(FULL_GEOCODING_sf_carto)){
+    if(aggreg_sector == TRUE){
       mf_map(
         x = suppressWarnings(st_point_on_surface(BE_SS[!is.na(BE_SS$n_cd_sector),])),
         var = "n_cd_sector",

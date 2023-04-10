@@ -78,91 +78,80 @@ phaco_geocode <- function(data_to_geocode,
   `%ni%` <- Negate(`%in%`)
 
   # Ne pas lancer la fonction si les arguments ne sont pas corrects
-  # NOTE : on pourrait tester qu'on n'introduit pas un vecteur avec plusieurs valeurs au lieu d'une => mais c'est une erreur moins probable
-  # NOTE2 : simplification avec une boucle ?
-  if(!is.null(colonne_rue)) {
-    if(!is.character(colonne_rue)){
+  # La logique : une boucle sur les arguments de la fonction stockes dans une liste (pour ne pas changer leur type : string, logical...)
+  list_arg_null_string <- list(colonne_rue = colonne_rue,
+                               colonne_num = colonne_num,
+                               colonne_code_postal = colonne_code_postal,
+                               colonne_num_rue = colonne_num_rue,
+                               colonne_num_rue_code_postal = colonne_num_rue_code_postal,
+                               colonne_rue_code_postal = colonne_rue_code_postal,
+                               path_data = path_data)
+
+  for (i in seq_along(list_arg_null_string)) {
+    if(length(list_arg_null_string[[i]]) > 1) {
       cat("\n")
-      stop(paste0("\u2716"," colonne_rue doit etre un vecteur string"))
+      stop(paste0("\u2716 ", names(list_arg_null_string[i]), " doit etre un vecteur de longueur 1"))
+    }
+    if(!is.null(list_arg_null_string[[i]])) {
+      if(!is.character(list_arg_null_string[[i]])){
+        cat("\n")
+        stop(paste0("\u2716 ", names(list_arg_null_string[i]), " doit etre un vecteur string"))
+      }
     }
   }
-  if(!is.null(colonne_num)) {
-    if(!is.character(colonne_num)){
+
+  list_arg_logical <- list(corrections_REGEX = corrections_REGEX,
+                           elargissement_com_adj = elargissement_com_adj,
+                           mid_street = mid_street,
+                           anonymous = anonymous)
+
+  for (i in seq_along(list_arg_logical)) {
+    if(length(list_arg_logical[[i]]) > 1) {
       cat("\n")
-      stop(paste0("\u2716"," colonne_num doit etre un vecteur string"))
+      stop(paste0("\u2716 ", names(list_arg_logical[i]), " doit etre un vecteur de longueur 1"))
+    }
+    if(!is.logical(list_arg_logical[[i]])) {
+      cat("\n")
+      stop(paste0("\u2716 ", names(list_arg_logical[i]), " doit etre une valeur logique"))
     }
   }
-  if(!is.null(colonne_code_postal)) {
-    if(!is.character(colonne_code_postal)){
+
+  list_arg_num <- list(error_max = error_max,
+                       approx_num_max = approx_num_max)
+
+  for (i in seq_along(list_arg_num)) {
+    if(length(list_arg_num[[i]]) > 1) {
       cat("\n")
-      stop(paste0("\u2716"," colonne_code_postal doit etre un vecteur string"))
+      stop(paste0("\u2716 ", names(list_arg_num[i]), " doit etre un vecteur de longueur 1"))
+    }
+    if(!is.numeric(list_arg_num[[i]])) {
+      cat("\n")
+      stop(paste0("\u2716 ", names(list_arg_num[i]), " doit etre une valeur numerique"))
     }
   }
-  if(!is.null(colonne_num_rue)) {
-    if(!is.character(colonne_num_rue)){
-      cat("\n")
-      stop(paste0("\u2716"," colonne_num_rue doit etre un vecteur string"))
-    }
-  }
-  if(!is.null(colonne_num_rue_code_postal)) {
-    if(!is.character(colonne_num_rue_code_postal)){
-      cat("\n")
-      stop(paste0("\u2716"," colonne_num_rue_code_postal doit etre un vecteur string"))
-    }
-  }
-  if(!is.null(colonne_rue_code_postal)) {
-    if(!is.character(colonne_rue_code_postal)){
-      cat("\n")
-      stop(paste0("\u2716"," colonne_rue_code_postal doit etre un vecteur string"))
-    }
+
+  # Ici plus de boucle, pas nécessaire
+  if(length(method_stringdist) > 1) {
+    cat("\n")
+    stop(paste0("\u2716 "," method_stringdist doit etre un vecteur de longueur 1"))
   }
   if(!is.character(method_stringdist)) {
     cat("\n")
     stop(paste0("\u2716"," method_stringdist doit etre un vecteur string"))
   }
-  method_stringdist <- str_to_lower(method_stringdist) # Au cas ou l'utilisateur aurait introduit les langues en majuscule
+  method_stringdist <- str_to_lower(unique(method_stringdist)) # Au cas ou l'utilisateur aurait introduit les langues en majuscule
   if(sum(method_stringdist %in% c("osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw", "soundex")) == 0) {
     cat("\n")
     stop(paste0("\u2716"," method_stringdist doit prendre une des valeurs : 'osa', 'lv', 'dl', 'hamming', 'lcs', 'qgram', 'cosine', 'jaccard', 'jw', 'soundex'"))
-  }
-  if(!is.logical(corrections_REGEX)) {
-    cat("\n")
-    stop(paste0("\u2716"," corrections_REGEX doit etre une valeur logique"))
-  }
-  if(!is.numeric(error_max)) {
-    cat("\n")
-    stop(paste0("\u2716"," error_max doit etre une valeur numerique"))
-  }
-  if(!is.numeric(approx_num_max)) {
-    cat("\n")
-    stop(paste0("\u2716"," approx_num_max doit etre une valeur numerique"))
-  }
-  if(!is.logical(elargissement_com_adj)) {
-    cat("\n")
-    stop(paste0("\u2716"," elargissement_com_adj doit etre une valeur logique"))
-  }
-  if(!is.logical(mid_street)) {
-    cat("\n")
-    stop(paste0("\u2716"," mid_street doit etre une valeur logique"))
   }
   if(!is.character(lang_encoded)) {
     cat("\n")
     stop(paste0("\u2716"," lang_encoded doit etre un vecteur string"))
   }
-  lang_encoded <- str_to_upper(lang_encoded) # Au cas ou l'utilisateur aurait introduit les langues en minuscule
+  lang_encoded <- str_to_upper(unique(lang_encoded)) # Au cas ou l'utilisateur aurait introduit les langues en minuscule
   if(sum(lang_encoded %in% c("FR", "NL", "DE")) == 0) {
     cat("\n")
     stop(paste0("\u2716"," lang_encoded doit prendre une des valeurs : 'FR', 'NL', 'DE'"))
-  }
-  if(!is.logical(anonymous)) {
-    cat("\n")
-    stop(paste0("\u2716"," anonymous doit etre une valeur logique"))
-  }
-  if(!is.null(path_data)) {
-    if(!is.character(path_data)){
-      cat("\n")
-      stop(paste0("\u2716"," path_data doit etre un vecteur string"))
-    }
   }
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
@@ -226,7 +215,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # On ne lance pas la fonction si des noms de colonnes du fichier a geocoder ont des noms de colonnes similaires a ceux utilises en interne
   # Pour l'instant on demande de changer les noms en indiquant ceux qui posent pb
-  # Alternatives plus performantes dans le futur ?
+  # Alternatives plus performantes dans le futur :
   # 1) d'abord mettre des noms moins communs a l'aide d'un prefixe
   # 2) changer automatiquement les noms qui posent pb avec un suffice _2, _3, etc.
   forbidden_names <- c("ID_address", "rue_to_geocode", "num_rue_to_geocode", "code_postal_to_geocode", "arrond", "Region", "num_rue_text", "num_rue_clean", "rue_recoded", "rue_recoded_commune",
@@ -1097,7 +1086,8 @@ phaco_geocode <- function(data_to_geocode,
       select(-address_join_geocoding)
   }
 
-  # J'enleve num_rue_to_geocode avec un if statement car la colonne n'est parfois pas creee
+  # J'enleve num_rue_to_geocode : pas besoin dans l'objet final
+  # Utilisation d'un if statement car la colonne n'est parfois pas creee
   if("num_rue_to_geocode" %in% colnames(FULL_GEOCODING)) {
     FULL_GEOCODING <- FULL_GEOCODING %>%
       select(-num_rue_to_geocode)

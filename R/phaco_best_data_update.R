@@ -28,15 +28,24 @@
 phaco_best_data_update <- function(force=FALSE,
                                    precision="m") {
 
+  # Ne pas lancer la fonction si les arguments ne sont pas corrects
+  if(length(force) > 1) {
+    cat("\n")
+    stop(paste0("\u2716 "," force doit etre un vecteur de longueur 1"))
+  }
   if(!is.logical(force)) {
     cat("\n")
     stop(paste0("\u2716"," force doit etre une valeur logique"))
+  }
+  if(length(precision) > 1) {
+    cat("\n")
+    stop(paste0("\u2716 "," precision doit etre un vecteur de longueur 1"))
   }
   if(!is.character(precision)) {
     cat("\n")
     stop(paste0("\u2716"," precision doit etre un vecteur string"))
   }
-  precision <- str_to_lower(precision) # Au cas ou l'utilisateur aurait introduit la precision en majuscule
+  precision <- str_to_lower(unique(precision)) # Au cas ou l'utilisateur aurait introduit la precision en majuscule
   if(sum(precision %in% c("m", "dm", "cm", "mm")) == 0) {
     cat("\n")
     stop(paste0("\u2716"," precision doit prendre une des valeurs : 'm', 'dm', 'cm', 'mm'"))
