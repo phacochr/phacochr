@@ -13,7 +13,7 @@ globalVariables(unique(c(
   "rue_recoded_boulevard", "rue_recoded_BP", "rue_recoded_burg",
   "rue_recoded_chaussee", "rue_recoded_Commandant",
   "rue_recoded_dokter", "rue_recoded_double_lettre_end",
-  "rue_recoded_koning", "rue_recoded_lettre_end",
+  "rue_recoded_koning", "rue_recoded_lettre_end", "rue_recoded_lettre_end2",
   "rue_recoded_Lieutenant", "rue_recoded_No", "rue_recoded_num",
   "rue_recoded_parenthese", "rue_recoded_place", "rue_recoded_professor",
   "rue_recoded_Rdc", "rue_recoded_Rez", "rue_recoded_route",

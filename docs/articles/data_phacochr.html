@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">phacochr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.12</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,11 +143,11 @@ wallonne).</td>
 <td>140Mo</td>
 </tr>
 <tr class="even">
-<td><strong>Données géospatiales Statbel et Urbis</strong></td>
-<td>Des données géospatiales <a href="https://statbel.fgov.be/fr/open-data?category=209" class="external-link">Statbel</a> et
+<td><strong>Données vectorielles Statbel et Urbis</strong></td>
+<td>Des données vectorielles <a href="https://statbel.fgov.be/fr/open-data?category=209" class="external-link">Statbel</a> et
 <a href="https://datastore.brussels/web/data/dataset/9651e420-2c8d-48ec-b4a1-6a43a3f6a40f" class="external-link">Urbis</a>
 permettant d’une part d’ajouter des informations administratives au
-géocodage (secteurs statistiques, quartiers du monitoring,
+géocodage (secteurs statistiques, quartiers du monitoring de Bruxelles,
 (sous-)communes…), d’autre part de fournir les limites spatiales pour
 pouvoir produire des cartographies des données géocodées.</td>
 <td>110Mo</td>
@@ -165,8 +165,8 @@ usuellement écrites de cette manière).</td>
 <td>Des tables de conversion nécessaires au processus de géocodage pour
 lier les différentes données. Il s’agit de tables permettant de passer
 du code postal à la commune, l’arrondissement ou la région, du secteur
-statistique au quartier monitoring de Bruxelles, d’une table faisant la
-liste des communes adjacentes pour chaque commune, etc.</td>
+statistique au quartier du monitoring de Bruxelles, d’une table faisant
+la liste des communes adjacentes pour chaque commune, etc.</td>
 <td>5Mo</td>
 </tr>
 </tbody>
@@ -214,10 +214,14 @@ Wallonie.</em>
 existent dans une version avec prénom abrégé (les rues étant usuellement
 écrites de cette manière).</li>
 <li>Les secteurs statistiques sont ajoutés aux données BeST à l’aide
-d’une jointure spatiale avec les données de Statbel. C’est par le biais
-des secteurs statistiques que les autres informations administratives
-(quartiers du monitoring, (sous-)communes…) sont ajoutées aux adresses
-géocodées en fin de géocodage.</li>
+d’une jointure spatiale avec les données vectorielles de Statbel. C’est
+par le biais des secteurs statistiques que les autres informations
+administratives (quartiers du monitoring de Bruxelles, (sous-)communes…)
+sont ajoutées aux adresses géocodées en fin de géocodage. La table
+secteurs statistiques - quartiers du monitoring de Bruxelles est quant à
+elle réalisée via une jointure spatiale des centroïdes des secteurs
+statistiques Statbel aux géométries Urbis des quartiers du
+monitoring.</li>
 <li>Les fichiers BeST sont simplifiés au maximum afin d’augmenter la
 vitesse du géocodage. Les fichiers BeST originaux font 960Mo ; nous les
 avons réduits à 140Mo. <em>Nous avons notamment diminué la précision des
@@ -232,11 +236,13 @@ belge.</li>
 <p>Ces opérations sont réalisées par le package lui-même à travers la
 fonction <code><a href="../reference/phaco_best_data_update.html">phaco_best_data_update()</a></code>. La fonction télécharge
 les dernières données BeST sur le site officiel, les transforme, y
-intègre les secteurs statistiques à partir des données de Statbel et
-sauvegarde le résultat dans le répertoire de travail de
+intègre les secteurs statistiques à partir des données vectorielles de
+Statbel et sauvegarde le résultat dans le répertoire de travail de
 <code>phacochr</code> pour être utilisées lors du géocodage. En outre,
 la fonction crée toutes les tables de conversion nécessaires au
-géocodage.</p>
+géocodage. Toutes les tables étant réalisées à la volée par la fonction,
+celles-si sont modifiables très facilement (en cas de refonte des
+secteurs statistiques, de changement des géométries, etc.).</p>
 <p>Cette manière de faire a l’avantage majeur que l’utilisateur/trice
 peut réaliser lui/elle-même la mise à jour des données. Les données BeST
 sont en effet mises à jour de manière hebdomadaire, et il aurait été
@@ -251,7 +257,13 @@ c’est bien le cas, elle procède alors aux téléchargements et calculs
 nécessaires pour créer les données. Les opérations sont nombreuses et
 peuvent prendre une dizaine de minutes pour être réalisées. L’avancement
 des opérations est indiqué par différents messages successifs dans la
-console.</p>
+console. Les autres données (par exemple les données vectorielles
+Statbel et Urbis) ne peuvent pas être mises à jour par l’utilisateur.
+Leur mise à disposition n’étant pas faite à une URL fixe,
+l’automatisation est moins facile. Cependant, leur actualisation étant
+beaucoup moins fréquente, nous (les développeurs de
+<code>phacochr</code>) nous chargeons de les intégrer au package dès
+qu’un changement se présentera.</p>
 </div>
 <div class="section level2">
 <h2 id="précision-du-géocodage">Précision du géocodage<a class="anchor" aria-label="anchor" href="#pr%C3%A9cision-du-g%C3%A9ocodage"></a>
