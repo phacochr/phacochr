@@ -12,4 +12,4 @@ Début de la mise à jour régulière du fichier `NEWS.md` pour documenter les m
 
 ## Modifications mineures
 
--   Ajout de `ifelse()` pour l'exécution des corrections orthographiques dans la fonction `phaco_geocode()`. La vitesse de géocodage augmente de +/- 1%.
+-   Ajout de `ifelse()` pour l'exécution des corrections orthographiques dans la fonction `phaco_geocode()`. Le temps de calcul pour le géocodage diminue de +/- 1%.
