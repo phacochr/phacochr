@@ -37,6 +37,8 @@ navbar:
       href: articles/performances.html
     - text: Géocodage anonymisé
       href: articles/anonymous_geocoding.html
+  - text: News
+    href: news/index.html
   - text: Géocoder
     href: articles/shiny_app.html
   right:

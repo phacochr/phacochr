@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">phacochr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.13</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,6 +35,9 @@
     <a class="dropdown-item" href="../articles/performances.html">Performances et fiabilité</a>
     <a class="dropdown-item" href="../articles/anonymous_geocoding.html">Géocodage anonymisé</a>
   </div>
+</li>
+<li class="active nav-item">
+  <a class="nav-link" href="../news/index.html">News</a>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../articles/shiny_app.html">Géocoder</a>
@@ -61,10 +64,23 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.9.0.5" id="phacochr-0905">phacochr 0.9.0.5<a class="anchor" aria-label="anchor" href="#phacochr-0905"></a></h2>
-<ul><li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
+<h2 class="pkg-version" data-toc-text="0.9.1.13" id="phacochr-09113">phacochr 0.9.1.13<a class="anchor" aria-label="anchor" href="#phacochr-09113"></a></h2>
+<div class="section level3">
+<h3 id="modifications-mineures-0-9-1-13">Modifications mineures<a class="anchor" aria-label="anchor" href="#modifications-mineures-0-9-1-13"></a></h3>
+<ul><li><p>Intégration au package du script <code>map_process.R</code> permettant de créer les géométries utilisées dans <code>phaco_map()</code> à partir des géométries des secteurs statistiques Statbel et des quartiers du monitoring Urbis (Bruxelles). Le script est situé dans le répertoire <code>inst/scripts</code> du package, et peut être appelé via la fonction <code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code>. Par exemple, en exécutant la commande : <code>source(paste0(system.file("scripts", package = "phacochr"), "/map_process.R"))</code>. Le script est intégré par transparence des opérations effectuées, mais il ne semble pas utile d’en faire une fonction, la mise à jour des géométries n’étant pas une opération à réaliser régulièrement.</p></li>
+<li><p>Modification dans la manière de créer les géométries des quartiers du monitoring (Bruxelles). Auparavant, les frontières des quartiers étaient issues du fichier Urbis installé avec le package. Désormais, les géométries des quartiers du monitoring reposent sur les géométries des secteurs statistiques de Stabel, par cohérence avec la manière dont la table <em>secteurs statistiques - quartiers du monitoring</em> est créée par la fonction <code><a href="../reference/phaco_best_data_update.html">phaco_best_data_update()</a></code>. Ce changement n’a aucun impact sur le fonctionnement et les résultats de <code>phacochr</code>, car les géométries des quartiers du monitoring ne sont pas utilisées par les fonctions de <code>phacochr</code>. Cette modification modifie simplement le fichier vectoriel des quartiers du monitoring de Bruxelles disponible dans le répertoire d’installation de phacochr (le fichier <code>C:\Users\USERNAME\AppData\Local\phacochr\phacochr\data_phacochr\STATBEL\PREPROCESSED\BXL_quartiers_PREPROCESSED.gpkg</code> sous Windows). A terme, il sera utile de créer une fonction rendant facilement disponible ces fichiers pour l’utilisateur.</p></li>
 </ul></div>
-  </main></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.1.12" id="phacochr-09112">phacochr 0.9.1.12<a class="anchor" aria-label="anchor" href="#phacochr-09112"></a></h2>
+<p>Début de la mise à jour régulière du fichier <code>NEWS.md</code> pour documenter les modifications de <code>phacochr</code>.</p>
+<div class="section level3">
+<h3 id="modifications-mineures-0-9-1-12">Modifications mineures<a class="anchor" aria-label="anchor" href="#modifications-mineures-0-9-1-12"></a></h3>
+<ul><li>Ajout de <code><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse()</a></code> pour l’exécution des corrections orthographiques dans la fonction <code><a href="../reference/phaco_geocode.html">phaco_geocode()</a></code>. La vitesse de géocodage augmente de +/- 1%.</li>
+</ul></div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

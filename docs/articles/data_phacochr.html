@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">phacochr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.13</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,9 @@
     <a class="dropdown-item" href="../articles/performances.html">Performances et fiabilité</a>
     <a class="dropdown-item" href="../articles/anonymous_geocoding.html">Géocodage anonymisé</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">News</a>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../articles/shiny_app.html">Géocoder</a>
@@ -144,8 +147,8 @@ wallonne).</td>
 </tr>
 <tr class="even">
 <td><strong>Données vectorielles Statbel et Urbis</strong></td>
-<td>Des données vectorielles <a href="https://statbel.fgov.be/fr/open-data?category=209" class="external-link">Statbel</a> et
-<a href="https://datastore.brussels/web/data/dataset/9651e420-2c8d-48ec-b4a1-6a43a3f6a40f" class="external-link">Urbis</a>
+<td>Des données vectorielles des secteurs statistiques <a href="https://statbel.fgov.be/fr/open-data?category=209" class="external-link">Statbel</a> et
+des quartiers du monitoring <a href="https://datastore.brussels/web/data/dataset/9651e420-2c8d-48ec-b4a1-6a43a3f6a40f" class="external-link">Urbis</a>
 permettant d’une part d’ajouter des informations administratives au
 géocodage (secteurs statistiques, quartiers du monitoring de Bruxelles,
 (sous-)communes…), d’autre part de fournir les limites spatiales pour
@@ -218,10 +221,11 @@ d’une jointure spatiale avec les données vectorielles de Statbel. C’est
 par le biais des secteurs statistiques que les autres informations
 administratives (quartiers du monitoring de Bruxelles, (sous-)communes…)
 sont ajoutées aux adresses géocodées en fin de géocodage. La table
-secteurs statistiques - quartiers du monitoring de Bruxelles est quant à
-elle réalisée via une jointure spatiale des centroïdes des secteurs
-statistiques Statbel aux géométries Urbis des quartiers du
-monitoring.</li>
+<em>secteurs statistiques - quartiers du monitoring de Bruxelles</em>
+est quant à elle réalisée via une jointure spatiale des centroïdes des
+secteurs statistiques Statbel aux géométries Urbis des quartiers du
+monitoring. De ce fait, les quartiers du monitoring épousent les limites
+spatiales des secteurs statistiques Statbel.</li>
 <li>Les fichiers BeST sont simplifiés au maximum afin d’augmenter la
 vitesse du géocodage. Les fichiers BeST originaux font 960Mo ; nous les
 avons réduits à 140Mo. <em>Nous avons notamment diminué la précision des
@@ -240,9 +244,9 @@ intègre les secteurs statistiques à partir des données vectorielles de
 Statbel et sauvegarde le résultat dans le répertoire de travail de
 <code>phacochr</code> pour être utilisées lors du géocodage. En outre,
 la fonction crée toutes les tables de conversion nécessaires au
-géocodage. Toutes les tables étant réalisées à la volée par la fonction,
-celles-si sont modifiables très facilement (en cas de refonte des
-secteurs statistiques, de changement des géométries, etc.).</p>
+géocodage. Toutes ces tables étant réalisées à la volée par la fonction,
+elles sont modifiables très facilement (en cas de refonte des secteurs
+statistiques, de changement des géométries, etc.).</p>
 <p>Cette manière de faire a l’avantage majeur que l’utilisateur/trice
 peut réaliser lui/elle-même la mise à jour des données. Les données BeST
 sont en effet mises à jour de manière hebdomadaire, et il aurait été
