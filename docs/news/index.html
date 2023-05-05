@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">phacochr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.14</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +63,14 @@
       <small>Source: <a href="NA/NA/NA/blob/HEAD/NEWS.html"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.1.14" id="phacochr-09114">phacochr 0.9.1.14<a class="anchor" aria-label="anchor" href="#phacochr-09114"></a></h2>
+<p>Date : 5 mai 2023</p>
+<div class="section level3">
+<h3 id="modifications-majeures-0-9-1-14">Modifications majeures<a class="anchor" aria-label="anchor" href="#modifications-majeures-0-9-1-14"></a></h3>
+<ul><li>Ajout d’une correction des rues BeSTAddress dans la fonction <code><a href="../reference/phaco_best_data_update.html">phaco_best_data_update()</a></code>. L’option est activée par défaut, car le formatage des données BeST n’est pas homogène : on trouve parfois dans celles-ci des précisions entre parenthèses (notamment pour Charleroi), des abréviations (St. pour Saint, Av. pour Avenue), etc., ce qui nuit à la bonne détection des rues. L’option est désactivable via le nouvel argument <code>corrections_REGEX</code> de la fonction <code><a href="../reference/phaco_best_data_update.html">phaco_best_data_update()</a></code>.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.1.13" id="phacochr-09113">phacochr 0.9.1.13<a class="anchor" aria-label="anchor" href="#phacochr-09113"></a></h2>
 <div class="section level3">

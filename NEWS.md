@@ -1,3 +1,11 @@
+# phacochr 0.9.1.14
+
+Date : 5 mai 2023
+
+## Modifications majeures
+
+-   Ajout d'une correction des rues BeSTAddress dans la fonction `phaco_best_data_update()`. L'option est activée par défaut, car le formatage des données BeST n'est pas homogène : on trouve parfois dans celles-ci des précisions entre parenthèses (notamment pour Charleroi), des abréviations (St. pour Saint, Av. pour Avenue), etc., ce qui nuit à la bonne détection des rues. L'option est désactivable via le nouvel argument `corrections_REGEX` de la fonction `phaco_best_data_update()`.
+
 # phacochr 0.9.1.13
 
 ## Modifications mineures

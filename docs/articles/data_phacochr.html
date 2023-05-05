@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">phacochr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1.14</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -216,6 +216,16 @@ Wallonie.</em>
 <li>Des alias des rues avec prénoms sont créés pour que celles-ci
 existent dans une version avec prénom abrégé (les rues étant usuellement
 écrites de cette manière).</li>
+<li>Des corrections orthographiques sont apportées aux données BeST. Le
+formatage des adresses BEST n’est en effet pas toujours homogène :
+celles-ci contiennent des précisions entre parenthèses, des abréviations
+(Av. pour “Avenue”, St. pour “Saint”), etc. qui nuisent potentiellement
+à la bonne détection des rues. Par défaut, des corrections sont donc
+apportées. Par cohérence, la correction orthographique des données à
+géocoder - dans la fonction <code><a href="../reference/phaco_geocode.html">phaco_geocode()</a></code> - est également
+activée par défaut. Cette correction des données BeST est désactivable
+via l’argument <code>correction_REGEX = FALSE</code> de la fonction
+<code><a href="../reference/phaco_best_data_update.html">phaco_best_data_update()</a></code>.</li>
 <li>Les secteurs statistiques sont ajoutés aux données BeST à l’aide
 d’une jointure spatiale avec les données vectorielles de Statbel. C’est
 par le biais des secteurs statistiques que les autres informations
