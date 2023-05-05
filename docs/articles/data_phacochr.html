@@ -194,9 +194,11 @@ disposition : <a href="https://opendata.bosa.be/" class="external-link uri">http
 lesquelles est construit <code>phacochr</code> sont en effet
 transformées dans le but d’ajouter des options au, et d’augmenter la
 vitesse du géocodage.</p>
-<p>Voici quelques éléments constituant les transformations opérées.
-L’utilisateur/trice peut prendre connaissance de l’ensemble de ces
-transformations en consultant le <a href="https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R" class="external-link">code
+<p>Ces opérations sont réalisées par le package lui-même à travers la
+fonction <code><a href="../reference/phaco_best_data_update.html">phaco_best_data_update()</a></code>. Voici quelques éléments
+constituant les transformations opérées. L’utilisateur/trice peut
+prendre connaissance de l’ensemble de ces transformations en consultant
+le <a href="https://github.com/phacochr/phacochr/blob/main/R/phaco_best_data_update.R" class="external-link">code
 de la fonction <code>phaco_best_data_update()</code> sur Github</a>.</p>
 <ul>
 <li>La distinction de numéros de boite différents pour le même numéro de
@@ -247,11 +249,10 @@ réduisant significativement le temps de chargement pour géocoder les
 bases de données d’adresses ne couvrant pas tout le territoire
 belge.</li>
 </ul>
-<p>Ces opérations sont réalisées par le package lui-même à travers la
-fonction <code><a href="../reference/phaco_best_data_update.html">phaco_best_data_update()</a></code>. La fonction télécharge
-les dernières données BeST sur le site officiel, les transforme, y
-intègre les secteurs statistiques à partir des données vectorielles de
-Statbel et sauvegarde le résultat dans le répertoire de travail de
+<p>La fonction <code><a href="../reference/phaco_best_data_update.html">phaco_best_data_update()</a></code> télécharge les
+dernières données BeST sur le site officiel, les transforme, y intègre
+les secteurs statistiques à partir des données vectorielles de Statbel
+et sauvegarde le résultat dans le répertoire de travail de
 <code>phacochr</code> pour être utilisées lors du géocodage. En outre,
 la fonction crée toutes les tables de conversion nécessaires au
 géocodage. Toutes ces tables étant réalisées à la volée par la fonction,
