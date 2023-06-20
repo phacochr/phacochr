@@ -18,7 +18,6 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/phacochr/phacochr/blob/main/LICENSE)
-
 <!-- badges: end -->
 
 `phacochr` est un géocodeur pour la Belgique sous forme de package R. Son principe est de produire, à partir d'une base de données d'adresses, une série d'informations nécessaires pour l'analyse spatiale : les coordonnées X-Y mais également d'autres informations utiles comme le secteur statistique ou le quartier du monitoring pour Bruxelles. Le niveau de précision du géocodage est celui du bâtiment. Le package est très rapide pour géocoder de longues listes (la vitesse d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses sur un ordinateur de puissance moyenne) et le taux de succès pour le géocodage est élevé (médiane de 97%). Voir la page [Performances et fiabilité](https://phacochr.github.io/phacochr/articles/performances.html) pour le détail des performances. Par ailleurs, le géocodage est réalisé entièrement en local, permettant une confidentialité maximale dans le cas d'adresses qui ne peuvent pas être envoyées sur des serveurs externes (permettant notamment un [Géocodage anonymisé](https://phacochr.github.io/phacochr/articles/anonymous_geocoding.html)). `phacochr` constitue donc une alternative très performante face aux solutions existantes tout en reposant entièrement sur des données publiques et des procédures libres.
