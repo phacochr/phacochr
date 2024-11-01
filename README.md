@@ -12,11 +12,23 @@ Son principe est de produire, à partir d’une base de données d’adresses,
 une série d’informations nécessaires pour l’analyse spatiale : les
 coordonnées X-Y mais également d’autres informations utiles comme le
 secteur statistique ou le quartier du monitoring pour Bruxelles. Le
-niveau de précision du géocodage est celui du bâtiment. Le package est
-très rapide pour géocoder de longues listes (la vitesse d’exécution se
-situe entre 0,4 et 0,8 secondes pour 100 adresses sur un ordinateur de
-puissance moyenne) et le taux de succès pour le géocodage est élevé
-(médiane de 97%). Voir la page [Performances et
+niveau de précision du géocodage est celui du bâtiment.
+
+<div style="border:0px; background-color:#f8f5e4; padding: 10px; margin-bottom: 10px">
+<p>
+<strong>Ceci est la version stable de phacochr.</strong>
+</p>
+<p>
+Rendez-vous sur la
+<a href="https://phacochr.github.io/phacochrdev/">version de
+développement</a> de phacochr pour bénéficier des dernières
+mises-à-jour.
+</div>
+
+Le package est très rapide pour géocoder de longues listes (la vitesse
+d’exécution se situe entre 0,4 et 0,8 secondes pour 100 adresses sur un
+ordinateur de puissance moyenne) et le taux de succès pour le géocodage
+est élevé (médiane de 97%). Voir la page [Performances et
 fiabilité](https://phacochr.github.io/phacochr/articles/performances.html)
 pour le détail des performances. Par ailleurs, le géocodage est réalisé
 entièrement en local, permettant une confidentialité maximale dans le
@@ -45,8 +57,7 @@ coordonnées du numéro médian de la rue. `phacochr` est compatible avec
 les 3 langues nationales : il géocode des adresses écrites en français,
 néérlandais ou allemand.
 
-<div
-style="border:0px; background-color:#f8f5e4; padding: 10px; margin-bottom: 10px">
+<div style="border:0px; background-color:#f8f5e4; padding: 10px; margin-bottom: 10px">
 
 **Note de développement:** Cette version de `phacochr` est encore une
 version de développement. Elle est néanmoins pleinement fonctionnelle et
@@ -386,8 +397,8 @@ En voici une liste exhaustive et commentée:
 | **langue_FINAL_detected**    | La langue détectée d’écriture de la rue (`FR`, `NL` ou `DE`). *`NA` si aucune rue n’a été détectée*.                                                                                                                                                                                                                                                                                                   |
 | **nom_propre_abv**           | Une valeur `1` indique que `phacochr` a détecté un nom propre abrégé dans le champ de rue original (*`NA` dans le cas contraire*). Cette information est produite durant le processus de détection des rues dans le but de maximiser la détection des rues dont les noms propres sont orthographiés avec des abréviations.                                                                             |
 | **mid_num**                  | Le numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                                                                   |
-| **mid_x\_31370**             | La coordonnée X (format: Lambert 72) du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                              |
-| **mid_y\_31370**             | La coordonnée Y (format: Lambert 72) du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                              |
+| **mid_x_31370**              | La coordonnée X (format: Lambert 72) du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                              |
+| **mid_y_31370**              | La coordonnée Y (format: Lambert 72) du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                              |
 | **mid_cd_sector**            | Le secteur statistique du numéro médian de la rue au code postal considéré.                                                                                                                                                                                                                                                                                                                            |
 | **dist_fuzzy**               | Indique le nombre d’erreurs qui ont été nécessaires pour faire la jointure avec les données de rue BeST. La valeur maximale est égal à `error_max` (`4` par défaut); `0` signifie que le matching est exact. *`NA` si aucune rue n’a été détectée*.                                                                                                                                                    |
 | **type_geocoding**           | Indique la nature du géocodage. Les rues dont la détection a nécessité un élargissement aux communes adjacentes sont indiquées par la valeur `elargissement_adj`. Les adresses qui ont demandé une localisation au numéro médian de la rue au code postal indiqué sont signalées par la valeur `mid_street`. Les autres cas présentent une valeur vide.                                                |
@@ -417,8 +428,8 @@ En voici une liste exhaustive et commentée:
 | **NAME_FRE**                 | Nom du quartier monitoring pour Bruxelles en FR (Urbis).                                                                                                                                                                                                                                                                                                                                               |
 | **NAME_DUT**                 | Nom du quartier monitoring pour Bruxelles en NL (Urbis).                                                                                                                                                                                                                                                                                                                                               |
 | **phaco_anonymous**          | Colonne créée dans le cas où l’option d’anonymisation des résultats est enclenchée. `1` signifie que le géocodage a été réalisé (même si le numéro a été approximé ou que l’adresse a été située au milieu de la rue). *`NA` si aucune coordonnée n’a été trouvée*. Voir la page [Géocodage anonymisé](https://phacochr.github.io/phacochr/articles/anonymous_geocoding.html) pour plus de précisions. |
-| **cd_sector_x\_31370**       | La coordonnée X (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                                                                          |
-| **cd_sector_y\_31370**       | La coordonnée Y (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                                                                          |
+| **cd_sector_x_31370**        | La coordonnée X (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                                                                          |
+| **cd_sector_y_31370**        | La coordonnée Y (format: Lambert 72) du centroïde du secteur statistique où se trouve l’adresse. *`NA` si aucune coordonnée n’a été trouvée*.                                                                                                                                                                                                                                                          |
 
 ## Autres géocodeurs libres
 
