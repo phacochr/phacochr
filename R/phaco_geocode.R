@@ -949,12 +949,13 @@ phaco_geocode <- function(data_to_geocode,
 
         # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
         # Si ca ne se lance pas, on supprime les cles de jointure dont on n'a plus besoin
-        if(sum(duplicated(res_adj$ID_address)) == 0){
+
+        if (!anyDuplicated(res_adj$ID_address)) {
           res_adj <- res_adj %>%
             select(-address_join, -address_join_street)
         }
 
-        if(sum(duplicated(res_adj$ID_address)) > 0){
+        if (anyDuplicated(res_adj$ID_address)) {
           res_adj <- res_adj %>%
             mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
             group_by(ID_address) %>%
