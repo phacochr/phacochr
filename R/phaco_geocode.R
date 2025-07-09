@@ -50,12 +50,15 @@
 #' }
 
 phaco_geocode <- function(data_to_geocode,
-                          colonne_rue = NULL,
-                          colonne_num = NULL,
-                          colonne_code_postal = NULL,
-                          colonne_num_rue = NULL,
-                          colonne_num_rue_code_postal = NULL,
-                          colonne_rue_code_postal = NULL,
+                          # colonne_rue = NULL,
+                          # colonne_num = NULL,
+                          # colonne_code_postal = NULL,
+                          # colonne_num_rue = NULL,
+                          # colonne_num_rue_code_postal = NULL,
+                          # colonne_rue_code_postal = NULL,
+                          rue,
+                          num_rue,
+                          code_postal,
                           method_stringdist = "lcs",
                           corrections_REGEX = TRUE,
                           error_max = 4,
@@ -69,6 +72,39 @@ phaco_geocode <- function(data_to_geocode,
 
   start_time <- Sys.time()
 
+
+  # Assert situation
+
+  rlang::check_required(rue)
+  rlang::check_required(code_postal)
+
+  rue_sym <- ensym(rue)
+  num_sym <- ensym(num_rue)
+  cp_sym <- ensym(code_postal)
+
+  have_number <- FALSE
+  integrated_number <- FALSE
+  integrated_postcode <- FALSE
+
+
+  if (!missing(num_rue)) {
+    have_number <- TRUE
+
+    if (setequal(data_to_geocode |> pull(!!rue_sym), data_to_geocode |> pull(!!num_sym))) {
+      integrated_number <- TRUE
+    }
+  }
+
+  if (setequal(data_to_geocode |> pull(!!rue_sym), data_to_geocode |> pull(!!cp_sym))) {
+    integrated_postcode <- TRUE
+  }
+
+  print(glue::glue("
+    have_number : {have_number}
+    integrated_number : {integrated_number}
+    integrated_postcode : {integrated_postcode}"))
+
+
   # Definition du chemin ou se trouve les donnees
   if(is.null(path_data)){
     path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr_branchdev"),"/data_phacochr/")) # bricolage pour windows
@@ -79,26 +115,26 @@ phaco_geocode <- function(data_to_geocode,
 
   # Ne pas lancer la fonction si les arguments ne sont pas corrects
   # La logique : une boucle sur les arguments de la fonction stockes dans une liste (pour ne pas changer leur type : string, logical...)
-  list_arg_null_string <- list(colonne_rue = colonne_rue,
-                               colonne_num = colonne_num,
-                               colonne_code_postal = colonne_code_postal,
-                               colonne_num_rue = colonne_num_rue,
-                               colonne_num_rue_code_postal = colonne_num_rue_code_postal,
-                               colonne_rue_code_postal = colonne_rue_code_postal,
-                               path_data = path_data)
-
-  for (i in seq_along(list_arg_null_string)) {
-    if(length(list_arg_null_string[[i]]) > 1) {
-      cat("\n")
-      stop(paste0("\u2716 ", names(list_arg_null_string[i]), " doit etre un vecteur de longueur 1"))
-    }
-    if(!is.null(list_arg_null_string[[i]])) {
-      if(!is.character(list_arg_null_string[[i]])){
-        cat("\n")
-        stop(paste0("\u2716 ", names(list_arg_null_string[i]), " doit etre un vecteur string"))
-      }
-    }
-  }
+  # list_arg_null_string <- list(colonne_rue = colonne_rue,
+  #                              colonne_num = colonne_num,
+  #                              colonne_code_postal = colonne_code_postal,
+  #                              colonne_num_rue = colonne_num_rue,
+  #                              colonne_num_rue_code_postal = colonne_num_rue_code_postal,
+  #                              colonne_rue_code_postal = colonne_rue_code_postal,
+  #                              path_data = path_data)
+  #
+  # for (i in seq_along(list_arg_null_string)) {
+  #   if(length(list_arg_null_string[[i]]) > 1) {
+  #     cat("\n")
+  #     stop(paste0("\u2716 ", names(list_arg_null_string[i]), " doit etre un vecteur de longueur 1"))
+  #   }
+  #   if(!is.null(list_arg_null_string[[i]])) {
+  #     if(!is.character(list_arg_null_string[[i]])){
+  #       cat("\n")
+  #       stop(paste0("\u2716 ", names(list_arg_null_string[i]), " doit etre un vecteur string"))
+  #     }
+  #   }
+  # }
 
   list_arg_logical <- list(corrections_REGEX = corrections_REGEX,
                            elargissement_com_adj = elargissement_com_adj,
@@ -251,61 +287,61 @@ phaco_geocode <- function(data_to_geocode,
 
   colourise("\u2139", fg= "blue")
 
-  # Pour definir la situation de num-rue-code postal
-  if(!is.null(colonne_num) & !is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
-    situation <- "num_rue_postal_s"
-    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"))
-    if(
-      sum(c(colonne_num, colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
-    ){
-      cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
-    }
-
-  } else if (!is.null(colonne_num_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
-    situation <- "num_rue_i_postal_s"
-    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro et rue int","\u00e9","gr","\u00e9","s + code postal s","\u00e9","par","\u00e9"))
-    if(
-      sum(c(colonne_num_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
-    ){
-      cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
-    }
-
-  } else if (!is.null(colonne_num_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_rue_code_postal)) {
-    situation <- "num_rue_postal_i"
-    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"))
-    if(
-      sum(c(colonne_num_rue_code_postal) %ni% names(data_to_geocode)) > 0
-    ){
-      cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
-    }
-
-  } else if (!is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
-    situation <- "no_num_rue_postal_s"
-    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : pas de num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"))
-    if(
-      sum(c(colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
-    ){
-      cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
-    }
-
-  } else if (!is.null(colonne_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal)) {
-    situation <- "no_num_rue_postal_i"
-    cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : pas de num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"))
-    if(
-      sum(c(colonne_rue_code_postal) %ni% names(data_to_geocode)) > 0
-    ){
-      cat("\n")
-      stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
-    }
-
-  } else {
-    cat("\n")
-    stop(paste0("\u2716"," les arguments pour les champs de num","\u00e9","ro, rue et/ou code postal ne sont pas correctent remplis"))
-  }
+  # # Pour definir la situation de num-rue-code postal
+  # if(!is.null(colonne_num) & !is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
+  #   situation <- "num_rue_postal_s"
+  #   cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"))
+  #   if(
+  #     sum(c(colonne_num, colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
+  #   ){
+  #     cat("\n")
+  #     stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
+  #   }
+  #
+  # } else if (!is.null(colonne_num_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
+  #   situation <- "num_rue_i_postal_s"
+  #   cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro et rue int","\u00e9","gr","\u00e9","s + code postal s","\u00e9","par","\u00e9"))
+  #   if(
+  #     sum(c(colonne_num_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
+  #   ){
+  #     cat("\n")
+  #     stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
+  #   }
+  #
+  # } else if (!is.null(colonne_num_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_rue_code_postal)) {
+  #   situation <- "num_rue_postal_i"
+  #   cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"))
+  #   if(
+  #     sum(c(colonne_num_rue_code_postal) %ni% names(data_to_geocode)) > 0
+  #   ){
+  #     cat("\n")
+  #     stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
+  #   }
+  #
+  # } else if (!is.null(colonne_rue) & !is.null(colonne_code_postal) & is.null(colonne_num) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal) & is.null(colonne_rue_code_postal)) {
+  #   situation <- "no_num_rue_postal_s"
+  #   cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : pas de num","\u00e9","ro, rue et code postal s","\u00e9","par","\u00e9","s"))
+  #   if(
+  #     sum(c(colonne_rue, colonne_code_postal) %ni% names(data_to_geocode)) > 0
+  #   ){
+  #     cat("\n")
+  #     stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
+  #   }
+  #
+  # } else if (!is.null(colonne_rue_code_postal) & is.null(colonne_num) & is.null(colonne_rue) & is.null(colonne_code_postal) & is.null(colonne_num_rue) & is.null(colonne_num_rue_code_postal)) {
+  #   situation <- "no_num_rue_postal_i"
+  #   cat(paste0("\n",colourise("\u2139", fg= "blue")," Champs introduits : pas de num","\u00e9","ro, rue et code postal int","\u00e9","gr","\u00e9","s"))
+  #   if(
+  #     sum(c(colonne_rue_code_postal) %ni% names(data_to_geocode)) > 0
+  #   ){
+  #     cat("\n")
+  #     stop(paste0("\u2716"," Au moins un nom des colonnes indiqu","\u00e9","es n'existe pas"))
+  #   }
+  #
+  # } else {
+  #   cat("\n")
+  #   stop(paste0("\u2716"," les arguments pour les champs de num","\u00e9","ro, rue et/ou code postal ne sont pas correctent remplis"))
+  # }
 
   # Creation d'un ID unique
   data_to_geocode <- data_to_geocode %>%
@@ -314,32 +350,47 @@ phaco_geocode <- function(data_to_geocode,
 
   # Creation/formatage des colonnes pour le geocodage
 
+  print(glue::glue("
+    have_number : {have_number}
+    integrated_number : {integrated_number}
+    integrated_postcode : {integrated_postcode}"))
+
   # Rue et num (si separe) : le principe est de creer la colonne rue_to_geocode pour qu'elle contienne le nom de la rue => dans le cas ou elle contient aussi le num ou le code postal, c'est separe dans la suite
-  if (situation == "num_rue_postal_s") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(rue_to_geocode = data_to_geocode[[colonne_rue]],
-             num_rue_to_geocode = data_to_geocode[[colonne_num]])
+  if (have_number) {
+    if (integrated_number) {
+      if (integrated_postcode) {
+        # if (situation == "num_rue_postal_i") {
+          data_to_geocode <- data_to_geocode %>%
+            mutate(rue_to_geocode = !!rue_sym)
+        # }
+      }
+      # if (situation == "num_rue_i_postal_s") {
+        data_to_geocode <- data_to_geocode %>%
+          mutate(rue_to_geocode = !!rue_sym)
+      # }
+    } else {
+      # if (situation == "num_rue_postal_s") {
+        data_to_geocode <- data_to_geocode %>%
+          mutate(rue_to_geocode = !!rue_sym,
+               num_rue_to_geocode = !!num_sym)
+        # }
+    }
+  } else {
+    if (integrated_postcode) {
+      # if (situation == "no_num_rue_postal_i") {
+        data_to_geocode <- data_to_geocode %>%
+          mutate(rue_to_geocode = !!rue_sym)
+      # }
+    }
+    # if (situation == "no_num_rue_postal_s") {
+      data_to_geocode <- data_to_geocode %>%
+        mutate(rue_to_geocode = !!rue_sym)
+    # }
   }
 
-  if (situation == "num_rue_i_postal_s") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(rue_to_geocode = data_to_geocode[[colonne_num_rue]])
-  }
+  print(data_to_geocode)
 
-  if (situation == "num_rue_postal_i") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(rue_to_geocode = data_to_geocode[[colonne_num_rue_code_postal]])
-  }
 
-  if (situation == "no_num_rue_postal_s") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(rue_to_geocode = data_to_geocode[[colonne_rue]])
-  }
-
-  if (situation == "no_num_rue_postal_i") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(rue_to_geocode = data_to_geocode[[colonne_rue_code_postal]])
-  }
 
   # Les rues vides "" sont recodees en NA
   data_to_geocode <- data_to_geocode %>%
@@ -356,27 +407,42 @@ phaco_geocode <- function(data_to_geocode,
   }
 
   # Code postal (si separe)
-  if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "no_num_rue_postal_s") {
+  if (!integrated_postcode) {
+  # if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "no_num_rue_postal_s") {
     data_to_geocode <- data_to_geocode %>%
-      mutate(code_postal_to_geocode = data_to_geocode[[colonne_code_postal]])
+      mutate(code_postal_to_geocode = !!cp_sym)
   }
 
 
   ## 2. Code postal ---------------------------------------------------------------------------------------------------------------------------
 
   # Je m'assure que le code postal ne comprend pas de texte => je ne garde que les chiffres du code postal
-  if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "no_num_rue_postal_s") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(code_postal_to_geocode = str_extract(code_postal_to_geocode, regex("[0-9]+", ignore_case = TRUE)))
+  if (integrated_postcode) {
+
+    data_to_geocode <- data_to_geocode |>
+      mutate(
+        code_postal_to_geocode = str_extract(rue_to_geocode, regex("([1-9][0-9]{3}\\s[\\p{Letter}-' ]+\\z)|([1-9][0-9]{3}(|\\s)\\z)", ignore_case = TRUE))
+      )
   }
 
-  # Extraction du code postal si interne au champ d'adresse
-  # NOTE /!\ le code postal doit IMPERATIVEMENT etre la derniere info du champ (souvent le cas) /!\
-  if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(code_postal_to_geocode = str_extract(rue_to_geocode, regex("([0-9]{4}\\s[\\p{Letter}-' ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
-             code_postal_to_geocode = str_extract(code_postal_to_geocode, regex("[0-9]{4}", ignore_case = TRUE)))
-  }
+  data_to_geocode <- data_to_geocode |>
+    mutate(
+      code_postal_to_geocode = str_extract(code_postal_to_geocode, regex("[1-9][0-9]{3}", ignore_case = TRUE))
+    )
+  #
+  # if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "no_num_rue_postal_s") {
+  #   data_to_geocode <- data_to_geocode %>%
+  #     mutate(code_postal_to_geocode = str_extract(code_postal_to_geocode, regex("[0-9]+", ignore_case = TRUE))) |>
+  #
+  #
+  #
+  # # Extraction du code postal si interne au champ d'adresse
+  # # NOTE /!\ le code postal doit IMPERATIVEMENT etre la derniere info du champ (souvent le cas) /!\
+  # if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
+  #   data_to_geocode <- data_to_geocode %>%
+  #     mutate(code_postal_to_geocode = str_extract(rue_to_geocode, regex("([0-9]{4}\\s[\\p{Letter}-' ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
+  #            code_postal_to_geocode = str_extract(code_postal_to_geocode, regex("[0-9]{4}", ignore_case = TRUE)))
+  # }
 
 
   ## 3. Detection des regions/arrondissements en Belgique -------------------------------------------------------------------------------------
@@ -402,7 +468,9 @@ phaco_geocode <- function(data_to_geocode,
   # Pour creer un numero de rue clean + aller chercher le numero de la rue dans le champ texte de l'adresse (s'il est present)
 
   # Dans le cas ou il y a une colonne separee avec le num de rue
-  if (situation == "num_rue_postal_s") {
+
+  if(!integrated_number) { # Do we let user choose if he want to do this since he explicitly say that the number is a specific column
+  # if (situation == "num_rue_postal_s") {
     data_to_geocode <- data_to_geocode %>%
       mutate(num_rue_text = ifelse(is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # J'extrait le num du champ texte (ssi il est absent de num_rue)
                                    str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE)),
@@ -417,17 +485,19 @@ phaco_geocode <- function(data_to_geocode,
 
   # Dans le cas ou le num de rue est integre
   # NOTE /!\ le numero de rue doit IMPERATIVEMENT etre le premier chiffre du champ (souvent le cas) /!\
-  if (situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {
+  if(integrated_number) {
+  # if (situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {
     data_to_geocode <- data_to_geocode %>%
       mutate(num_rue_clean = str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))) %>%
       mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
       relocate(num_rue_clean, .before = code_postal_to_geocode)}
 
   # On force mid_street = TRUE si la colonne contenant la rue ne possede que des NA
-  if (mid_street == FALSE & (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i")) {
-    if(
-      sum(is.na(data_to_geocode$num_rue_clean))/sum(nrow(data_to_geocode)) == 1
-    ){
+  if (!mid_street & have_number) {
+  # if (mid_street == FALSE & (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i")) {
+    if(all(is.na(data_to_geocode$num_rue_clean)))
+      # sum(is.na(data_to_geocode$num_rue_clean))/sum(nrow(data_to_geocode)) == 1
+    {
       cat(colourise(paste0("\n","\u2192"," La colonne contenant le num","\u00e9","ro ne contient que des NA : switch mid_street = TRUE"), fg="brown"))
       mid_street <- TRUE
     }
@@ -436,13 +506,14 @@ phaco_geocode <- function(data_to_geocode,
 
   # I. REGEX adresses (corrections) =========================================================================================================
   # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-  if ((situation == "num_rue_i_postal_s"|situation == "num_rue_postal_i"|situation == "no_num_rue_postal_i") & corrections_REGEX == FALSE){
+  if (integrated_postcode | integrated_number) {
+  # if ((situation == "num_rue_i_postal_s"|situation == "num_rue_postal_i"|situation == "no_num_rue_postal_i") & corrections_REGEX == FALSE){
     cat(colourise(paste0("\n","\u2192"," La colonne contenant la rue est m","\u00e9","lang","\u00e9","e avec le num","\u00e9","ro ou le code postal : switch corrections_REGEX = TRUE"), fg="brown"))
     corrections_REGEX <- TRUE
   }
 
   # On cree une nouvelle colonne avec le nom de rue corrige + des colonnes avec TRUE / FALSE pour identifier les familles de changements
-  if (corrections_REGEX == TRUE){
+  if (corrections_REGEX){
 
     cat(paste0("\n","\u29D7"," Correction orthographique des adresses"))
 
@@ -455,7 +526,8 @@ phaco_geocode <- function(data_to_geocode,
              rue_recoded_code_postal = NA) # Pour la compatibilite avec la suite si le code postal n'est pas integre et supprime
 
     # Suppression du code postal ssi interne au champ d'adresse
-    if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
+    if (integrated_postcode) {
+    # if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
 
       table_postal_com_name <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
 
@@ -760,7 +832,8 @@ phaco_geocode <- function(data_to_geocode,
   }
 
   # On cree rue_recoded meme si corrections_REGEX == FALSE => necessaire car le fuzzy matching se fait sur cette colonne
-  if (corrections_REGEX == FALSE & (situation == "num_rue_postal_s"|situation == "no_num_rue_postal_s")) {
+  if (!corrections_REGEX & !integrated_postcode) {
+  # if (corrections_REGEX == FALSE & (situation == "num_rue_postal_s"|situation == "no_num_rue_postal_s")) {
     data_to_geocode <- data_to_geocode %>%
       mutate(rue_recoded = str_squish(rue_to_geocode),
              recode = NA)
@@ -860,17 +933,17 @@ phaco_geocode <- function(data_to_geocode,
 
   # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
   # Si ca ne se lance pas, on supprime les cles de jointure dont on n'a plus besoin
-  if(sum(duplicated(res$ID_address)) == 0){
+  if (!anyDuplicated(res$ID_address)) {
     res <- res %>%
       select(-address_join, -address_join_street)
   }
 
-  if(sum(duplicated(res$ID_address)) > 0){
+  if (anyDuplicated(res$ID_address)) {
 
     cat(paste0("\n","\u29D7"," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
 
     res <- res %>%
-      mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
+      mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p = 0.1, nthread = n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
       group_by(ID_address) %>%
       mutate(min_jw = min(distance_jw)) %>%
       filter(distance_jw == min_jw | is.na(distance_jw)) %>%
@@ -889,7 +962,7 @@ phaco_geocode <- function(data_to_geocode,
   ### iii) Elargissement de la boucle aux communes adjacentes -------------------------------------------------------------------------------
   # On supprime la contrainte de recherche de la rue dans la commune, pour augmenter le % de rues detectees
 
-  if (elargissement_com_adj == TRUE) {
+  if (elargissement_com_adj) {
 
     cat(paste0("\n","\u29D7"," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes"))
 
@@ -900,7 +973,7 @@ phaco_geocode <- function(data_to_geocode,
       select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -dist_fuzzy,
              -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector)
 
-    if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
+    if (nrow(ADDRESS_last_tentative) > 0) { # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
 
       # On charge la table de conversion code postal > code INS recode (voir preprocessing)
       table_INS_recod_code_postal <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";",progress= F, col_types = cols(.default = col_character()))
@@ -988,7 +1061,8 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 2)  Jointure des adresses --------------------------------------------------------------------------------------------------------------
 
-  if (situation != "no_num_rue_postal_s" & situation != "no_num_rue_postal_i") {
+  if (have_number) {
+  # if (situation != "no_num_rue_postal_s" & situation != "no_num_rue_postal_i") {
 
     #### i. Preparation des fichiers adresses (BeST) ------------------------------------------------------------------------------------------
 
@@ -1108,7 +1182,8 @@ phaco_geocode <- function(data_to_geocode,
 
   # On cree FULLGEOCODING si on est dans le cas d'absence de num (on geocode a la rue) => FULLGEOCODING n'a alors pas encore ete cree
   # On renomme les variables pour etre compatible avec le reste du script
-  if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
+  if (!have_number){
+  # if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
     FULL_GEOCODING <- res %>%
       mutate(approx_num = NA,
              type_geocoding2 = ifelse(!is.na(mid_x_31370), "mid_street", NA)) %>%
@@ -1122,7 +1197,8 @@ phaco_geocode <- function(data_to_geocode,
   }
 
   # On indique le num du milieu de la rue si les coordonnee du batiment ne sont pas trouvee
-  if (mid_street == TRUE &(situation == "num_rue_postal_s"|situation == "num_rue_i_postal_s"|situation == "num_rue_postal_i")){
+  if (mid_street & have_number) {
+  # if (mid_street == TRUE &(situation == "num_rue_postal_s"|situation == "num_rue_i_postal_s"|situation == "num_rue_postal_i")){
     FULL_GEOCODING <- FULL_GEOCODING %>%
       mutate(type_geocoding2 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), "mid_street", NA),
              x_31370 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), mid_x_31370, x_31370),
@@ -1155,7 +1231,8 @@ phaco_geocode <- function(data_to_geocode,
     arrange(ID_address)
 
   # On enleve address_join_geocoding dans un if statement car la colonne n'existe pas pour les situations sans numeros
-  if (situation != "no_num_rue_postal_s" & situation != "no_num_rue_postal_i") {
+  if (!have_number) {
+  # if (situation != "no_num_rue_postal_s" & situation != "no_num_rue_postal_i") {
     FULL_GEOCODING <- FULL_GEOCODING %>%
       select(-address_join_geocoding)
   }
@@ -1239,6 +1316,7 @@ phaco_geocode <- function(data_to_geocode,
   ## 3) Anonymisation potentielle -----------------------------------------------------------------------------------------------------------
 
   # Si l'anonymat est enclenche, supression de toutes les colonnes permettant de reconnaitre l'adresse
+  # TODO
   if (anonymous == TRUE) {
 
     if (situation == "num_rue_postal_s") {
