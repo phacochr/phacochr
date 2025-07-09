@@ -1047,7 +1047,7 @@ phaco_geocode <- function(data_to_geocode,
             group_by(ID_address) %>%
             mutate(min = min(approx_num)) %>%
             filter(min == approx_num) %>%  # selection plus proche
-            sample_n(1) %>%
+            slice_sample_seeded(seed_cols = c(num_rue_clean, ID_address), n = 1) %>%
             select(-street_id_phaco, -num_rue_clean)
 
           #sum(duplicated(APPROX_1$ID_address))
