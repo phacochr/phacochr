@@ -75,7 +75,7 @@ phaco_best_data_update <- function(force=FALSE,
 
   # 0. Mise a jour --------------------------------------------------------------------------------------------------------------------------
 
-  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr_branchdev"),"/data_phacochr/")) # bricolage pour windows
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
   if(sum(
@@ -169,20 +169,27 @@ phaco_best_data_update <- function(force=FALSE,
 
     # Fonction pour extraire les rues
     extract_street <- function(x) {
-      temp <- x %>%
-        mutate(street_id_phaco=1:n()) %>%
-        pivot_longer(cols = c("street_fr", "street_nl", "street_de"),
-                     values_to = "street_FINAL_detected",
-                     names_to = "langue_FINAL_detected") %>%
-        filter(!is.na(street_FINAL_detected)) %>%
-        mutate(langue_FINAL_detected = recode(langue_FINAL_detected,
-                                              "street_fr" = "FR",
-                                              "street_nl" = "NL",
-                                              "street_de" ="DE"),
-               key_street_unique = paste(street_FINAL_detected, postal_id)) %>%
-        distinct(key_street_unique, .keep_all = TRUE) %>%
-        select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected, key_street_unique) %>%
-        return(temp)
+      temp <- x |>
+        # mutate(street_id_phaco = 1:n()) |>
+        pivot_longer(
+          cols = c("street_fr", "street_nl", "street_de"),
+          values_to = "street_FINAL_detected",
+          names_to = "langue_FINAL_detected"
+        ) |>
+        filter(!is.na(street_FINAL_detected)) |>
+        mutate(
+          langue_FINAL_detected = recode(langue_FINAL_detected,
+            "street_fr" = "FR",
+            "street_nl" = "NL",
+            "street_de" = "DE"
+          ),
+          # key_street_unique = paste(street_FINAL_detected, postal_id),
+          street_id_phaco = paste0(street_no, "_", postal_id)
+        ) |>
+        # On supprime les dupliques (rues dont les noms sont egaux en plusieurs langues) => on ne garde que le 1er
+        distinct(street_id_phaco, langue_FINAL_detected, .keep_all = TRUE) |>
+        select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected)
+      return(temp)
     }
 
     Brussels_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
@@ -191,6 +198,10 @@ phaco_best_data_update <- function(force=FALSE,
 
     belgium_street <- bind_rows(Brussels_postal_street,Wallonia_postal_street, Flanders_postal_street)
     belgium_street <- extract_street(belgium_street)
+
+    # belgium_street_unique <- belgium_street |>
+    #   distinct(key_street_unique, .keep_all = TRUE) |>
+    #   select(-street_FINAL_detected, -langue_FINAL_detected)
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation du fichier des rues BeST"))
 
@@ -202,7 +213,7 @@ phaco_best_data_update <- function(force=FALSE,
 
       cat(paste0("\n","\u29D7"," Correction orthographique des rues BeST"))
 
-      belgium_street <- belgium_street %>%
+      belgium_street <- belgium_street |>
         mutate(rue_recoded = street_FINAL_detected,
                id_regex_belgium_street = 1:n(),
 
@@ -319,7 +330,7 @@ phaco_best_data_update <- function(force=FALSE,
                rue_recoded = str_squish(rue_recoded) # A faire a la fin : pour les doubles espaces et les espaces en trop a gauche ou a droite
         )
 
-      belgium_street <- belgium_street %>%
+      belgium_street <- belgium_street |>
         mutate(rue_recoded_virgule = ifelse(rue_recoded_virgule == TRUE, "virgule", NA),
                rue_recoded_parenthese = ifelse(rue_recoded_parenthese == TRUE, "parenthese", NA),
                rue_recoded_Commandant = ifelse(rue_recoded_Commandant == TRUE, "Commandant", NA),
@@ -340,17 +351,16 @@ phaco_best_data_update <- function(force=FALSE,
         )
 
       # On fusionne toutes les colonnes qui commencent par "rue_recoded_" en une
-      belgium_street_REGEX <- belgium_street %>%
-        select(id_regex_belgium_street, starts_with("rue_recoded_")) %>%
+      belgium_street_REGEX <- belgium_street |>
+        select(id_regex_belgium_street, starts_with("rue_recoded_")) |>
         unite("recode", 2:last_col(), sep = " ; ", remove = TRUE, na.rm = TRUE)
 
-      belgium_street <- belgium_street %>%
-        select(-starts_with("rue_recoded_")) %>%
-        left_join(belgium_street_REGEX, by = "id_regex_belgium_street") %>%
-
+      belgium_street <- belgium_street |>
+        select(-starts_with("rue_recoded_")) |>
+        left_join(belgium_street_REGEX, by = "id_regex_belgium_street") |>
         # Pour revenir a la structure originale pre correction
-        select(-id_regex_belgium_street, -recode, -street_FINAL_detected) %>%
-        rename("street_FINAL_detected" = "rue_recoded") %>%
+        select(-id_regex_belgium_street, -recode, -street_FINAL_detected) |>
+        rename("street_FINAL_detected" = "rue_recoded") |>
         relocate(street_FINAL_detected, .after = postal_id)
 
       cat(paste0("\033[K","\r",colourise("\u2714", fg="green")," Correction orthographique des rues BeST", "\033[K"))
@@ -360,25 +370,61 @@ phaco_best_data_update <- function(force=FALSE,
 
     # 2. Fichier adresses ---------------------------------------------------------------------------------------------------------------------
 
-    cat(paste0("\n",  "\u29D7"," Cr", "\u00e9", "ation du fichier des adresses BeST (jointure spatiale avec les secteurs statistiques)"))
+    cat(paste0("\n",  "\u29D7"," Cr", "\u00e9", "ation du fichier des adresses BeST et jointure spatiale avec les secteurs statistiques (cela peut prendre du temps...)"))
 
-    # Fonction pour selectionner les variables et creer un ID street
+    # Fonction pour formater les adresses Best
     select_id_street <- function(x) {
-      temp <- x %>%
-        rename("x_31370" = "EPSG:31370_x",
-               "y_31370" = "EPSG:31370_y") %>%
-        filter(x_31370 != "0.00000") %>%
-        mutate(house_number_sans_lettre = str_extract(house_number, regex("[0-9]+", ignore_case = TRUE))) %>%
-        select(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, x_31370, y_31370) %>%
-        distinct(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, .keep_all = TRUE) %>%
-        pivot_longer(cols=  c("streetname_de", "streetname_fr", "streetname_nl"),
-                     values_to = "street_name",
-                     names_to = "langue") %>%
-        filter(!is.na(street_name)) %>%
-        mutate(key_street_unique = paste(street_name, postcode)) %>%
-        left_join(belgium_street, by = "key_street_unique") %>%
-        select(house_number_sans_lettre, street_id_phaco, x_31370, y_31370, postcode) %>%
-        distinct(house_number_sans_lettre, street_id_phaco, postcode, .keep_all = TRUE) # J'enleve les coordonnees car 1 adresse en double avec des coordonnees differentes (?)
+      start_time <- Sys.time()
+
+      temp <- x |>
+        rename(
+          "x_31370" = "EPSG:31370_x",
+          "y_31370" = "EPSG:31370_y"
+        ) |>
+        # On ne garde pas les adresses sans coord. (inutile pour du geocodage)
+        filter(x_31370 != "0.00000") |>
+        mutate(
+          # On detecte le num de police SANS LA LETTRE (le geocodage = niveau de precision du batiment)
+          house_number_sans_lettre = str_extract(house_number, regex("[0-9]+", ignore_case = TRUE)),
+          # On cree un ID unique dans la fonction pour la jointure apres
+          id_select_id_street = 1:n()
+        )
+        # On transforme en objet datatable
+        # dtplyr::lazy_dt()
+      # print("temp")
+
+      # Etape pour ne garder que les adresses par num de police SANS LA LETTRE
+      temp_distinct <- temp |>
+        select(id_select_id_street, house_number_sans_lettre, street_id, streetname_de, streetname_fr, streetname_nl, postcode, x_31370, y_31370) |>
+        # On ne garde qu'une adresse par num de police SANS LA LETTRE (avec distinct())
+        distinct(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, .keep_all = TRUE) |>
+        mutate(
+          street_id_phaco = paste0(street_id, "_", postcode)
+        ) |>
+        # # On joint les rues pour avoir l'id phaco (DESORMAIS DISPENSABLE AVEC LE NOUVEAU ID)
+        # left_join(belgium_street_unique |> select(-postal_id), by = "key_street_unique") |>
+        select(street_id_phaco, id_select_id_street, house_number_sans_lettre, x_31370, y_31370, postcode)
+      # print("temp_distinct")
+
+      # Etape pour garder tous les id des adresses (de tous les num de police AVEC LETTRE)
+      temp_id_best <- temp |>
+        select(id_select_id_street, address_id, house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode) |>
+        group_by(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode) |>
+        summarise(
+          address_id = paste0(address_id, collapse = ";"),
+          id_select_id_street = first(id_select_id_street)
+        ) |>
+        ungroup() |>
+        select(address_id, id_select_id_street)
+      # print("temp_id_best")
+
+      temp <- temp_distinct |>
+        left_join(temp_id_best, by = "id_select_id_street") |>
+        select(-id_select_id_street)
+        # as_tibble()
+      # print("final")
+
+      print(paste("Temps de calcul :", Sys.time() - start_time))
       return(temp)
     }
 
@@ -476,7 +522,7 @@ phaco_best_data_update <- function(force=FALSE,
         )
       ) %>%
       filter(detect == TRUE) %>%
-      select(-key_street_unique, "street_FINAL_detected_Origin" = "street_FINAL_detected", "street_FINAL_detected" = "street_FINAL_detected_abv", nom_propre_abv = detect) %>%
+      rename("street_FINAL_detected_Origin" = "street_FINAL_detected", "street_FINAL_detected" = "street_FINAL_detected_abv") %>%
       mutate(nom_propre_abv = 1)
 
     # On supprime qques abreviations fausses
@@ -485,7 +531,7 @@ phaco_best_data_update <- function(force=FALSE,
              Saint = str_detect(street_FINAL_detected, regex("(Sint-[a-z])|(Saint(|e)-[a-z])", ignore_case = TRUE)),
              Last = str_detect(street_FINAL_detected, regex("(\\s|'|-)[A-Z]$", ignore_case = TRUE)),
              Last_double = str_detect(street_FINAL_detected, regex("((\\s|'|-)[A-Z][A-Z]$)", ignore_case = TRUE)),
-             King = str_detect(street_FINAL_detected_Origin, regex("1er$|II|Roi\\s|Koning(|in)\\s", ignore_case = TRUE))
+             King = str_detect(street_FINAL_detected_Origin, regex("( Ier|1er)$|II|Roi\\s|Koning(|in)\\s", ignore_case = TRUE))
       ) %>%
       filter(Last == FALSE) %>%
       filter(Last_double == FALSE) %>%
@@ -495,13 +541,105 @@ phaco_best_data_update <- function(force=FALSE,
       select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected, nom_propre_abv)
 
     # Export Belgium street
-    belgium_street <- belgium_street %>%
-      select(-key_street_unique)
-
     belgium_street_abv <- belgium_street %>%
       bind_rows(belgium_street_abv)
 
     cat(paste0("\r",  colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
+
+    # Ajout des rues de Charleroi
+
+    cat(paste0("\n", "\u29D7", " Ajout des anciens noms de rue pour la commune de Charleroi"))
+
+    # Certaines rues sont mal ecrites dans le fichier de la commune, on les corrige
+    rue_charleroi <- read_excel(paste0(path_data,"CHARLEROI/Rues-Nouveaux-noms_2024-01-17.xlsx")) %>%
+      mutate(
+        section = substr(section, 1, 4),
+        nouveau_nom = str_replace(nouveau_nom, "' ", "'"),
+        nouveau_nom = str_replace(nouveau_nom, "  ", " "),
+        nouveau_nom = str_replace(nouveau_nom, "\u2019", "'"),# apostrophe courbe ’ différent de '
+        nouveau_nom = str_replace(nouveau_nom, "rue ", "Rue "),
+        nouveau_nom = str_replace(nouveau_nom, paste0("Ch", "\u00e8", "vres"), paste0("Ch", "\u00ea", "vres")), # "Chèvres" en "Chêvres"
+        nouveau_nom = str_replace(nouveau_nom, paste0("Br", "\u00e8", "y", "\u00f6", "d"), paste0("Br", "\u00e8", "y", "\u00f4", "d")), # "Brèyöd" en "Brèyôd"
+        nouveau_nom = str_replace(nouveau_nom, paste0("Tr", "\u00ef"), paste0("Tr", "\u00ee")), # "Trï" en "Trî"
+        nouveau_nom = str_replace(nouveau_nom, "Helleputte", "Hellepute")
+      ) |>
+      # Ces anciennes rues ont 2 nouveaux noms au sein du meme code postal => ambiguite, on n'en selectionne qu'une
+      # group_by(section, ancienne_denomination) |>
+      # mutate(dup = n()) |>
+      filter(!(ancienne_denomination == "Place Albert Ier" & nouveau_nom == "Petite Rue")) |>
+      filter(!(ancienne_denomination == "Rue Jules Destrée" & nouveau_nom == "Rue des Raspes"))
+
+    # On identifie les (nouveaux noms de) rues dans Best qui correspondent aux anciens noms de rue de Charleroi
+    rue_charleroi_old <- belgium_street %>%
+      mutate(street_FINAL_detected = str_replace(street_FINAL_detected, "\u2019", "'")) %>% # apostrophe courbe ’ différent de  '
+      inner_join(rue_charleroi, by = c(
+        "postal_id" = "section",
+        "street_FINAL_detected" = "nouveau_nom"
+      )) %>%
+      mutate(
+        street_FINAL_detected = ancienne_denomination,
+        ancien_nom_rue = 1
+      ) |>
+      select(-ancienne_denomination)
+
+    # On remplace les noms propres par leur abreviations (y compris noms composes)
+    rue_charleroi_old_abv <- rue_charleroi_old %>%
+      mutate(
+        detect = str_detect(
+          street_FINAL_detected,
+          str_c(
+            "\\b(?<!\\-)(",
+            str_c(prenoms$TX_FST_NAME,
+                  collapse = "|"
+            ),
+            ")\\b(?!\\-)"
+          )
+        ),
+        street_FINAL_detected_abv = str_replace(
+          street_FINAL_detected,
+          str_c(
+            "\\b(?<!\\-)(",
+            str_c(prenoms$TX_FST_NAME,
+                  collapse = "|"
+            ),
+            ")\\b(?!\\-)"
+          ),
+          str_remove_all(str_replace(str_extract(
+            street_FINAL_detected,
+            str_c(
+              "\\b(?<!\\-)(",
+              str_c(prenoms$TX_FST_NAME,
+                    collapse = "|"
+              ),
+              ")\\b(?!\\-)"
+            )
+          ), "-", " "), "(?<!^|[:space:]).")
+        )
+      ) |>
+      filter(detect==TRUE) %>%
+      rename("street_FINAL_detected_Origin" = "street_FINAL_detected", "street_FINAL_detected" = "street_FINAL_detected_abv") %>%
+      mutate(nom_propre_abv = 1)
+
+    # On supprime qques abreviations fausses
+    rue_charleroi_old_abv <- rue_charleroi_old_abv |>
+      mutate(Count = str_length(street_FINAL_detected),
+             Saint = str_detect(street_FINAL_detected, regex("(Sint-[a-z])|(Saint(|e)-[a-z])", ignore_case = TRUE)),
+             Last = str_detect(street_FINAL_detected, regex("(\\s|'|-)[A-Z]$", ignore_case = TRUE)),
+             Last_double = str_detect(street_FINAL_detected, regex("((\\s|'|-)[A-Z][A-Z]$)", ignore_case = TRUE)),
+             King = str_detect(street_FINAL_detected_Origin, regex("( Ier|1er)$|II|Roi\\s|Koning(|in)\\s", ignore_case = TRUE))
+             ) %>%
+      filter(Last == FALSE) %>%
+      filter(Last_double == FALSE) %>%
+      filter(Count >= 10 & Count <= 25) %>%
+      filter(Saint == FALSE) %>%
+      filter(King == FALSE) %>%
+      select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected, ancien_nom_rue, nom_propre_abv)
+
+    rue_charleroi_old_abv <- bind_rows(rue_charleroi_old, rue_charleroi_old_abv)
+
+    belgium_street_abv <- bind_rows(belgium_street_abv, rue_charleroi_old_abv)
+
+    cat(paste0("\r", colourise("\u2714", fg="green"), " Ajout des anciens noms de rue pour la commune de Charleroi"))
 
     # Assigner a chaque rue par code postal les coordonnees du numero du milieu
     cat(paste0("\n", "\u29D7", " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))

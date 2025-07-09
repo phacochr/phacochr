@@ -71,7 +71,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # Definition du chemin ou se trouve les donnees
   if(is.null(path_data)){
-    path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+    path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr_branchdev"),"/data_phacochr/")) # bricolage pour windows
   }
 
   # Fonction utilisee dans le script => https://www.r-bloggers.com/2018/07/the-notin-operator/

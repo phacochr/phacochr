@@ -17,8 +17,8 @@ phaco_setup_data <- function(){
   cat(colourise(paste0(" -- Chargement des donn","\u00e9","es pour PhacochR --"), fg="light green" ))
   start_time <- Sys.time()
 
-  # Creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
-  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr")) # bricolage pour windows
+  # Creer le chemin en fonction du systeme d'ephacoxploitation (Mac, Windows ou Linux)
+  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr_branchdev"),"/data_phacochr")) # bricolage pour windows
   cat(paste0("\n",colourise("\u2714", fg="green"), " Cr","\u00e9","ation du dossier : ", path_data))
   dir.create(path_data, recursive = T, showWarnings = F)
 
