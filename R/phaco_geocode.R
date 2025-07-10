@@ -388,7 +388,6 @@ phaco_geocode <- function(data_to_geocode,
     # }
   }
 
-  print(data_to_geocode)
 
 
 
@@ -902,25 +901,33 @@ phaco_geocode <- function(data_to_geocode,
 
   # /!\ NOTE : la cle de jointure est en minuscule (d'ou les str_to_lower() avant), car stringdist identifie la diff de case comme une diff !
   # /!\ NOTE2 : la jointure cree les colonnes de postal_street, meme si 0 match ! Important pour la suite, notamment le if statement pour la creation de l'objet sf
-  res <- tibble()
-  res <- foreach (i = unique(data_to_geocode$code_postal_to_geocode),
-                  .combine = 'bind_rows',
-                  .packages=c("dplyr","fuzzyjoin"))  %dopar% {
+  # res <- tibble()
+  # res <- foreach (i = unique(data_to_geocode$code_postal_to_geocode),
+  #                 .combine = 'bind_rows',
+  #                 .packages=c("dplyr","fuzzyjoin"))  %dopar% {
+  #
+  #                   data_to_geocode_i <- data_to_geocode %>%
+  #                     filter(code_postal_to_geocode == i)
+  #
+  #                   postal_street_i <- postal_street %>%
+  #                     filter(postal_id == i)
+  #
+  #                   stringdist_left_join(data_to_geocode_i,
+  #                                        postal_street_i,
+  #                                        by = c("address_join" = "address_join_street"),
+  #                                        method = method_stringdist,
+  #                                        max_dist = error_max,
+  #                                        distance_col = "dist_fuzzy",
+  #                                        nthread= n.cores)
+  #                 }
 
-                    data_to_geocode_i <- data_to_geocode %>%
-                      filter(code_postal_to_geocode == i)
-
-                    postal_street_i <- postal_street %>%
-                      filter(postal_id == i)
-
-                    stringdist_left_join(data_to_geocode_i,
-                                         postal_street_i,
-                                         by = c("address_join" = "address_join_street"),
-                                         method = method_stringdist,
-                                         max_dist = error_max,
-                                         distance_col = "dist_fuzzy",
-                                         nthread= n.cores)
-                  }
+  res <- address_fuzzy_matching_by_group(
+    data_to_geocode, postal_street,
+    cols_to_match = c("address_join" = "address_join_street"),
+    group_by = c("code_postal_to_geocode" = "postal_id"),
+    method = method_stringdist,
+    max_dist = error_max,
+    nthread = n.cores)
 
   cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)", "\033[K"))
 
@@ -1010,6 +1017,8 @@ phaco_geocode <- function(data_to_geocode,
                                                  max_dist = error_max/2,
                                                  distance_col = "dist_fuzzy")
                           }
+
+
 
       # Ce if statement car res_adj peut avoir 0 observations => NOTE : elucider pourquoi ? Pourquoi ca n'arrive pas avec "res" (boucle precedente) ?
       if(nrow(res_adj) > 0){
@@ -1148,7 +1157,7 @@ phaco_geocode <- function(data_to_geocode,
               group_by(ID_address) %>%
               mutate(min = min(approx_num)) %>%
               filter(min == approx_num) %>%  # selection plus proche
-              sample_n(1) %>%
+              slice_sample_seeded(seed_cols = c(num_rue_clean, ID_address), n = 1) %>%
               select(-street_id_phaco, -num_rue_clean)
 
             #sum(duplicated(APPROX_2$ID_address))
@@ -1359,7 +1368,7 @@ phaco_geocode <- function(data_to_geocode,
     # Le cas est particulier si pas de num, les colonnes de num n'existant pas !
     if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
       FULL_GEOCODING <- FULL_GEOCODING %>%
-        select(-rue_recoded, -recode, -street_FINAL_detected,                 -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num,                                                                        -cd_sector_x_31370, -cd_sector_y_31370)
+        select(-rue_recoded, -recode, -street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num,                                                                        -cd_sector_x_31370, -cd_sector_y_31370)
     }
 
   }
