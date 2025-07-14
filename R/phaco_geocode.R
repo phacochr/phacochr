@@ -1154,15 +1154,14 @@ phaco_geocode <- function(data_to_geocode,
 
       cat(paste0("\n","\u29D7"," Approximation ", "\u00e0", " + ou - ", approx_num_max*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es"))
 
-      FULL_GEOCODING <<- FULL_GEOCODING
       # On selectionne les lignes pour lesquelles un numero de police a ete encode, on a trouve la rue, mais pour lesquelles on n'a pas trouve de correspondance dans les fichiers openaddress.
       FULL_GEOCODING_APPROX <- FULL_GEOCODING %>%
         filter(!is.na(street_id_phaco) & !is.na(num_rue_clean) & is.na(address_id)) %>%
         select(-x_31370, -y_31370, -cd_sector, -address_id, -approx_num)
 
-      FULL_GEOCODING_APPROX %>%
+      FULL_GEOCODING_APPROX <- FULL_GEOCODING_APPROX |>
         ungroup() |>
-        select(ID_address, num_rue_clean, street_id_phaco) |>
+        # select(ID_address, num_rue_clean, street_id_phaco) |>
         inner_join(
           openaddress_be |> select(street_id_phaco, house_number_sans_lettre, x_31370, y_31370, cd_sector),
           by = c("street_id_phaco"),
@@ -1253,6 +1252,7 @@ phaco_geocode <- function(data_to_geocode,
       #       inner_join(FULL_GEOCODING_APPROX, APPROX_1, by = "ID_address"),
       #       inner_join(FULL_GEOCODING_APPROX, APPROX_2, by = "ID_address")) %>%
       #       filter(approx_num <= approx_num_max*2)
+
       #
           FULL_GEOCODING <- FULL_GEOCODING %>%
             filter(ID_address %ni% FULL_GEOCODING_APPROX$ID_address) %>%
@@ -1345,7 +1345,6 @@ phaco_geocode <- function(data_to_geocode,
 
 
   ## 2) Resultats recapitulatifs ------------------------------------------------------------------------------------------------------------
-  FULL_GEOCODING <<- FULL_GEOCODING
   Summary_region <- bind_rows(
     FULL_GEOCODING,
     FULL_GEOCODING |> mutate(Region = "Total") # Technique tres astucieuse pour ajouter un total au tableau de synthese avec le group_by > summarise!
