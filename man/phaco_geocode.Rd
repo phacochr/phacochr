@@ -7,7 +7,7 @@
 phaco_geocode(
   data_to_geocode,
   rue,
-  num_rue,
+  num,
   code_postal,
   method_stringdist = "lcs",
   corrections_REGEX = TRUE,
@@ -22,6 +22,12 @@ phaco_geocode(
 }
 \arguments{
 \item{data_to_geocode}{Un dataframe avec les adresses a geocoder.}
+
+\item{rue}{Nom de la colonne avec les rues.}
+
+\item{num}{Nom de la colonne avec les numéros.}
+
+\item{code_postal}{Nom de la colonne avec les codes postaux.}
 
 \item{method_stringdist}{Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles: "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw","soundex".}
 
@@ -40,18 +46,6 @@ phaco_geocode(
 \item{anonymous}{Anonymisation des résultats en ajoutant uniquement les informations des entités administratives (secteurs statistiques, quartiers, (sous-)communes, etc.). Dans ce cas, les coordonnées X-Y indiquées sont le centroïde du secteur statistique. De plus, toutes les informations relatives à l'adresse dans les données originales sont supprimées. Par défaut: FALSE.}
 
 \item{path_data}{Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.}
-
-\item{colonne_rue}{Nom de la colonne avec les rues.}
-
-\item{colonne_num}{Nom de la colonne avec les numéros.}
-
-\item{colonne_code_postal}{Nom de la colonne avec les codes postaux.}
-
-\item{colonne_num_rue}{Nom de la colonne avec numéros et rues ensemble.}
-
-\item{colonne_rue_code_postal}{Nom de la colonne avec rues et code postaux ensemble.}
-
-\item{colonne_num_rue_code_postal}{Nom de la colonne avec numéros, rues et code postaux ensemble.}
 }
 \description{
 A FAIRE : exemple solo ne fonctionne pas : bug => A regler !

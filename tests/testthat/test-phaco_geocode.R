@@ -3,9 +3,9 @@ test_that("phaco_geocode renvoie un objet cohérent", {
 
   result <- phaco_geocode(
     data_to_geocode = snacks,
-    colonne_num = "num",
-    colonne_rue = "rue",
-    colonne_code_postal = "code_postal"
+    num = "num",
+    rue = "rue",
+    code_postal = "code_postal"
   )
 
   expect_equal(
