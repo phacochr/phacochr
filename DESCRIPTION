@@ -9,10 +9,10 @@ URL: https://phacochr.github.io/phacochr/, https://github.com/phacochr
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, purrr, stats,
     readr, readxl, stringdist, sf, sp, spdep, knitr, 
-    stringr, tidyr, rappdirs, utils, mapsf, scales
+    stringr, tidyr, rappdirs, utils, mapsf, scales, arrow
 Language: fr
 LazyData: true
 Depends: R (>= 3.5.0)
