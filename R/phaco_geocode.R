@@ -486,7 +486,6 @@ phaco_geocode <- function(data_to_geocode,
 
 
     data_to_geocode <- data_to_geocode |>
-      data_to_geocode |>
       mutate(num_rue_clean = ifelse(
         is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)),
         regex_extract_number_from_address(rue_to_geocode),
@@ -505,7 +504,6 @@ phaco_geocode <- function(data_to_geocode,
     #   relocate(num_rue_clean, .before = code_postal_to_geocode)
 
     data_to_geocode <- data_to_geocode |>
-      data_to_geocode |>
       mutate(num_rue_clean = regex_extract_number_from_address(rue_to_geocode))
 
   }
@@ -987,10 +985,9 @@ phaco_geocode <- function(data_to_geocode,
     res <- res %>%
       mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p = 0.1, nthread = n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
       group_by(ID_address) %>%
-      mutate(min_jw = min(distance_jw)) %>%
-      filter(distance_jw == min_jw | is.na(distance_jw)) %>%
+      filter(distance_jw == min(distance_jw) | is.na(distance_jw)) %>%
       sample_n(1) %>% # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
-      select(-min_jw, -distance_jw, -address_join, -address_join_street)
+      select(-distance_jw, -address_join, -address_join_street)
 
     cat(paste0("\r",colourise("\u2714", fg="green")," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
   }
@@ -1078,7 +1075,7 @@ phaco_geocode <- function(data_to_geocode,
             group_by(ID_address) %>%
             filter(distance_jw == min(distance_jw) | is.na(distance_jw)) %>%
             sample_n(1) %>% # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
-            select(-min_jw, -distance_jw, -address_join, -address_join_street)
+            select(-distance_jw, -address_join, -address_join_street)
         }
 
         res_adj <- res_adj %>%

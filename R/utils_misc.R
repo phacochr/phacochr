@@ -28,7 +28,7 @@ address_fuzzy_matching_by_group <- function(a, b, cols_to_match, group_by, metho
   results <- foreach(
     i = seq_len(nrow(var_to_filter)),
     .combine = 'bind_rows',
-    .packages = c("dplyr","fuzzyjoin")) %do% {
+    .packages = c("dplyr","fuzzyjoin")) %dopar% {
     current_filter_a <- var_to_filter[i, ]
 
     # Dynamically build filter expressions for a and b
