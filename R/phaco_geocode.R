@@ -1169,20 +1169,21 @@ phaco_geocode <- function(data_to_geocode,
           relationship = "many-to-many") |>
         mutate(
           is_same_side = is_same_parity(num_rue_clean, house_number_sans_lettre),
-          diff = abs(num_rue_clean - house_number_sans_lettre),
+          approx_num = abs(num_rue_clean - house_number_sans_lettre),
           .by = street_id_phaco) |>
         # Take number with minimum difference on the same side and under the max approximation allowed
         mutate(
-          num_fix = if_else(diff == min(diff) & is_same_side & diff <= approx_num_max * 2, house_number_sans_lettre, NA),
+          num_fix = if_else(approx_num == min(approx_num) & is_same_side & approx_num <= approx_num_max * 2, house_number_sans_lettre, NA),
           .by = c(is_same_side, street_id_phaco)
         ) |>
         #
         mutate(
-          num_fix = if_else(is.na(num_fix) & diff == min(diff) & diff <= approx_num_max * 2, house_number_sans_lettre, num_fix),
+          num_fix = if_else(is.na(num_fix) & approx_num == min(approx_num) & approx_num <= approx_num_max * 2, house_number_sans_lettre, num_fix),
           .by = street_id_phaco
         ) |>
         filter(!is.na(num_fix)) |>
         mutate(num_rue_clean = num_fix) |>
+        group_by(street_id_phaco) |>
         slice_sample_seeded(seed_cols = c(num_rue_clean, ID_address), n = 1)
 
       # if (nrow(FULL_GEOCODING_APPROX) > 0) { # A partir d'ici, plein de if statement pour eviter d'appliquer les operations sur un tableau vide (possible a chaque etape)
@@ -1344,7 +1345,7 @@ phaco_geocode <- function(data_to_geocode,
 
 
   ## 2) Resultats recapitulatifs ------------------------------------------------------------------------------------------------------------
-
+  FULL_GEOCODING <<- FULL_GEOCODING
   Summary_region <- bind_rows(
     FULL_GEOCODING,
     FULL_GEOCODING |> mutate(Region = "Total") # Technique tres astucieuse pour ajouter un total au tableau de synthese avec le group_by > summarise!
@@ -1356,8 +1357,8 @@ phaco_geocode <- function(data_to_geocode,
               "stringdist (moy)" = mean(dist_fuzzy, na.rm = T),
               "Geocode(%tot)" = round((sum(!is.na(x_31370))/n())*100, 1),
               "Geocode(%valid)" = round((sum(!is.na(x_31370))/sum(!is.na(rue_to_geocode)))*100, 1),
-              #"Approx (% geocodes)" = (sum(approx_num > 0, na.rm = T)/(sum(!is.na(x_31370))))*100,
-              "Approx.(n)" = sum(diff > 0, na.rm = T),
+              # "Approx (% geocodes)" = (sum(approx_num > 0, na.rm = T)/(sum(!is.na(x_31370))))*100,
+              "Approx.(n)" = sum(approx_num > 0, na.rm = T),
               "Elarg.(n)" = (sum(str_detect(type_geocoding, "elargissement_adj"), na.rm = T)),
               "Mid.(n)" = (sum(str_detect(type_geocoding, "mid_street"), na.rm = T)),
               "Abrev.(n)" = (sum(nom_propre_abv == 1, na.rm = T)),
