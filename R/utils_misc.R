@@ -73,3 +73,8 @@ detect_n_cores <- function(min_free_cores = 2) {
   }
   return(n.cores)
 }
+
+
+is_same_parity <- function(a, b){
+  a %% 2 == b %% 2
+}

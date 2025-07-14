@@ -14,8 +14,8 @@ regex_remove_postcode <- function(string) {
 }
 
 regex_extract_number_from_address <- function(string) {
- # str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))
- str_extract(string, regex("(?<!\\b(?:des|du|Albert|L[eé]opold|Baudouin)\\s?)([0-9]++)(?!\\s?(?:[i\\s]?[èe]me|de|er?))", ignore_case = TRUE)) |>
+ str_extract(string, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))
+ # str_extract(string, regex("(?<!\\b(?:des|du|Albert|L[eé]opold|Baudouin)\\s?)([0-9]++)(?!\\s?(?:[i\\s]?[èe]me|de|er?))", ignore_case = TRUE)) |>
     as.integer()
 }
 
@@ -141,7 +141,11 @@ regex_remove_tiret <- function(string) {
 
 regex_correct_street <- function(string){
   string |>
-    str_replace_all("[,:/]|[(].*[)]", " ") |>
+    # str_replace_all("[,:/]|[(].*[)]", " ") |>
+    str_replace_all(regex("[,]", ignore_case = TRUE), " ") |>
+    str_replace_all(regex("[:]", ignore_case = TRUE), " ") |>
+    str_replace_all(regex("[(].+[)]", ignore_case = TRUE), " ") |>
+    str_replace_all(regex("[/]", ignore_case = TRUE), " ") |>
     str_squish() |>
     regex_remove_boite() |>
     regex_remove_BP_CP() |>
@@ -153,7 +157,7 @@ regex_correct_street <- function(string){
     regex_fix_commandant() |>
     regex_fix_lieutenant() |>
     regex_fix_saint() |>
-    str_squish() |>  # To check if different bc was trim left
+    str_trim("left") |>  # To check if different bc was trim left
     regex_fix_chaussee() |>
     regex_fix_avenue() |>
     regex_fix_koning() |>
@@ -170,4 +174,6 @@ regex_correct_street <- function(string){
     regex_remove_tiret() |>
     str_squish()
 }
+
+
 

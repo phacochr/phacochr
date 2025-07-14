@@ -24,9 +24,9 @@ Partons des [données d'exemples `snacks`](https://phacochr.github.io/phacochr/r
 library(phacochr)
 
 result_anonym <- phaco_geocode(data_to_geocode = snacks,
-                               colonne_num = "num",
-                               colonne_rue = "rue",
-                               colonne_code_postal = "code_postal",
+                               num = "num",
+                               rue = "rue",
+                               code_postal = "code_postal",
                                anonymous = TRUE)
 ```
 
