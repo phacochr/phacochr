@@ -60,3 +60,16 @@ address_fuzzy_matching_by_group <- function(a, b, cols_to_match, group_by, metho
 #
 
 
+detect_n_cores <- function(min_free_cores = 2) {
+  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+  if (nzchar(chk) && chk == "TRUE") {
+    n.cores <- 2L # limite le nombre de coeurs a 2 pour les tests sur CRAN https://stackoverflow.com/questions/50571325/r-cran-check-fail-when-using-parallel-functions
+  } else {
+    if(parallel::detectCores() > 3) {  # on parallelise a n-1 core ssi 3 cores ou plus, sinon 1 core
+      n.cores <- parallel::detectCores() - min_free_cores
+    } else {
+      n.cores <- 1
+    }
+  }
+  return(n.cores)
+}

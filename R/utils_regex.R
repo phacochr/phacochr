@@ -13,6 +13,17 @@ regex_remove_postcode <- function(string) {
 
 }
 
+regex_extract_number_from_address <- function(string) {
+ # str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))
+ str_extract(string, regex("(?<!\\b(?:des|du|Albert|L[eé]opold|Baudouin)\\s?)([0-9]++)(?!\\s?(?:[i\\s]?[èe]me|de|er?))", ignore_case = TRUE)) |>
+    as.integer()
+}
+
+regex_extract_number <- function(string) {
+  str_extract(string, regex("[0-9]+", ignore_case = TRUE)) |>
+    as.integer()
+}
+
 regex_remove_boite <- function(string) {
   str_replace(string, regex("(^|\\s)(bt(e|[.]|)|bo(i|\u00ee)te|bus)(|\\s)([0-9]+|[a-zA-Z]\\b)", ignore_case = TRUE), " ")
 }

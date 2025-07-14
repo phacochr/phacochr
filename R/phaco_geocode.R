@@ -265,7 +265,7 @@ phaco_geocode <- function(data_to_geocode,
                        "tx_adm_dstr_descr_fr", "cd_prov_refnis", "tx_prov_descr_nl", "tx_prov_descr_fr", "cd_rgn_refnis", "tx_rgn_descr_nl", "tx_rgn_descr_fr", "MDRC", "NAME_FRE", "NAME_DUT",
                        "cd_sector_x_31370", "cd_sector_y_31370", "phaco_anonymous")
 
-  if(sum(names(data_to_geocode) %in% forbidden_names) > 0){
+  if (any(names(data_to_geocode) %in% forbidden_names)) {
     cat("\n")
     stop(paste0("\u2716"," des noms de colonnes de votre fichier sont similaires ","\u00e0"," certains utilis","\u00e9"," en interne par phaco_geocode(). Changez les noms de colonnes suivants : ", paste(intersect(names(data_to_geocode), forbidden_names), collapse = ", ")))
   }
@@ -397,9 +397,7 @@ phaco_geocode <- function(data_to_geocode,
     )
 
   # Un stop() si la colonne contenant la rue ne possede que des NA
-  if(
-    sum(is.na(data_to_geocode$rue_to_geocode))/sum(nrow(data_to_geocode)) == 1
-  ){
+  if (all(is.na(data_to_geocode$rue_to_geocode))) {
     cat("\n")
     stop(paste0("\u2716"," La colonne contenant la rue ne contient que des NA"))
   }
@@ -452,7 +450,10 @@ phaco_geocode <- function(data_to_geocode,
 
   # @@@@@@@@@@ Tout le script se lance uniquement s'il y a des codes postaux en Belgique ! @@@@@@@@@@
   # Dans le cas contraire => message d'erreur
-  if (length(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)])) == 0){
+
+  # TODO : Replace with regex [1-9]{1}[0-9]{3} -> if(any(str_detect(cp, regex)))
+  # Only load the file for the region when we use it at the end
+  if (length(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)])) == 0) {
     cat("\n")
     stop(paste0("\u2716"," il n'y a aucun code postal belge dans le fichier (ou erreur d'encodage)"))
   }
@@ -469,27 +470,49 @@ phaco_geocode <- function(data_to_geocode,
 
   if(!integrated_number) { # Do we let user choose if he want to do this since he explicitly say that the number is a specific column
   # if (situation == "num_rue_postal_s") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(num_rue_text = ifelse(is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # J'extrait le num du champ texte (ssi il est absent de num_rue)
-                                   str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE)),
-                                   NA),
-             num_rue_clean = ifelse(!is.na(num_rue_to_geocode) & str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # On cree un numero cleane : le num_rue (sans texte) OU le num du champ texte (ssi num_rue est vide)
-                                    str_extract(num_rue_to_geocode, regex("[0-9]+", ignore_case = TRUE)),
-                                    num_rue_text)) %>%
-      mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
-      relocate(num_rue_text, .before = code_postal_to_geocode) %>%
-      relocate(num_rue_clean, .after = num_rue_text) %>%
-      select(-num_rue_text)}
+
+    # Probable mistake here : we have a regex to not pickup king and ranking number but we are not using it to extract the correct number
+    # data_to_geocode <- data_to_geocode %>%
+    #   mutate(num_rue_text = ifelse(is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # J'extrait le num du champ texte (ssi il est absent de num_rue)
+    #                                str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE)),
+    #                                NA),
+    #          num_rue_clean = ifelse(!is.na(num_rue_to_geocode) & str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # On cree un numero cleane : le num_rue (sans texte) OU le num du champ texte (ssi num_rue est vide)
+    #                                 str_extract(num_rue_to_geocode, regex("[0-9]+", ignore_case = TRUE)),
+    #                                 num_rue_text)) %>%
+    #   mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
+    #   relocate(num_rue_text, .before = code_postal_to_geocode) %>%
+    #   relocate(num_rue_clean, .after = num_rue_text) %>%
+    #   select(-num_rue_text)
+
+
+    data_to_geocode <- data_to_geocode |>
+      data_to_geocode |>
+      mutate(num_rue_clean = ifelse(
+        is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)),
+        regex_extract_number_from_address(rue_to_geocode),
+        NA)
+      )
+    }
+
 
   # Dans le cas ou le num de rue est integre
   # NOTE /!\ le numero de rue doit IMPERATIVEMENT etre le premier chiffre du champ (souvent le cas) /!\
   if(integrated_number) {
   # if (situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(num_rue_clean = str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))) %>%
-      mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
-      relocate(num_rue_clean, .before = code_postal_to_geocode)
+    # data_to_geocode <- data_to_geocode %>%
+    #   mutate(num_rue_clean = str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))) %>%
+    #   mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
+    #   relocate(num_rue_clean, .before = code_postal_to_geocode)
+
+    data_to_geocode <- data_to_geocode |>
+      data_to_geocode |>
+      mutate(num_rue_clean = regex_extract_number_from_address(rue_to_geocode))
+
   }
+
+  # Probably useless
+  data_to_geocode <- data_to_geocode |>
+    mutate(num_rue_clean = regex_extract_number(num_rue_clean))
 
   # On force mid_street = TRUE si la colonne contenant la rue ne possede que des NA
   if (!mid_street & have_number) {
@@ -568,7 +591,11 @@ phaco_geocode <- function(data_to_geocode,
     # NOTE : en faire une fonction, et trouver une syntaxe plus pratique (une boucle ?)
 
     data_to_geocode <- data_to_geocode |>
-      mutate(rue_recoded = regex_correct_street(rue_recoded))
+      mutate(
+        rue_recoded = regex_correct_street(rue_recoded),
+        rue_recoded = if_else(rue_recoded == "", NA, rue_recoded))
+
+    # data_to_geocode$rue_recoded[data_to_geocode$rue_recoded == ""] <- NA
     #
     # data_to_geocode <- data_to_geocode %>%
     #   mutate(rue_recoded_virgule = str_detect(rue_recoded, regex("[,]", ignore_case = TRUE)),
@@ -820,7 +847,7 @@ phaco_geocode <- function(data_to_geocode,
     #   )
 
     # Au cas ou la rue serait un espace vide (certains cas possibles) => NA
-    data_to_geocode$rue_recoded[data_to_geocode$rue_recoded == ""] <- NA
+
 
     # On fusionne toutes les colonnes qui commencent par "rue_recoded_" en une
     # data_to_geocode_REGEX <- data_to_geocode %>%
@@ -862,16 +889,18 @@ phaco_geocode <- function(data_to_geocode,
   ## 0. Parametres/fonctions ----------------------------------------------------------------------------------------------------------------
 
   # Parametres pour la parallelisation
-  chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
-  if (nzchar(chk) && chk == "TRUE") {
-    n.cores <- 2L # limite le nombre de coeurs a 2 pour les tests sur CRAN https://stackoverflow.com/questions/50571325/r-cran-check-fail-when-using-parallel-functions
-  } else {
-    if(parallel::detectCores() > 3) {  # on parallelise a n-1 core ssi 3 cores ou plus, sinon 1 core
-      n.cores <- parallel::detectCores() - 1
-    } else {
-      n.cores <- 1
-    }
-  }
+  # chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+  # if (nzchar(chk) && chk == "TRUE") {
+  #   n.cores <- 2L # limite le nombre de coeurs a 2 pour les tests sur CRAN https://stackoverflow.com/questions/50571325/r-cran-check-fail-when-using-parallel-functions
+  # } else {
+  #   if(parallel::detectCores() > 3) {  # on parallelise a n-1 core ssi 3 cores ou plus, sinon 1 core
+  #     n.cores <- parallel::detectCores() - 1
+  #   } else {
+  #     n.cores <- 1
+  #   }
+  # }
+
+  n.cores <- detect_n_cores(min_free_cores = 1)
 
   cat(paste0("\n","-- G","\u00e9","ocodage"))
   cat(paste0("\n","\u29D7"," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur"))
@@ -941,9 +970,8 @@ phaco_geocode <- function(data_to_geocode,
 
   # On ne retient que l'adresse detectee avec la distance minimale
   res <- res |>
-    mutate(min = min(dist_fuzzy), .by = ID_address) |>
-    filter(dist_fuzzy == min | is.na(dist_fuzzy)) |>
-    select(-min, -postal_id)
+    filter(dist_fuzzy == min(dist_fuzzy) | is.na(dist_fuzzy), .by = ID_address) |>
+    select(-postal_id)
 
   # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
   # Si ca ne se lance pas, on supprime les cles de jointure dont on n'a plus besoin
@@ -1048,8 +1076,7 @@ phaco_geocode <- function(data_to_geocode,
           res_adj <- res_adj %>%
             mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
             group_by(ID_address) %>%
-            mutate(min_jw = min(distance_jw)) %>%
-            filter(distance_jw == min_jw | is.na(distance_jw)) %>%
+            filter(distance_jw == min(distance_jw) | is.na(distance_jw)) %>%
             sample_n(1) %>% # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
             select(-min_jw, -distance_jw, -address_join, -address_join_street)
         }
