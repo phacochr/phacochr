@@ -666,6 +666,8 @@ phaco_best_data_update <- function(force=FALSE,
 
     #write_csv2(belgium_street, paste0(path_data, "BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"))
     write_delim(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress=F)
+    #write_parquet(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"))
+
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
 
@@ -803,6 +805,9 @@ phaco_best_data_update <- function(force=FALSE,
       write_delim(temp, paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".csv"), delim = ";", na = "", progress=F)
     }
 
+    #write_parquet(openaddress_be, paste0(path_data, "BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet"))
+
+
     cat(paste0("\r", colourise("\u2714", fg="green")," Export des fichiers BeST par arrondissement"))
 
 
@@ -814,7 +819,7 @@ phaco_best_data_update <- function(force=FALSE,
     # Quartiers du monitoring
     BXL_QUARTIERS_sf <- st_read(paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg"), quiet=T,crs=31370)
     # jointure spatiale avec le centroid des secteurs statistiques
-    BXL_QUARTIERS <- st_join(BXL_QUARTIERS_sf, st_centroid(BE_SS)) %>%
+    BXL_QUARTIERS <- st_join(BXL_QUARTIERS_sf, st_point_on_surface(BE_SS)) %>%
       as.data.frame() %>%
       select(cd_sector, MDRC, NAME_FRE, NAME_DUT)
 

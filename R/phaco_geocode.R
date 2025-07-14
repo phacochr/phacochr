@@ -156,7 +156,9 @@ phaco_geocode <- function(data_to_geocode,
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
   if(sum(
-    file.exists(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"),
+    file.exists(#paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"),
+                #paste0(path_data,"BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet"),
+                paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"),
                 paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_11.csv"),
                 paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_12.csv"),
                 paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_13.csv"),
@@ -813,6 +815,8 @@ phaco_geocode <- function(data_to_geocode,
 
   # J'importe les rues
   postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
+    #arrow::open_dataset(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"))%>%
+    #arrow::collect()
     mutate(address_join_street = str_to_lower(str_trim(street_FINAL_detected)))
 
   if (length(lang_encoded) != 3){
