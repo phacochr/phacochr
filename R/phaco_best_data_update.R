@@ -670,7 +670,7 @@ phaco_best_data_update <- function(force=FALSE,
 
     #write_csv2(belgium_street, paste0(path_data, "BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"))
     write_delim(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress=F)
-    #write_parquet(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"))
+    arrow::write_parquet(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"))
 
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
@@ -803,14 +803,14 @@ phaco_best_data_update <- function(force=FALSE,
 
     filter_arrondissements <- unique(openaddress_be$arrond[!is.na(openaddress_be$arrond)])
 
-    for (i in filter_arrondissements) {
-      temp <- openaddress_be %>%
-        filter(arrond == i) %>%
-        select(-postcode, -arrond)
-      write_delim(temp, paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".csv"), delim = ";", na = "", progress=F)
-    }
+    # for (i in filter_arrondissements) {
+    #   temp <- openaddress_be %>%
+    #     filter(arrond == i) %>%
+    #     select(-postcode, -arrond)
+    #   write_delim(temp, paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".csv"), delim = ";", na = "", progress=F)
+    # }
 
-    #write_parquet(openaddress_be, paste0(path_data, "BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet"))
+    arrow::write_parquet(openaddress_be, paste0(path_data, "BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet"))
 
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Export des fichiers BeST par arrondissement"))

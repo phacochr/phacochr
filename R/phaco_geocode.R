@@ -193,59 +193,59 @@ phaco_geocode <- function(data_to_geocode,
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
   if(sum(
-    file.exists(#paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"),
-                #paste0(path_data,"BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet"),
-                paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_11.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_12.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_13.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_21.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_23.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_24.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_25.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_31.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_32.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_33.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_34.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_35.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_36.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_37.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_38.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_41.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_42.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_43.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_44.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_45.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_46.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_51.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_52.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_53.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_55.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_56.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_57.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_58.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_61.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_62.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_63.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_64.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_71.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_72.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_73.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_81.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_82.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_83.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_84.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_85.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_91.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_92.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_93.csv"),
+    file.exists(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"),
+                paste0(path_data,"BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet"),
+                # paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_11.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_12.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_13.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_21.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_23.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_24.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_25.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_31.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_32.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_33.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_34.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_35.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_36.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_37.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_38.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_41.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_42.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_43.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_44.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_45.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_46.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_51.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_52.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_53.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_55.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_56.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_57.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_58.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_61.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_62.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_63.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_64.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_71.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_72.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_73.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_81.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_82.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_83.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_84.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_85.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_91.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_92.csv"),
+                # paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_93.csv"),
                 paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"),
                 paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"),
+                #paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"),
                 paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.csv"),
                 paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv")
     )
-  ) != 49) {
+  ) != 6) {
 
     cat("\n")
     stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
@@ -923,9 +923,9 @@ phaco_geocode <- function(data_to_geocode,
   ### i. Preparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
   # J'importe les rues
-  postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
-    #arrow::open_dataset(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"))%>%
-    #arrow::collect()
+  # postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
+    postal_street <-arrow::open_dataset(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"))%>%
+    collect() |>
     mutate(address_join_street = str_to_lower(str_trim(street_FINAL_detected)))
 
   if (length(lang_encoded) != 3){
@@ -1119,11 +1119,17 @@ phaco_geocode <- function(data_to_geocode,
     cat(paste0("\n","\u29D7"," Chargement du fichier openaddress"))
 
     # Ici on cree une liste des adresses en n'important que les arrondissements detectes dans data_to_geocode
-    openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
-                             unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
-                             ".csv") %>%
-      map_dfr(read_delim, delim = ";", progress= F, col_types = cols(.default = col_character())) %>%
-      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
+    # openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
+    #                          unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
+    #                          ".csv") %>%
+    #   map_dfr(read_delim, delim = ";", progress= F, col_types = cols(.default = col_character())) %>%
+    #   mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
+
+    openaddress_be <- arrow::open_dataset(paste0(path_data, "BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet")) |>
+      filter(street_id_phaco %in% unique(res$street_id_phaco)) |>
+      collect() |>
+      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre))
+
 
     cat(paste0("\r",colourise("\u2714", fg="green")," Chargement du fichier openaddress "))
 
