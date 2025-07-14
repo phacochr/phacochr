@@ -470,7 +470,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # Dans le cas ou il y a une colonne separee avec le num de rue
 
-  if(!integrated_number) { # Do we let user choose if he want to do this since he explicitly say that the number is a specific column
+  if(have_number & !integrated_number) { # Do we let user choose if he want to do this since he explicitly say that the number is a specific column
   # if (situation == "num_rue_postal_s") {
 
     # Probable mistake here : we have a regex to not pickup king and ranking number but we are not using it to extract the correct number
@@ -493,12 +493,12 @@ phaco_geocode <- function(data_to_geocode,
         regex_extract_number_from_address(rue_to_geocode),
         NA)
       )
-    }
+  }
 
 
   # Dans le cas ou le num de rue est integre
   # NOTE /!\ le numero de rue doit IMPERATIVEMENT etre le premier chiffre du champ (souvent le cas) /!\
-  if(integrated_number) {
+  if(have_number & integrated_number) {
   # if (situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {
     # data_to_geocode <- data_to_geocode %>%
     #   mutate(num_rue_clean = str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))) %>%
@@ -510,9 +510,9 @@ phaco_geocode <- function(data_to_geocode,
 
   }
 
-  # Probably useless
-  data_to_geocode <- data_to_geocode |>
-    mutate(num_rue_clean = regex_extract_number(num_rue_clean))
+  # # Probably useless
+  # data_to_geocode <- data_to_geocode |>
+  #   mutate(num_rue_clean = regex_extract_number(num_rue_clean))
 
   # On force mid_street = TRUE si la colonne contenant la rue ne possede que des NA
   if (!mid_street & have_number) {
@@ -1032,7 +1032,6 @@ phaco_geocode <- function(data_to_geocode,
       # On charge la table des communes (= code INS recodes) adjacentes par commune (voir preprocessing)
       table_commune_adjacentes <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"), progress= F, delim = ";", col_types = cols(.default = col_character()))
 
-      res_adj <- tibble()
       res_adj <- foreach (i = unique(ADDRESS_last_tentative$`Refnis code`),
                           .combine = 'bind_rows',
                           .packages=c("dplyr","fuzzyjoin"))  %dopar% {
@@ -1146,28 +1145,55 @@ phaco_geocode <- function(data_to_geocode,
       cat(paste0("\n","\u29D7"," Approximation ", "\u00e0", " + ou - ", approx_num_max*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es"))
 
       # On selectionne les lignes pour lesquelles un numero de police a ete encode, on a trouve la rue, mais pour lesquelles on n'a pas trouve de correspondance dans les fichiers openaddress.
-      FULL_GEOCODING_APPROX <- FULL_GEOCODING %>%
+      FULL_GEOCODING_APPROX <<- FULL_GEOCODING %>%
         filter(!is.na(street_id_phaco) & !is.na(num_rue_clean) & is.na(address_id)) %>%
         select(-x_31370, -y_31370, -cd_sector, -address_id, -approx_num)
+
+      openaddress_be <<- openaddress_be
 
       if (nrow(FULL_GEOCODING_APPROX) > 0) { # A partir d'ici, plein de if statement pour eviter d'appliquer les operations sur un tableau vide (possible a chaque etape)
         # On fait une jointure avec openaddress sur base des noms de rue (et pas le num, pour tous les avoir), uniquement du meme cote de la rue
         APPROX_1 <- FULL_GEOCODING_APPROX %>%
-          select(ID_address, num_rue_clean, street_id_phaco) %>%
-          inner_join(select(openaddress_be, street_id_phaco, house_number_sans_lettre, x_31370, y_31370, cd_sector),
-                     by=c("street_id_phaco"),
+          select(ID_address, num_rue_clean, street_id_phaco) |>
+          inner_join(
+            openaddress_be |> select(street_id_phaco, house_number_sans_lettre, x_31370, y_31370, cd_sector),
+            by = c("street_id_phaco"),
+            relationship = "many-to-many") |>
+          filter(is_same_parity(num_rue_clean, house_number_sans_lettre))
                      # many-to-many car il peut y avoir plusieurs rues dans la BDD a geocoder
-                     relationship = "many-to-many") %>%
+
           # distinct() %>%
-          filter(num_rue_clean%%2 == house_number_sans_lettre%%2) #  On ne selectionne que les numeros du meme cote
+           #  On ne selectionne que les numeros du meme cote
+
+        # FULL_GEOCODING_APPROX %>%
+        #   ungroup() |>
+        #   select(ID_address, num_rue_clean, street_id_phaco) |>
+        #   inner_join(
+        #     openaddress_be |> select(street_id_phaco, house_number_sans_lettre, x_31370, y_31370, cd_sector),
+        #     by = c("street_id_phaco"),
+        #     relationship = "many-to-many") |>
+        #   mutate(
+        #     is_same_side = is_same_parity(num_rue_clean, house_number_sans_lettre),
+        #     diff = abs(num_rue_clean - house_number_sans_lettre),
+        #     .by = street_id_phaco) |>
+        #   mutate(
+        #     num_fix = if_else(diff == min(diff) & is_same_side, house_number_sans_lettre, NA),
+        #     .by = c(is_same_side, street_id_phaco)
+        #   ) |>
+        #   mutate(
+        #     num_fix = if_else(is.na(num_fix) & diff == min(diff), house_number_sans_lettre, num_fix),
+        #     .by = street_id_phaco
+        #   ) |>
+        #   filter(!is.na(num_fix)) |>
+        #   slice_sample_seeded(seed_cols = c(num_rue_clean, ID_address), n = 1)
+
 
         if (nrow(APPROX_1) > 0){
           # On ne retient que le numero avec la distance minimale
           APPROX_1 <- APPROX_1 %>%
             mutate(approx_num = abs(num_rue_clean - house_number_sans_lettre)) %>%
             group_by(ID_address) %>%
-            mutate(min = min(approx_num)) %>%
-            filter(min == approx_num) %>%  # selection plus proche
+            filter(min == min(approx_num)) %>%  # selection plus proche
             slice_sample_seeded(seed_cols = c(num_rue_clean, ID_address), n = 1) %>%
             select(-street_id_phaco, -num_rue_clean)
 
@@ -1209,8 +1235,8 @@ phaco_geocode <- function(data_to_geocode,
 
           # On rassemble les resultats
           FULL_GEOCODING_APPROX <- bind_rows(
-            inner_join(FULL_GEOCODING_APPROX, APPROX_1, by= "ID_address"),
-            inner_join(FULL_GEOCODING_APPROX, APPROX_2, by= "ID_address")) %>%
+            inner_join(FULL_GEOCODING_APPROX, APPROX_1, by = "ID_address"),
+            inner_join(FULL_GEOCODING_APPROX, APPROX_2, by = "ID_address")) %>%
             filter(approx_num <= approx_num_max*2) %>%
             select(-min)
 
@@ -1362,50 +1388,127 @@ phaco_geocode <- function(data_to_geocode,
   # TODO
   if (anonymous == TRUE) {
 
-    if (situation == "num_rue_postal_s") {
-      FULL_GEOCODING <- FULL_GEOCODING %>%
-        select(-.data[[colonne_rue]],
-               -.data[[colonne_num]])
+
+    # if (situation == "num_rue_postal_s") {
+    #   FULL_GEOCODING <- FULL_GEOCODING %>%
+    #     select(-.data[[colonne_rue]],
+    #            -.data[[colonne_num]])
+    # }
+    #
+    # if (situation == "num_rue_i_postal_s") {
+    #   FULL_GEOCODING <- FULL_GEOCODING %>%
+    #     select(-.data[[colonne_num_rue]])
+    # }
+    #
+    # if (situation == "num_rue_postal_i") {
+    #   FULL_GEOCODING <- FULL_GEOCODING %>%
+    #     select(-.data[[colonne_num_rue_code_postal]])
+    # }
+    #
+    # if (situation == "no_num_rue_postal_s") {
+    #   FULL_GEOCODING <- FULL_GEOCODING %>%
+    #     select(-.data[[colonne_rue]])
+    # }
+    #
+    # if (situation == "no_num_rue_postal_i") {
+    #   FULL_GEOCODING <- FULL_GEOCODING %>%
+    #     select(-.data[[colonne_rue_code_postal]])
+    # }
+    #
+    # FULL_GEOCODING <- FULL_GEOCODING %>%
+    #   mutate(phaco_anonymous = ifelse(!is.na(cd_sector), 1, NA),  # On cree cette colonne pour signifier a phaco_map que c'est anonyme
+    #          x_31370 = cd_sector_x_31370, # Dans le cas d'une anonymisation : les coordonnees = centroides des secteurs
+    #          y_31370 = cd_sector_y_31370)
+    #
+    # # On enleve les colonnes referant a l'adresse
+    # if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {
+    #   FULL_GEOCODING <- FULL_GEOCODING %>%
+    #     select(-rue_recoded, -recode, -street_FINAL_detected, -num_rue_clean, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector, -house_number_sans_lettre, -cd_sector_x_31370, -cd_sector_y_31370)
+    # }
+    #
+    # # Le cas est particulier si pas de num, les colonnes de num n'existant pas !
+    # if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
+    #   FULL_GEOCODING <- FULL_GEOCODING %>%
+    #     select(-rue_recoded, -recode, -street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num,                                                                        -cd_sector_x_31370, -cd_sector_y_31370)
+    # }
+    if (have_number) {
+      if (integrated_number) {
+        if (integrated_postcode) {
+          # if (situation == "num_rue_postal_i") {
+          data_to_geocode <- data_to_geocode %>%
+            select(-!!rue_sym)
+          # }
+        }
+        # if (situation == "num_rue_i_postal_s") {
+        data_to_geocode <- data_to_geocode %>%
+          select(-!!rue_sym)
+        # }
+      } else {
+        # if (situation == "num_rue_postal_s") {
+        data_to_geocode <- data_to_geocode %>%
+          select(-c(!!rue_sym, !!num_sym))
+        # }
+      }
+    } else {
+      if (integrated_postcode) {
+        # if (situation == "no_num_rue_postal_i") {
+        data_to_geocode <- data_to_geocode %>%
+          select(-!!rue_sym)
+        # }
+      }
+      # if (situation == "no_num_rue_postal_s") {
+      data_to_geocode <- data_to_geocode %>%
+        select(-!!rue_sym)
+      # }
     }
 
-    if (situation == "num_rue_i_postal_s") {
-      FULL_GEOCODING <- FULL_GEOCODING %>%
-        select(-.data[[colonne_num_rue]])
-    }
-
-    if (situation == "num_rue_postal_i") {
-      FULL_GEOCODING <- FULL_GEOCODING %>%
-        select(-.data[[colonne_num_rue_code_postal]])
-    }
-
-    if (situation == "no_num_rue_postal_s") {
-      FULL_GEOCODING <- FULL_GEOCODING %>%
-        select(-.data[[colonne_rue]])
-    }
-
-    if (situation == "no_num_rue_postal_i") {
-      FULL_GEOCODING <- FULL_GEOCODING %>%
-        select(-.data[[colonne_rue_code_postal]])
-    }
 
     FULL_GEOCODING <- FULL_GEOCODING %>%
       mutate(phaco_anonymous = ifelse(!is.na(cd_sector), 1, NA),  # On cree cette colonne pour signifier a phaco_map que c'est anonyme
              x_31370 = cd_sector_x_31370, # Dans le cas d'une anonymisation : les coordonnees = centroides des secteurs
-             y_31370 = cd_sector_y_31370)
-
-    # On enleve les colonnes referant a l'adresse
-    if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {
-      FULL_GEOCODING <- FULL_GEOCODING %>%
-        select(-rue_recoded, -recode, -street_FINAL_detected, -num_rue_clean, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector, -house_number_sans_lettre, -cd_sector_x_31370, -cd_sector_y_31370)
-    }
-
-    # Le cas est particulier si pas de num, les colonnes de num n'existant pas !
-    if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
-      FULL_GEOCODING <- FULL_GEOCODING %>%
-        select(-rue_recoded, -recode, -street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -mid_num,                                                                        -cd_sector_x_31370, -cd_sector_y_31370)
-    }
+             y_31370 = cd_sector_y_31370) |>
+      select(-any_of(rue_recoded, recode, street_FINAL_detected, num_rue_clean, street_id_phaco, langue_FINAL_detected, nom_propre_abv, mid_num, mid_x_31370, mid_y_31370, mid_cd_sector, house_number_sans_lettre, cd_sector_x_31370, cd_sector_y_31370))
 
   }
+
+  if (have_number) {
+    if (integrated_number) {
+      if (integrated_postcode) {
+        # if (situation == "num_rue_postal_i") {
+        data_to_geocode <- data_to_geocode %>%
+          select(-!!rue_sym)
+        # }
+      }
+      # if (situation == "num_rue_i_postal_s") {
+      data_to_geocode <- data_to_geocode %>%
+        select(-!!rue_sym)
+      # }
+    } else {
+      # if (situation == "num_rue_postal_s") {
+      data_to_geocode <- data_to_geocode %>%
+        select(-c(!!rue_sym, !!num_sym))
+      # }
+    }
+  } else {
+    if (integrated_postcode) {
+      # if (situation == "no_num_rue_postal_i") {
+      data_to_geocode <- data_to_geocode %>%
+        select(-!!rue_sym)
+      # }
+    }
+    # if (situation == "no_num_rue_postal_s") {
+    data_to_geocode <- data_to_geocode %>%
+      select(-!!rue_sym)
+    # }
+  }
+
+
+  FULL_GEOCODING <- FULL_GEOCODING %>%
+    mutate(phaco_anonymous = ifelse(!is.na(cd_sector), 1, NA),  # On cree cette colonne pour signifier a phaco_map que c'est anonyme
+           x_31370 = cd_sector_x_31370, # Dans le cas d'une anonymisation : les coordonnees = centroides des secteurs
+           y_31370 = cd_sector_y_31370) |>
+    select(-any_of(rue_recoded, recode, street_FINAL_detected, num_rue_clean, street_id_phaco, langue_FINAL_detected, nom_propre_abv, mid_num, mid_x_31370, mid_y_31370, mid_cd_sector, house_number_sans_lettre, cd_sector_x_31370, cd_sector_y_31370))
+
 
 
   ## 4) Creation de l'objet SF avec les coordonnees -----------------------------------------------------------------------------------------
