@@ -167,23 +167,24 @@ phaco_best_data_update <- function(force=FALSE,
 
     cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation du fichier des rues BeST"))
 
-    # Fonction pour extraire les rues
+    # Fonction pour formater les rues et creer un identifiant de rue
     extract_street <- function(x) {
       temp <- x |>
-        # mutate(street_id_phaco = 1:n()) |>
+        # On pivote pour creer differentes lignes par langue pour la meme rue (=> necessaire pour la detection)
         pivot_longer(
           cols = c("street_fr", "street_nl", "street_de"),
           values_to = "street_FINAL_detected",
           names_to = "langue_FINAL_detected"
         ) |>
-        filter(!is.na(street_FINAL_detected)) |>
+        filter(!is.na(street_FINAL_detected)) |> # Certaines rues n'ont pas de traduction en NL ou FR ou DE => on supprime les lignes crees artificiellement par le pivot
         mutate(
           langue_FINAL_detected = recode(langue_FINAL_detected,
             "street_fr" = "FR",
             "street_nl" = "NL",
             "street_de" = "DE"
           ),
-          # key_street_unique = paste(street_FINAL_detected, postal_id),
+          # On cree un id unique de rue => ID Best street x code postal (la combinaison semble unique et elle permet de ramener l'id Best de la rue dans le geocodage)
+          # Cet ID est identifique pour la meme rue en =/= langues
           street_id_phaco = paste0(street_no, "_", postal_id)
         ) |>
         # On supprime les dupliques (rues dont les noms sont egaux en plusieurs langues) => on ne garde que le 1er
@@ -196,7 +197,7 @@ phaco_best_data_update <- function(force=FALSE,
     Wallonia_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
     Flanders_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
 
-    belgium_street <- bind_rows(Brussels_postal_street,Wallonia_postal_street, Flanders_postal_street)
+    belgium_street <- bind_rows(Brussels_postal_street, Wallonia_postal_street, Flanders_postal_street)
     belgium_street <- extract_street(belgium_street)
 
     # belgium_street_unique <- belgium_street |>
@@ -360,7 +361,7 @@ phaco_best_data_update <- function(force=FALSE,
         left_join(belgium_street_REGEX, by = "id_regex_belgium_street") |>
         # Pour revenir a la structure originale pre correction
         select(-id_regex_belgium_street, -recode, -street_FINAL_detected) |>
-        rename("street_FINAL_detected" = "rue_recoded") |>
+        rename(street_FINAL_detected = rue_recoded) |>
         relocate(street_FINAL_detected, .after = postal_id)
 
       cat(paste0("\033[K","\r",colourise("\u2714", fg="green")," Correction orthographique des rues BeST", "\033[K"))
@@ -370,61 +371,58 @@ phaco_best_data_update <- function(force=FALSE,
 
     # 2. Fichier adresses ---------------------------------------------------------------------------------------------------------------------
 
-    cat(paste0("\n",  "\u29D7"," Cr", "\u00e9", "ation du fichier des adresses BeST et jointure spatiale avec les secteurs statistiques (cela peut prendre du temps...)"))
+    cat(paste0("\n",  "\u29D7"," Cr", "\u00e9", "ation du fichier des adresses BeST et jointure spatiale avec les secteurs statistiques (patience...)"))
 
     # Fonction pour formater les adresses Best
     select_id_street <- function(x) {
-      start_time <- Sys.time()
+      # start_time <- Sys.time()
 
       temp <- x |>
         rename(
           "x_31370" = "EPSG:31370_x",
           "y_31370" = "EPSG:31370_y"
         ) |>
-        # On ne garde pas les adresses sans coord. (inutile pour du geocodage)
+        # On ne garde pas les adresses sans coord. (inutile pour le geocodage)
         filter(x_31370 != "0.00000") |>
         mutate(
-          # On detecte le num de police SANS LA LETTRE (le geocodage = niveau de precision du batiment)
+          # On detecte le num de police SANS LA LETTRE (notre geocodage = niveau de precision du batiment)
           house_number_sans_lettre = str_extract(house_number, regex("[0-9]+", ignore_case = TRUE)),
-          # On cree un ID unique dans la fonction pour la jointure apres
+          # On cree un ID unique specifique pour les besoins de cette fonction
           id_select_id_street = 1:n()
         )
-        # On transforme en objet datatable
-        # dtplyr::lazy_dt()
-      # print("temp")
 
-      # Etape pour ne garder que les adresses par num de police SANS LA LETTRE
+      # Etape pour aggreger les adresses par num de police SANS LA LETTRE
+      # NOTE : les coord. x-y sont celles du premier num AVEC LETTRE !
       temp_distinct <- temp |>
         select(id_select_id_street, house_number_sans_lettre, street_id, streetname_de, streetname_fr, streetname_nl, postcode, x_31370, y_31370) |>
         # On ne garde qu'une adresse par num de police SANS LA LETTRE (avec distinct())
         distinct(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, .keep_all = TRUE) |>
+        # On cree un id unique de rue => ID Best street x code postal (le meme que les rues, pour jointure dans le geocodage qui permet de ramener les coord. x-y)
         mutate(
           street_id_phaco = paste0(street_id, "_", postcode)
         ) |>
         # # On joint les rues pour avoir l'id phaco (DESORMAIS DISPENSABLE AVEC LE NOUVEAU ID)
         # left_join(belgium_street_unique |> select(-postal_id), by = "key_street_unique") |>
         select(street_id_phaco, id_select_id_street, house_number_sans_lettre, x_31370, y_31370, postcode)
-      # print("temp_distinct")
 
-      # Etape pour garder tous les id des adresses (de tous les num de police AVEC LETTRE)
+      # Etape pour garder tous les ID Best des num de police AVEC LETTRE pour les num de police agreges SANS LETTRE
       temp_id_best <- temp |>
         select(id_select_id_street, address_id, house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode) |>
         group_by(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode) |>
         summarise(
-          address_id = paste0(address_id, collapse = ";"),
+          # L'ID Best des adresses => ID Best adresse x code postal (l'id des adresse pouvant etre different pour =/= communes ou region - pas sur)
+          address_id = paste0(paste0(address_id, "_", postcode), collapse = ";"),
           id_select_id_street = first(id_select_id_street)
         ) |>
         ungroup() |>
         select(address_id, id_select_id_street)
-      # print("temp_id_best")
 
+      # On joint les resultats des 2 operations
       temp <- temp_distinct |>
         left_join(temp_id_best, by = "id_select_id_street") |>
         select(-id_select_id_street)
-        # as_tibble()
-      # print("final")
 
-      print(paste("Temps de calcul :", Sys.time() - start_time))
+      # print(paste("Temps de calcul :", Sys.time() - start_time))
       return(temp)
     }
 
@@ -464,10 +462,12 @@ phaco_best_data_update <- function(force=FALSE,
     # Belgique
     openaddress_be <- bind_rows(openaddress_bebru, openaddress_bewal, openaddress_bevlg)
 
-    cat(paste0("\r",  colourise("\u2714", fg="green")," Cr", "\u00e9", "ation du fichier des adresses BeST (jointure spatiale avec les secteurs statistiques)"))
+    # sum(duplicated(openaddress_be$address_id))
+
+    cat(paste0("\r",  colourise("\u2714", fg="green")," Cr", "\u00e9", "ation du fichier des adresses BeST et jointure spatiale avec les secteurs statistiques (patience...)"))
 
 
-    # 3. Belgium street : noms abrégés, mid_street et export ----------------------------------------------------------------------------------
+    # 3. Belgium street : noms abreges, mid_street et export ----------------------------------------------------------------------------------
 
     cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
 
@@ -487,7 +487,7 @@ phaco_best_data_update <- function(force=FALSE,
       filter(TX_FST_NAME %ni% c("Prince", "Reine")) %>%  # On evite de creer des abreviations pour les rues avec noms de Reine / Prince (on abrege pas communement ces noms)
       mutate(abv = str_remove_all(str_replace(TX_FST_NAME, "-", " "), "(?<!^|[:space:])."))
 
-    # On remplace les noms propres par leur abreviations (y compris noms composes)
+    # On remplace les noms propres par leurs abreviations (y compris noms composes)
     belgium_street_abv <- belgium_street %>%
       mutate(
         detect = str_detect(
@@ -522,7 +522,7 @@ phaco_best_data_update <- function(force=FALSE,
         )
       ) %>%
       filter(detect == TRUE) %>%
-      rename("street_FINAL_detected_Origin" = "street_FINAL_detected", "street_FINAL_detected" = "street_FINAL_detected_abv") %>%
+      rename(street_FINAL_detected_Origin = street_FINAL_detected, street_FINAL_detected = street_FINAL_detected_abv) %>%
       mutate(nom_propre_abv = 1)
 
     # On supprime qques abreviations fausses
@@ -540,7 +540,6 @@ phaco_best_data_update <- function(force=FALSE,
       filter(King == FALSE) %>%
       select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected, nom_propre_abv)
 
-    # Export Belgium street
     belgium_street_abv <- belgium_street %>%
       bind_rows(belgium_street_abv)
 
@@ -556,22 +555,22 @@ phaco_best_data_update <- function(force=FALSE,
         section = substr(section, 1, 4),
         nouveau_nom = str_replace(nouveau_nom, "' ", "'"),
         nouveau_nom = str_replace(nouveau_nom, "  ", " "),
-        nouveau_nom = str_replace(nouveau_nom, "\u2019", "'"),# apostrophe courbe ’ différent de '
+        nouveau_nom = str_replace(nouveau_nom, "\u2019", "'"),# apostrophe courbe ’ different de '
         nouveau_nom = str_replace(nouveau_nom, "rue ", "Rue "),
-        nouveau_nom = str_replace(nouveau_nom, paste0("Ch", "\u00e8", "vres"), paste0("Ch", "\u00ea", "vres")), # "Chèvres" en "Chêvres"
-        nouveau_nom = str_replace(nouveau_nom, paste0("Br", "\u00e8", "y", "\u00f6", "d"), paste0("Br", "\u00e8", "y", "\u00f4", "d")), # "Brèyöd" en "Brèyôd"
-        nouveau_nom = str_replace(nouveau_nom, paste0("Tr", "\u00ef"), paste0("Tr", "\u00ee")), # "Trï" en "Trî"
+        nouveau_nom = str_replace(nouveau_nom, paste0("Ch", "\u00e8", "vres"), paste0("Ch", "\u00ea", "vres")), # "Chevre" avec accent circ.
+        nouveau_nom = str_replace(nouveau_nom, paste0("Br", "\u00e8", "y", "\u00f6", "d"), paste0("Br", "\u00e8", "y", "\u00f4", "d")), # "Breyod" avec accent circ.
+        nouveau_nom = str_replace(nouveau_nom, paste0("Tr", "\u00ef"), paste0("Tr", "\u00ee")), # "Tri" avec accent circ.
         nouveau_nom = str_replace(nouveau_nom, "Helleputte", "Hellepute")
       ) |>
       # Ces anciennes rues ont 2 nouveaux noms au sein du meme code postal => ambiguite, on n'en selectionne qu'une
       # group_by(section, ancienne_denomination) |>
       # mutate(dup = n()) |>
       filter(!(ancienne_denomination == "Place Albert Ier" & nouveau_nom == "Petite Rue")) |>
-      filter(!(ancienne_denomination == "Rue Jules Destrée" & nouveau_nom == "Rue des Raspes"))
+      filter(!(ancienne_denomination == paste0("Rue Jules Destr", "\u00e9", "e") & nouveau_nom == "Rue des Raspes"))
 
     # On identifie les (nouveaux noms de) rues dans Best qui correspondent aux anciens noms de rue de Charleroi
     rue_charleroi_old <- belgium_street %>%
-      mutate(street_FINAL_detected = str_replace(street_FINAL_detected, "\u2019", "'")) %>% # apostrophe courbe ’ différent de  '
+      mutate(street_FINAL_detected = str_replace(street_FINAL_detected, "\u2019", "'")) %>% # apostrophe courbe ’ different de  '
       inner_join(rue_charleroi, by = c(
         "postal_id" = "section",
         "street_FINAL_detected" = "nouveau_nom"
@@ -582,7 +581,7 @@ phaco_best_data_update <- function(force=FALSE,
       ) |>
       select(-ancienne_denomination)
 
-    # On remplace les noms propres par leur abreviations (y compris noms composes)
+    # On remplace les noms propres par leurs abreviations (y compris noms composes)
     rue_charleroi_old_abv <- rue_charleroi_old %>%
       mutate(
         detect = str_detect(
@@ -645,9 +644,12 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\n", "\u29D7", " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
 
     num_mid <- belgium_street_abv %>%
-      inner_join(openaddress_be, by = "street_id_phaco" ) %>% # certaines rues n'ont pas de numero, on les ecartes
+      # On supprime les doublons du fait des traductions en plusieurs langues => inutile ici
+      distinct(street_id_phaco, .keep_all = T) |>
+      # certaines rues n'ont pas de numero, on les ecartes
+      inner_join(openaddress_be, by = "street_id_phaco") %>%
       mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) %>%
-      group_by(street_id_phaco, postal_id) %>% # par rue et code postal
+      group_by(street_id_phaco) %>% # par rue et code postal
       filter(house_number_sans_lettre == as.numeric(quantile(house_number_sans_lettre, p = 0.5, type = 3, na.rm=T))) %>% # quantile parce que median() prend la valeur du milieu quand paire, type 3 arrondi vers le bas
       rename(mid_num = house_number_sans_lettre,
              mid_x_31370 = x_31370,
@@ -655,11 +657,13 @@ phaco_best_data_update <- function(force=FALSE,
              mid_postcode= postcode,
              mid_cd_sector= cd_sector,
              mid_arrond= arrond) %>%
-      select(street_id_phaco, postal_id, mid_num, mid_x_31370, mid_y_31370, mid_cd_sector) %>%
-      unique()
+      select(street_id_phaco, mid_num, mid_x_31370, mid_y_31370, mid_cd_sector)
 
-    belgium_street_abv<-belgium_street_abv %>%
-      left_join(num_mid, by=c("street_id_phaco", "postal_id")) %>%
+    # sum(duplicated(num_mid$street_id_phaco))
+
+    belgium_street_abv <- belgium_street_abv %>%
+      left_join(num_mid, by = c("street_id_phaco")) %>%
+      # Les coord. x-y du milieu de la rue suivent le niveau de precision defini
       mutate(mid_x_31370 = round(as.numeric(mid_x_31370), precision_digits),
              mid_y_31370 = round(as.numeric(mid_y_31370), precision_digits))
 
@@ -783,6 +787,7 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\n", "\u29D7"," Export des fichiers BeST par arrondissement"))
 
     openaddress_be <- rename(openaddress_be, "arrond2" = "arrond") %>%
+      # Les coord. x-y suivent le niveau de precision defini
       mutate(x_31370 = round(as.numeric(x_31370), precision_digits),
              y_31370 = round(as.numeric(y_31370), precision_digits)) %>%
       left_join(select(table_postal_arrond, postcode, arrond), by = "postcode")
@@ -806,7 +811,7 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\r", colourise("\u2714", fg="green")," Export des fichiers BeST par arrondissement"))
 
 
-    # 7. Table secteurs - quartiers - communes -  arrond - region -----------------------------------------------------------------------------
+    # 7. Table secteurs - quartiers - communes - arrond - region -----------------------------------------------------------------------------
 
     # On cree une table avec les infos administratives pour jointure a la fin de phaco_geocode()
     cat(paste0("\n", "\u29D7", " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers Urbis)"))
