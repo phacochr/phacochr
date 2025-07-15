@@ -170,12 +170,16 @@ phaco_best_data_update <- function(force=FALSE,
     # Fonction pour formater les rues et creer un identifiant de rue
     extract_street <- function(x) {
       temp <- x |>
+        group_by(street_fr, street_nl, street_de, postal_id) |>
+        mutate(street_no = paste0(sort(unique(street_no)), collapse = "-")) |>
+        ungroup() |>
         # On pivote pour creer differentes lignes par langue pour la meme rue (=> necessaire pour la detection)
         pivot_longer(
           cols = c("street_fr", "street_nl", "street_de"),
           values_to = "street_FINAL_detected",
           names_to = "langue_FINAL_detected"
         ) |>
+        #TODO
         filter(!is.na(street_FINAL_detected)) |> # Certaines rues n'ont pas de traduction en NL ou FR ou DE => on supprime les lignes crees artificiellement par le pivot
         mutate(
           langue_FINAL_detected = recode(langue_FINAL_detected,
@@ -395,8 +399,12 @@ phaco_best_data_update <- function(force=FALSE,
       # NOTE : les coord. x-y sont celles du premier num AVEC LETTRE !
       temp_distinct <- temp |>
         select(id_select_id_street, house_number_sans_lettre, street_id, streetname_de, streetname_fr, streetname_nl, postcode, x_31370, y_31370) |>
+        group_by(streetname_de, streetname_fr, streetname_nl, postcode) |>
+        mutate(street_id = paste0(sort(unique(street_id)), collapse = "-")) |>
+        ungroup() |>
         # On ne garde qu'une adresse par num de police SANS LA LETTRE (avec distinct())
-        distinct(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, .keep_all = TRUE) |>
+        distinct(house_number_sans_lettre, street_id, postcode, .keep_all = TRUE) |>
+        ungroup() |>
         # On cree un id unique de rue => ID Best street x code postal (le meme que les rues, pour jointure dans le geocodage qui permet de ramener les coord. x-y)
         mutate(
           street_id_phaco = paste0(street_id, "_", postcode)
@@ -665,12 +673,15 @@ phaco_best_data_update <- function(force=FALSE,
       left_join(num_mid, by = c("street_id_phaco")) %>%
       # Les coord. x-y du milieu de la rue suivent le niveau de precision defini
       mutate(mid_x_31370 = round(as.numeric(mid_x_31370), precision_digits),
-             mid_y_31370 = round(as.numeric(mid_y_31370), precision_digits))
+             mid_y_31370 = round(as.numeric(mid_y_31370), precision_digits)) |>
+      mutate(address_join_street = str_to_lower(str_trim(street_FINAL_detected)))
+
+
 
 
     #write_csv2(belgium_street, paste0(path_data, "BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"))
     write_delim(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress=F)
-    arrow::write_parquet(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"))
+    arrow::write_parquet(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"), compression = "zstd")
 
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
@@ -779,7 +790,7 @@ phaco_best_data_update <- function(force=FALSE,
       distinct()
 
 
-    write_delim(table_INS_recod_code_postal, paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";", progress=F)
+    write_delim(table_INS_recod_code_postal, paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";", progress = F)
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - codes INS recod", "\u00e9", "es' (Statbel)"))
 
@@ -788,15 +799,20 @@ phaco_best_data_update <- function(force=FALSE,
 
     cat(paste0("\n", "\u29D7"," Export des fichiers BeST par arrondissement"))
 
+
+
     openaddress_be <- rename(openaddress_be, "arrond2" = "arrond") %>%
       # Les coord. x-y suivent le niveau de precision defini
       mutate(x_31370 = round(as.numeric(x_31370), precision_digits),
              y_31370 = round(as.numeric(y_31370), precision_digits)) %>%
-      left_join(select(table_postal_arrond, postcode, arrond), by = "postcode")
+      left_join(select(table_postal_arrond, postcode, arrond), by = "postcode") |>
+      mutate(house_number_sans_lettre = as.integer(house_number_sans_lettre))
 
     # Verif = pas toujours convergent ! => On penche plutot pour des erreurs des coordonnees que du code postal
     # => On garde donc les arrond issus de la jointure CODE POSTAL > ARROND au lieu de partir des arrond definis par localisation geo
     # table(openaddress_be$arrond, openaddress_be$arrond2)
+
+
 
     openaddress_be <- openaddress_be %>%
       select(-arrond2)
@@ -810,7 +826,7 @@ phaco_best_data_update <- function(force=FALSE,
     #   write_delim(temp, paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".csv"), delim = ";", na = "", progress=F)
     # }
 
-    arrow::write_parquet(openaddress_be, paste0(path_data, "BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet"))
+    arrow::write_parquet(openaddress_be, paste0(path_data, "BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet"), compression = "zstd")
 
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Export des fichiers BeST par arrondissement"))

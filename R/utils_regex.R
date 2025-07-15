@@ -14,8 +14,8 @@ regex_remove_postcode <- function(string) {
 }
 
 regex_extract_number_from_address <- function(string) {
- str_extract(string, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))
- # str_extract(string, regex("(?<!\\b(?:des|du|Albert|L[eé]opold|Baudouin)\\s?)([0-9]++)(?!\\s?(?:[i\\s]?[èe]me|de|er?))", ignore_case = TRUE)) |>
+ # str_extract(string, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))
+ str_extract(string, regex("(?<!\\b(?:des|du|Albert|L[eé]opold|Baudouin)\\s?)([0-9]++)(?!\\s?(?:[i\\s]?[èe]me|de|er?))", ignore_case = TRUE)) |>
     as.integer()
 }
 
@@ -25,11 +25,11 @@ regex_extract_number <- function(string) {
 }
 
 regex_remove_boite <- function(string) {
-  str_replace(string, regex("(^|\\s)(bt(e|[.]|)|bo(i|\u00ee)te|bus)(|\\s)([0-9]+|[a-zA-Z]\\b)", ignore_case = TRUE), " ")
+  str_replace(string, regex("(^|\\s)(bt[e\\.]?|bo[iî]te|bus)\\s?([0-9]+|[a-zA-Z]\\b)", ignore_case = TRUE), " ")
 }
 
 regex_remove_BP_CP <- function(string) {
-  str_replace(string, regex("\\s(BP|CP)(|\\s)[0-9]+|^(BP|CP)(|\\s)[0-9]+", ignore_case = TRUE), " ")
+  str_replace(string, regex("\\s(BP|CP)\\s?[0-9]+|^(BP|CP)\\s?[0-9]+", ignore_case = TRUE), " ")
 }
 
 regex_remove_numero <- function(string) {
@@ -37,8 +37,7 @@ regex_remove_numero <- function(string) {
 }
 
 regex_remove_king_num <- function(string) {
-  str_replace_all(string, regex("((?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( |)er |( ||i)(\u00e8|e)me |( |)de |(-|)[a-z]{3,}))([^ ,0-9]+))|(([^ ,0-9]+)(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |))|([a-z]{3,20}))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er )))|(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE), " ")
-}
+  str_replace_all(string, regex("((?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( |)er |( ||i)(\u00e8|e)me |( |)de |(-|)[a-z]{3,}))([^ ,0-9]+))|(([^ ,0-9]+)(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |))|([a-z]{3,20}))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er )))|(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE), " ")}
 
 regex_remove_rez <- function(string) {
   str_replace(string, regex("\\sRez\\s", ignore_case = TRUE), " ")
@@ -53,7 +52,7 @@ regex_remove_rdc <- function(string) {
 }
 
 regex_fix_commandant <- function(string) {
-  str_replace(string, regex("(c(m|)dt([.]|)(\\s|))", ignore_case = TRUE), "Commandant ")
+  str_replace(string, regex("(cm?dt([.]|)\\s?)", ignore_case = TRUE), "Commandant ")
 }
 
 regex_fix_lieutenant <- function(string) {
@@ -68,11 +67,11 @@ regex_fix_saint <- function(string) {
 }
 
 regex_fix_chaussee <- function(string) {
-  str_replace(string, regex("(^ch(s|)(\u00e9|e)e\\s|^ch([.]|\\s))", ignore_case = TRUE), "Chaussee ")
+  str_replace(string, regex("(^chs?([ée]e)?\\s|^ch[\\.\\s])", ignore_case = TRUE), "Chaussee ")
 }
 
 regex_fix_avenue <- function(string) {
-  str_replace(string, regex("(^av[.](\\s|)|^av(e|)\\s)", ignore_case = TRUE), "Avenue ")
+  str_replace(string, regex("(^av\\.\\s?|^ave?\\s)", ignore_case = TRUE), "Avenue ")
 }
 
 regex_fix_koning <- function(string) {
@@ -82,11 +81,11 @@ regex_fix_koning <- function(string) {
 }
 
 regex_fix_professor <- function(string) {
-  str_replace(string, regex("(^prof[.](\\s|)|^prof\\s)", ignore_case = TRUE), "Professor ")
+  str_replace(string, regex("(^prof\\.\\s?|^prof\\s)", ignore_case = TRUE), "Professor ")
 }
 
 regex_fix_square <- function(string) {
-  str_replace(string, regex("(^sq[.](\\s|)|^sq\\s)", ignore_case = TRUE), "Square ")
+  str_replace(string, regex("(^sq\\.\\s?|^sq\\s)", ignore_case = TRUE), "Square ")
 }
 
 regex_fix_steenweg <- function(string) {
@@ -113,17 +112,24 @@ regex_fix_place <- function(string) {
   str_replace(string, regex("^pl\\s", ignore_case = TRUE), "Place ")
 }
 
+is_nl_street_regex <- function(string) {
+  str_detect(string, regex("(laan|straat|plein|dreef|lei)", ignore_case = TRUE))
+}
+
 regex_fix_rue <- function(string) {
-  str_replace(string, regex("^de\\sla\\s", ignore_case = TRUE), "Rue de la ") |>
-    str_replace(regex("^du\\s", ignore_case = TRUE), "Rue du ") |>
-    str_replace(regex("^des\\s", ignore_case = TRUE), "Rue des ") |>
-    str_replace(regex("^d[']", ignore_case = TRUE), "Rue d'") |>
-    str_replace(regex("^de\\s", ignore_case = TRUE), "Rue de ") |>
-    str_replace(regex("^r\\s", ignore_case = TRUE), "Rue ") |>
-    str_replace(regex("^de\\sl(\\s|)[']", ignore_case = TRUE), "Rue de l'") |>
-    str_replace(regex("de\\sl\\s([']|)", ignore_case = TRUE), "de l'") |>
+  if_else(
+    !is_nl_street_regex(string),
+    str_replace(string, regex("^de\\sla\\s", ignore_case = TRUE), "Rue de la ") |>
+      str_replace(regex("^du\\s", ignore_case = TRUE), "Rue du ") |>
+      str_replace(regex("^des\\s", ignore_case = TRUE), "Rue des ") |>
+      str_replace(regex("^d[']", ignore_case = TRUE), "Rue d'") |>
+      str_replace(regex("^de\\s", ignore_case = TRUE), "Rue de ") |>
+      str_replace(regex("^r\\s", ignore_case = TRUE), "Rue ") |>
+      str_replace(regex("^de\\sl\\s?\\'", ignore_case = TRUE), "Rue de l'"),
+    string) |>
+    str_replace(regex("de\\sl\\s\\'?", ignore_case = TRUE), "de l'") |>
     str_replace(regex("rue\\sd\\s", ignore_case = TRUE), "Rue d'") |>
-    str_replace(regex("[']\\s", ignore_case = TRUE), "'")
+    str_replace(regex("\\'\\s", ignore_case = TRUE), "'")
 }
 
 
@@ -141,11 +147,11 @@ regex_remove_tiret <- function(string) {
 
 regex_correct_street <- function(string){
   string |>
-    # str_replace_all("[,:/]|[(].*[)]", " ") |>
-    str_replace_all(regex("[,]", ignore_case = TRUE), " ") |>
-    str_replace_all(regex("[:]", ignore_case = TRUE), " ") |>
-    str_replace_all(regex("[(].+[)]", ignore_case = TRUE), " ") |>
-    str_replace_all(regex("[/]", ignore_case = TRUE), " ") |>
+    str_replace_all("[,:/]|[(].*[)]", " ") |>
+    # str_replace_all(regex("[,]", ignore_case = TRUE), " ") |>
+    # str_replace_all(regex("[:]", ignore_case = TRUE), " ") |>
+    # str_replace_all(regex("[(].+[)]", ignore_case = TRUE), " ") |>
+    # str_replace_all(regex("[/]", ignore_case = TRUE), " ") |>
     str_squish() |>
     regex_remove_boite() |>
     regex_remove_BP_CP() |>
@@ -157,7 +163,7 @@ regex_correct_street <- function(string){
     regex_fix_commandant() |>
     regex_fix_lieutenant() |>
     regex_fix_saint() |>
-    str_trim("left") |>  # To check if different bc was trim left
+    str_trim("left") |>
     regex_fix_chaussee() |>
     regex_fix_avenue() |>
     regex_fix_koning() |>

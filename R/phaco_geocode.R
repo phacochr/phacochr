@@ -153,6 +153,7 @@ phaco_geocode <- function(data_to_geocode,
   list_arg_num <- list(error_max = error_max,
                        approx_num_max = approx_num_max)
 
+
   for (i in seq_along(list_arg_num)) {
     if(length(list_arg_num[[i]]) > 1) {
       cat("\n")
@@ -473,30 +474,29 @@ phaco_geocode <- function(data_to_geocode,
   # if (situation == "num_rue_postal_s") {
 
     # Probable mistake here : we have a regex to not pickup king and ranking number but we are not using it to extract the correct number
-    data_to_geocode <- data_to_geocode %>%
-      mutate(num_rue_text = ifelse(is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # J'extrait le num du champ texte (ssi il est absent de num_rue)
-                                   str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE)),
-                                   NA),
-             num_rue_clean = ifelse(!is.na(num_rue_to_geocode) & str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # On cree un numero cleane : le num_rue (sans texte) OU le num du champ texte (ssi num_rue est vide)
-                                    str_extract(num_rue_to_geocode, regex("[0-9]+", ignore_case = TRUE)),
-                                    num_rue_text)) %>%
-      mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
-      relocate(num_rue_text, .before = code_postal_to_geocode) %>%
-      relocate(num_rue_clean, .after = num_rue_text) %>%
-      select(-num_rue_text)
+    # data_to_geocode <- data_to_geocode %>%
+    #   mutate(num_rue_text = ifelse(is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # J'extrait le num du champ texte (ssi il est absent de num_rue)
+    #                                str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE)),
+    #                                NA),
+    #          num_rue_clean = ifelse(!is.na(num_rue_to_geocode) & str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)), # On cree un numero cleane : le num_rue (sans texte) OU le num du champ texte (ssi num_rue est vide)
+    #                                 str_extract(num_rue_to_geocode, regex("[0-9]+", ignore_case = TRUE)),
+    #                                 num_rue_text)) %>%
+    #   mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
+    #   relocate(num_rue_text, .before = code_postal_to_geocode) %>%
+    #   relocate(num_rue_clean, .after = num_rue_text) %>%
+    #   select(-num_rue_text)
 
-
-    # data_to_geocode <- data_to_geocode |>
-    #   mutate(
-    #     num_rue_clean = ifelse(
-    #       is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)),
-    #       regex_extract_number_from_address(rue_to_geocode),
-    #       NA),
-    #     num_rue_clean = ifelse(
-    #       is.na(num_rue_clean),
-    #       regex_extract_number(num_rue_to_geocode),
-    #       NA)
-    #   )
+  data_to_geocode <- data_to_geocode |>
+    mutate(
+      num_rue_clean = ifelse(
+        is.na(num_rue_to_geocode) | !str_detect(num_rue_to_geocode, regex("[0-9]", ignore_case = TRUE)),
+        regex_extract_number_from_address(rue_to_geocode),
+        NA),
+      num_rue_clean = ifelse(
+        is.na(num_rue_clean),
+        regex_extract_number(num_rue_to_geocode),
+        num_rue_clean)
+    )
   }
 
 
@@ -504,13 +504,13 @@ phaco_geocode <- function(data_to_geocode,
   # NOTE /!\ le numero de rue doit IMPERATIVEMENT etre le premier chiffre du champ (souvent le cas) /!\
   if (have_number & integrated_number) {
   # if (situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i") {
-    data_to_geocode <- data_to_geocode %>%
-      mutate(num_rue_clean = str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))) %>%
-      mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
-      relocate(num_rue_clean, .before = code_postal_to_geocode)
+    # data_to_geocode <- data_to_geocode %>%
+    #   mutate(num_rue_clean = str_extract(rue_to_geocode, regex("(?<!(\\sd(es|u) )|(Albert( |))|(L(e|\u00e9)opold( |))|(Baudouin( |)))([0-9]++)(?!(( |)e |( ||i)(\u00e8|e)me |( |)de |( |)er ))", ignore_case = TRUE))) %>%
+    #   mutate(num_rue_clean = as.numeric(num_rue_clean)) %>%
+    #   relocate(num_rue_clean, .before = code_postal_to_geocode)
 
-    # data_to_geocode <- data_to_geocode |>
-    #   mutate(num_rue_clean = regex_extract_number_from_address(rue_to_geocode))
+    data_to_geocode <- data_to_geocode |>
+      mutate(num_rue_clean = regex_extract_number_from_address(rue_to_geocode))
 
   }
 
@@ -926,9 +926,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # J'importe les rues
   # postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
-    postal_street <-arrow::open_dataset(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet"))%>%
-    collect() |>
-    mutate(address_join_street = str_to_lower(str_trim(street_FINAL_detected)))
+    postal_street <- arrow::open_dataset(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet")) |> collect()
 
   if (length(lang_encoded) != 3){
     postal_street <- postal_street %>%
@@ -1126,8 +1124,7 @@ phaco_geocode <- function(data_to_geocode,
 
     openaddress_be <- arrow::open_dataset(paste0(path_data, "BeST/PREPROCESSED/openaddress_be_PREPROCESSED.parquet")) |>
       filter(street_id_phaco %in% unique(res$street_id_phaco)) |>
-      collect() |>
-      mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre))
+      collect()
 
 
     cat(paste0("\r",colourise("\u2714", fg="green")," Chargement du fichier openaddress "))
@@ -1159,6 +1156,7 @@ phaco_geocode <- function(data_to_geocode,
         filter(!is.na(street_id_phaco) & !is.na(num_rue_clean) & is.na(address_id)) %>%
         select(-x_31370, -y_31370, -cd_sector, -address_id, -approx_num)
 
+
       FULL_GEOCODING_APPROX <- FULL_GEOCODING_APPROX |>
         ungroup() |>
         # select(ID_address, num_rue_clean, street_id_phaco) |>
@@ -1169,20 +1167,19 @@ phaco_geocode <- function(data_to_geocode,
         mutate(
           is_same_side = is_same_parity(num_rue_clean, house_number_sans_lettre),
           approx_num = abs(num_rue_clean - house_number_sans_lettre),
-          .by = street_id_phaco) |>
+          .by = ID_address) |>
         # Take number with minimum difference on the same side and under the max approximation allowed
         mutate(
           num_fix = if_else(approx_num == min(approx_num) & is_same_side & approx_num <= approx_num_max * 2, house_number_sans_lettre, NA),
-          .by = c(is_same_side, street_id_phaco)
+          .by = c(is_same_side, ID_address)
         ) |>
         #
         mutate(
-          num_fix = if_else(is.na(num_fix) & approx_num == min(approx_num) & approx_num <= approx_num_max * 2, house_number_sans_lettre, num_fix),
-          .by = street_id_phaco
+          num_fix = if_else(all(is.na(num_fix)) & approx_num == min(approx_num) & approx_num <= approx_num_max * 2, house_number_sans_lettre, num_fix),
+          .by = ID_address
         ) |>
         filter(!is.na(num_fix)) |>
-        mutate(num_rue_clean = num_fix) |>
-        group_by(street_id_phaco) |>
+        group_by(ID_address) |>
         slice_sample_seeded(seed_cols = c(num_rue_clean, ID_address), n = 1)
 
       # if (nrow(FULL_GEOCODING_APPROX) > 0) { # A partir d'ici, plein de if statement pour eviter d'appliquer les operations sur un tableau vide (possible a chaque etape)
@@ -1287,6 +1284,7 @@ phaco_geocode <- function(data_to_geocode,
   # On indique le num du milieu de la rue si les coordonnee du batiment ne sont pas trouvee
   if (mid_street & have_number) {
   # if (mid_street == TRUE &(situation == "num_rue_postal_s"|situation == "num_rue_i_postal_s"|situation == "num_rue_postal_i")){
+
     FULL_GEOCODING <- FULL_GEOCODING %>%
       mutate(type_geocoding2 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), "mid_street", NA),
              x_31370 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), mid_x_31370, x_31370),
@@ -1483,45 +1481,9 @@ phaco_geocode <- function(data_to_geocode,
       select(-any_of(c("rue_recoded", "recode", "street_FINAL_detected", "num_rue_clean", "street_id_phaco", "langue_FINAL_detected", "nom_propre_abv", "mid_num", "mid_x_31370", "mid_y_31370", "mid_cd_sector", "house_number_sans_lettre", "cd_sector_x_31370", "cd_sector_y_31370")))
 
 
-
-  }
-
-  if (have_number) {
-    if (integrated_number) {
-      if (integrated_postcode) {
-        # if (situation == "num_rue_postal_i") {
-        data_to_geocode <- data_to_geocode %>%
-          select(-!!rue_sym)
-        # }
-      }
-      # if (situation == "num_rue_i_postal_s") {
-      data_to_geocode <- data_to_geocode %>%
-        select(-!!rue_sym)
-      # }
-    } else {
-      # if (situation == "num_rue_postal_s") {
-      data_to_geocode <- data_to_geocode %>%
-        select(-c(!!rue_sym, !!num_sym))
-      # }
-    }
-  } else {
-    if (integrated_postcode) {
-      # if (situation == "no_num_rue_postal_i") {
-      data_to_geocode <- data_to_geocode %>%
-        select(-!!rue_sym)
-      # }
-    }
-    # if (situation == "no_num_rue_postal_s") {
-    data_to_geocode <- data_to_geocode %>%
-      select(-!!rue_sym)
-    # }
   }
 
 
-  FULL_GEOCODING <- FULL_GEOCODING %>%
-    mutate(phaco_anonymous = ifelse(!is.na(cd_sector), 1, NA),  # On cree cette colonne pour signifier a phaco_map que c'est anonyme
-           x_31370 = cd_sector_x_31370, # Dans le cas d'une anonymisation : les coordonnees = centroides des secteurs
-           y_31370 = cd_sector_y_31370)
 
   ## 4) Creation de l'objet SF avec les coordonnees -----------------------------------------------------------------------------------------
 

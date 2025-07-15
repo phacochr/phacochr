@@ -1,15 +1,16 @@
-slice_sample_seeded <- function(df, seed_cols, n = 1){
+slice_sample_seeded <- function(df, seed_cols, n = 1) {
   df |>
     group_split() |>
-    purrr::map(\(df) {
+    purrr::map(\(sub_df) {
 
-      seed <- df |>
+      if (nrow(sub_df) == 1) {return(sub_df)}
+      seed <- sub_df |>
         slice_head(n = 1) |>
         summarise(seed = sum({{seed_cols}})) |>
         pull(seed)
 
       set.seed(seed)
-      slice_sample(df, n = n)
+      return(slice_sample(sub_df, n = n))
 
     }) |> bind_rows()
 }
