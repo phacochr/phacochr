@@ -293,7 +293,7 @@ phaco_geocode <- function(data_to_geocode,
   # Code postal (si separe)
   if (!integrated_postcode) {
   # if (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "no_num_rue_postal_s") {
-    data_to_geocode <- data_to_geocode %>%
+    data_to_geocode <- data_to_geocode |>
       mutate(code_postal_to_geocode = !!cp_sym)
   }
 
@@ -319,7 +319,7 @@ phaco_geocode <- function(data_to_geocode,
   # Cette partie directement apres le code postal pour pouvoir arreter si le code postal n'est pas valide
   table_postal_arrond <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
 
-  data_to_geocode <- data_to_geocode %>%
+  data_to_geocode <- data_to_geocode |>
     left_join(table_postal_arrond, by = c("code_postal_to_geocode" = "postcode"))
 
   # @@@@@@@@@@ Tout le script se lance uniquement s'il y a des codes postaux en Belgique ! @@@@@@@@@@
@@ -372,7 +372,7 @@ phaco_geocode <- function(data_to_geocode,
   # On force mid_street = TRUE si la colonne contenant la rue ne possede que des NA
   if (!mid_street & have_number) {
   # if (mid_street == FALSE & (situation == "num_rue_postal_s" | situation == "num_rue_i_postal_s" | situation == "num_rue_postal_i")) {
-    if(all(is.na(data_to_geocode$num_rue_clean)))
+    if (all(is.na(data_to_geocode$num_rue_clean)))
       # sum(is.na(data_to_geocode$num_rue_clean))/sum(nrow(data_to_geocode)) == 1
     {
       cat(colourise(paste0("\n","\u2192"," La colonne contenant le num","\u00e9","ro ne contient que des NA : switch mid_street = TRUE"), fg="brown"))
@@ -395,7 +395,7 @@ phaco_geocode <- function(data_to_geocode,
     cat(paste0("\n","\u29D7"," Correction orthographique des adresses"))
 
     # On cree rue_recoded qui contient toutes les corrections et sera l'objet du fuzzy matching apres
-    data_to_geocode <- data_to_geocode %>%
+    data_to_geocode <- data_to_geocode |>
       mutate(
         rue_recoded = ifelse(!is.na(rue_to_geocode), paste0(rue_to_geocode,"   "), NA),
         rue_recoded_commune = NA, # Pour la compatibilite avec la suite si le code postal n'est pas integre et supprime
@@ -404,7 +404,6 @@ phaco_geocode <- function(data_to_geocode,
     # Suppression du code postal ssi interne au champ d'adresse
     if (integrated_postcode) {
     # if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
-
 
       data_to_geocode <- data_to_geocode |>
         mutate(rue_recoded = regex_remove_postcode(rue_recoded))
@@ -420,12 +419,12 @@ phaco_geocode <- function(data_to_geocode,
         rue_recoded = if_else(rue_recoded == "", NA, rue_recoded))
 
     # On fusionne toutes les colonnes qui commencent par "rue_recoded_" en une
-    data_to_geocode_REGEX <- data_to_geocode %>%
-      select(ID_address, starts_with("rue_recoded_")) %>%
+    data_to_geocode_REGEX <- data_to_geocode |>
+      select(ID_address, starts_with("rue_recoded_")) |>
       unite("recode", 2:last_col(), sep = " ; ", remove = TRUE, na.rm = TRUE)
 
-    data_to_geocode <- data_to_geocode %>%
-      select(-starts_with("rue_recoded_")) %>%
+    data_to_geocode <- data_to_geocode |>
+      select(-starts_with("rue_recoded_")) |>
       left_join(data_to_geocode_REGEX, by = "ID_address")
 
     # A FAIRE EN NL :
@@ -438,7 +437,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # On cree rue_recoded meme si corrections_REGEX == FALSE => necessaire car le fuzzy matching se fait sur cette colonne
   if (!corrections_REGEX & !integrated_postcode) {
-    data_to_geocode <- data_to_geocode %>%
+    data_to_geocode <- data_to_geocode |>
       mutate(rue_recoded = str_squish(rue_to_geocode),
              recode = NA)
   }
@@ -473,16 +472,16 @@ phaco_geocode <- function(data_to_geocode,
   ### i. Preparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
   # J'importe les rues
-  # postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
+  # postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) |>
     postal_street <- arrow::open_dataset(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet")) |> collect()
 
   if (length(lang_encoded) != 3){
-    postal_street <- postal_street %>%
+    postal_street <- postal_street |>
       filter(langue_FINAL_detected %in% lang_encoded)
   }
 
   # On filtre + creation d'une cle de jointure
-  data_to_geocode <- data_to_geocode %>%
+  data_to_geocode <- data_to_geocode |>
     mutate(address_join = str_to_lower(str_trim(rue_recoded)))
 
 
@@ -509,7 +508,7 @@ phaco_geocode <- function(data_to_geocode,
   # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
   # Si ca ne se lance pas, on supprime les cles de jointure dont on n'a plus besoin
   if (!anyDuplicated(res$ID_address)) {
-    res <- res %>%
+    res <- res |>
       select(-address_join, -address_join_street)
   }
 
@@ -517,11 +516,11 @@ phaco_geocode <- function(data_to_geocode,
 
     cat(paste0("\n","\u29D7"," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
 
-    res <- res %>%
-      mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p = 0.1, nthread = n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
-      group_by(ID_address) %>%
-      filter(distance_jw == min(distance_jw) | is.na(distance_jw)) %>%
-      sample_n(1) %>% # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
+    res <- res |>
+      mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p = 0.1, nthread = n.cores)) |> # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
+      group_by(ID_address) |>
+      filter(distance_jw == min(distance_jw) | is.na(distance_jw)) |>
+      sample_n(1) |> # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
       select(-distance_jw, -address_join, -address_join_street)
 
     cat(paste0("\r",colourise("\u2714", fg="green")," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
@@ -529,8 +528,8 @@ phaco_geocode <- function(data_to_geocode,
 
 
 
-  res <- res %>%
-    # relocate(street_FINAL_detected, .after = recode) %>%
+  res <- res |>
+    # relocate(street_FINAL_detected, .after = recode) |>
     mutate(type_geocoding = NA,
            type_geocoding = as.character(type_geocoding)) # pour compatibilite avec res_adj si res = NA
 
@@ -543,9 +542,9 @@ phaco_geocode <- function(data_to_geocode,
     cat(paste0("\n","\u29D7"," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes"))
 
     # On ne retient que les adresses dont les rues n'ont pas ete detectees
-    ADDRESS_last_tentative <- res %>%
-      filter(is.na(dist_fuzzy)) %>%
-      mutate(address_join = str_to_lower(str_trim(rue_recoded))) %>%
+    ADDRESS_last_tentative <- res |>
+      filter(is.na(dist_fuzzy)) |>
+      mutate(address_join = str_to_lower(str_trim(rue_recoded))) |>
       # On supprime les colonnes jointes par le fuzzy_join, puisqu'on va en refaire un elargi
       select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy,
              -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector)
@@ -556,9 +555,9 @@ phaco_geocode <- function(data_to_geocode,
       table_INS_recod_code_postal <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";",progress= F, col_types = cols(.default = col_character()))
 
       # On ajoute ce code INS recode 1) aux rues Best et 2) aux adresses non trouvees
-      postal_street_adj <- postal_street %>%
+      postal_street_adj <- postal_street |>
         left_join(table_INS_recod_code_postal, by = c("postal_id" = "code_postal"))
-      ADDRESS_last_tentative <- ADDRESS_last_tentative %>%
+      ADDRESS_last_tentative <- ADDRESS_last_tentative |>
         left_join(table_INS_recod_code_postal, by = c("code_postal_to_geocode" = "code_postal"))
 
       # On charge la table des communes (= code INS recodes) adjacentes par commune (voir preprocessing)
@@ -571,12 +570,12 @@ phaco_geocode <- function(data_to_geocode,
                             # On calcule un vecteur reprenant les communes adjacentes par commune i
                             com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == i]
 
-                            ADDRESS_last_tentative_i <- ADDRESS_last_tentative %>%
-                              filter(`Refnis code` %in% i) %>%
+                            ADDRESS_last_tentative_i <- ADDRESS_last_tentative |>
+                              filter(`Refnis code` %in% i) |>
                               select(-`Refnis code`)
 
-                            postal_street_adj_i <- postal_street_adj %>%
-                              filter(`Refnis code` %in% c(i, com_adj_i)) %>% # On inclut i dans c(i, com_adj_i) car le code postal est plus petit que i
+                            postal_street_adj_i <- postal_street_adj |>
+                              filter(`Refnis code` %in% c(i, com_adj_i)) |> # On inclut i dans c(i, com_adj_i) car le code postal est plus petit que i
                               select(-`Refnis code`)
 
                             stringdist_left_join(ADDRESS_last_tentative_i,
@@ -590,42 +589,42 @@ phaco_geocode <- function(data_to_geocode,
 
 
       # Ce if statement car res_adj peut avoir 0 observations => NOTE : elucider pourquoi ? Pourquoi ca n'arrive pas avec "res" (boucle precedente) ?
-      if(nrow(res_adj) > 0){
+      if (nrow(res_adj) > 0) {
         # On ne retient que l'adresse detectee avec la distance minimale
-        res_adj <- res_adj %>%
-          group_by(ID_address) %>%
+        res_adj <- res_adj |>
+          group_by(ID_address) |>
           filter(dist_fuzzy == min(dist_fuzzy) | is.na(dist_fuzzy))
 
         # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
         # Si ca ne se lance pas, on supprime les cles de jointure dont on n'a plus besoin
 
         if (!anyDuplicated(res_adj$ID_address)) {
-          res_adj <- res_adj %>%
+          res_adj <- res_adj |>
             select(-address_join, -address_join_street)
         }
 
         if (anyDuplicated(res_adj$ID_address)) {
-          res_adj <- res_adj %>%
-            mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) %>% # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
-            group_by(ID_address) %>%
-            filter(distance_jw == min(distance_jw) | is.na(distance_jw)) %>%
-            sample_n(1) %>% # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
+          res_adj <- res_adj |>
+            mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) |> # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
+            group_by(ID_address) |>
+            filter(distance_jw == min(distance_jw) | is.na(distance_jw)) |>
+            sample_n(1) |> # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
             select(-distance_jw, -address_join, -address_join_street)
         }
 
-        res_adj <- res_adj %>%
-          # relocate(street_FINAL_detected, .after = recode) %>%
-          mutate(type_geocoding = "elargissement_adj") %>%
-          filter(!is.na(dist_fuzzy)) %>%
-          mutate(code_postal_to_geocode = postal_id) %>%
+        res_adj <- res_adj |>
+          # relocate(street_FINAL_detected, .after = recode) |>
+          mutate(type_geocoding = "elargissement_adj") |>
+          filter(!is.na(dist_fuzzy)) |>
+          mutate(code_postal_to_geocode = postal_id) |>
           select(-postal_id)
 
         # On liste les ID_address geocodes dans cette nouvelle procedure
         ADDRESS_last_tentative_vector <- unique(res_adj$ID_address)
 
         # Et on les ajoute a res (prelablement deleste des adresses prealablement non trouvees mais desormais trouvees !)
-        res <- res %>%
-          filter(ID_address %ni% ADDRESS_last_tentative_vector) %>%
+        res <- res |>
+          filter(ID_address %ni% ADDRESS_last_tentative_vector) |>
           bind_rows(res_adj)
       }
     }
@@ -658,9 +657,9 @@ phaco_geocode <- function(data_to_geocode,
     cat(paste0("\n","\u29D7"," Jointure avec les coordonn","\u00e9","es X-Y"))
 
     # On joint aux rues detectees (res) les adresses pour obtenir les coord. x-y.
-    FULL_GEOCODING <- res %>%
+    FULL_GEOCODING <- res |>
       # On joint par street_id x numero de rue (pour avoir la coord. x-y propre de cette adresse)
-      left_join(openaddress_be, by = c("street_id_phaco", "num_rue_clean" = "house_number_sans_lettre")) %>%
+      left_join(openaddress_be, by = c("street_id_phaco", "num_rue_clean" = "house_number_sans_lettre")) |>
       # Toutes les coord. trouvees = pas d'approximation
       mutate(approx_num = ifelse(!is.na(x_31370), 0, NA))
 
@@ -675,8 +674,8 @@ phaco_geocode <- function(data_to_geocode,
       cat(paste0("\n","\u29D7"," Approximation ", "\u00e0", " + ou - ", approx_num_max*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es"))
 
       # On selectionne les lignes pour lesquelles un numero de police a ete encode, on a trouve la rue, mais pour lesquelles on n'a pas trouve de correspondance dans les fichiers openaddress.
-      FULL_GEOCODING_APPROX <- FULL_GEOCODING %>%
-        filter(!is.na(street_id_phaco) & !is.na(num_rue_clean) & is.na(address_id)) %>%
+      FULL_GEOCODING_APPROX <- FULL_GEOCODING |>
+        filter(!is.na(street_id_phaco) & !is.na(num_rue_clean) & is.na(address_id)) |>
         select(-x_31370, -y_31370, -cd_sector, -address_id, -approx_num)
 
 
@@ -706,8 +705,8 @@ phaco_geocode <- function(data_to_geocode,
         slice_sample_seeded(seed_cols = c(num_rue_clean, ID_address), n = 1)
 
 
-      FULL_GEOCODING <- FULL_GEOCODING %>%
-        filter(ID_address %ni% FULL_GEOCODING_APPROX$ID_address) %>%
+      FULL_GEOCODING <- FULL_GEOCODING |>
+        filter(ID_address %ni% FULL_GEOCODING_APPROX$ID_address) |>
         bind_rows(FULL_GEOCODING_APPROX)
 
       cat(paste0("\r",colourise("\u2714", fg="green")," Approximation ", "\u00e0", " + ou - ", approx_num_max*2, " num","\u00e9","ros pour les adresses non localis","\u00e9","es"))
@@ -721,14 +720,14 @@ phaco_geocode <- function(data_to_geocode,
   # On renomme les variables pour etre compatible avec le reste du script
   if (!have_number){
   # if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
-    FULL_GEOCODING <- res %>%
+    FULL_GEOCODING <- res |>
       mutate(approx_num = NA,
-             type_geocoding2 = ifelse(!is.na(mid_x_31370), "mid_street", NA)) %>%
+             type_geocoding2 = ifelse(!is.na(mid_x_31370), "mid_street", NA)) |>
       rename(cd_sector = mid_cd_sector,
              x_31370 = mid_x_31370,
              y_31370 = mid_y_31370)
 
-    FULL_GEOCODING <- FULL_GEOCODING %>%
+    FULL_GEOCODING <- FULL_GEOCODING |>
       unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite doit fonctionner en dehors de mutate
 
   }
@@ -737,13 +736,13 @@ phaco_geocode <- function(data_to_geocode,
   if (mid_street & have_number) {
   # if (mid_street == TRUE &(situation == "num_rue_postal_s"|situation == "num_rue_i_postal_s"|situation == "num_rue_postal_i")){
 
-    FULL_GEOCODING <- FULL_GEOCODING %>%
+    FULL_GEOCODING <- FULL_GEOCODING |>
       mutate(type_geocoding2 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), "mid_street", NA),
              x_31370 = ifelse(is.na(x_31370) & !is.na(mid_x_31370), mid_x_31370, x_31370),
              y_31370 = ifelse(is.na(y_31370) & !is.na(mid_y_31370), mid_y_31370, y_31370),
              cd_sector = ifelse(is.na(cd_sector) & !is.na(mid_cd_sector), mid_cd_sector, cd_sector))
 
-    FULL_GEOCODING <- FULL_GEOCODING %>%
+    FULL_GEOCODING <- FULL_GEOCODING |>
       unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite doit operer en dehors de mutate
 
   }
@@ -760,29 +759,29 @@ phaco_geocode <- function(data_to_geocode,
   ## 1) Jointure ----------------------------------------------------------------------------------------------------------------------------
 
   # Il manque potentiellement des lignes par rapport a la BD originale, car pas de code postal, ou qui ne matchent pas avec les donnees BeST => on les recupere par un antijoin(), et les ajoute
-  MISSING <- data_to_geocode %>%
-    anti_join(FULL_GEOCODING, by = "ID_address") %>%
+  MISSING <- data_to_geocode |>
+    anti_join(FULL_GEOCODING, by = "ID_address") |>
     select(-address_join)
 
-  FULL_GEOCODING <- FULL_GEOCODING %>%
-    bind_rows(MISSING) %>%
+  FULL_GEOCODING <- FULL_GEOCODING |>
+    bind_rows(MISSING) |>
     arrange(ID_address)
 
   # J'enleve num_rue_to_geocode : pas besoin dans l'objet final
   # Utilisation d'un if statement car la colonne n'est parfois pas creee
   if("num_rue_to_geocode" %in% colnames(FULL_GEOCODING)) {
-    FULL_GEOCODING <- FULL_GEOCODING %>%
+    FULL_GEOCODING <- FULL_GEOCODING |>
       select(-num_rue_to_geocode)
   }
 
   # On remet les bons noms de rue (ils sont abreges dans le cas des noms propres abreges, et on indique les nouvelles rues pour les anciennes)
-  postal_street_join_final <- postal_street %>%
-    filter(is.na(nom_propre_abv) & is.na(ancien_nom_rue)) %>%
+  postal_street_join_final <- postal_street |>
+    filter(is.na(nom_propre_abv) & is.na(ancien_nom_rue)) |>
     select(street_id_phaco, street_FINAL_detected_full = street_FINAL_detected, langue_FINAL_detected)
 
-  FULL_GEOCODING <- as.data.frame(FULL_GEOCODING) %>% # On transforme en dataframe sinon ca pose pb dans la suite (a cause du foreach a priori ?)
-    left_join(postal_street_join_final, by = c("street_id_phaco", "langue_FINAL_detected")) %>%
-    relocate(street_FINAL_detected_full, .after = street_FINAL_detected) %>%
+  FULL_GEOCODING <- as.data.frame(FULL_GEOCODING) |> # On transforme en dataframe sinon ca pose pb dans la suite (a cause du foreach a priori ?)
+    left_join(postal_street_join_final, by = c("street_id_phaco", "langue_FINAL_detected")) |>
+    relocate(street_FINAL_detected_full, .after = street_FINAL_detected) |>
     select(-street_FINAL_detected, street_FINAL_detected = street_FINAL_detected_full)
 
   # @@@@@@@@@@ QUESTION : DOIT-ON AUSSI REMPLACER LES NOMS DES ANCIENNES RUES (CHARLEROI) PAR LES NOUVELLES ? @@@@@@@@@@
@@ -790,7 +789,7 @@ phaco_geocode <- function(data_to_geocode,
   # On joint les donnees de region, provinces, communes, quartiers (BXL)... aux secteurs stat
   table_secteurs_prov_commune_quartier <- readr::read_delim(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", progress= F, col_types = cols(.default = col_character()))
 
-  FULL_GEOCODING <- FULL_GEOCODING %>%
+  FULL_GEOCODING <- FULL_GEOCODING |>
     left_join(table_secteurs_prov_commune_quartier, by = "cd_sector")
 
 
@@ -836,12 +835,12 @@ phaco_geocode <- function(data_to_geocode,
                              "Dupliques" = sum(duplicated(data_to_geocode$ID_address)))
 
 
-  Summary_full <- bind_rows(Summary_original, Summary_region) %>%
+  Summary_full <- bind_rows(Summary_original, Summary_region) |>
     slice(match(c("Total (original)", "Bruxelles", "Flandre", "Wallonie", NA, "Total"), Region))
 
   # J'enleve la region et les arrondissements, car doublon avec jointure dans le point precedent => pas ideal, mais necessaire pour importer les CSV par arrond avec map_dfr, pour le summary et au debut pour detecter les regions et ne pas executer si pas BE => optimiser ?
   # J'enleve aussi rue_to_geocode => plus besoin
-  FULL_GEOCODING <- FULL_GEOCODING %>%
+  FULL_GEOCODING <- FULL_GEOCODING |>
     select(-Region, -arrond, -rue_to_geocode)
 
 
@@ -855,35 +854,35 @@ phaco_geocode <- function(data_to_geocode,
       if (integrated_number) {
         if (integrated_postcode) {
           # if (situation == "num_rue_postal_i") {
-          data_to_geocode <- data_to_geocode %>%
+          data_to_geocode <- data_to_geocode |>
             select(-!!rue_sym)
           # }
         }
         # if (situation == "num_rue_i_postal_s") {
-        data_to_geocode <- data_to_geocode %>%
+        data_to_geocode <- data_to_geocode |>
           select(-!!rue_sym)
         # }
       } else {
         # if (situation == "num_rue_postal_s") {
-        data_to_geocode <- data_to_geocode %>%
+        data_to_geocode <- data_to_geocode |>
           select(-c(!!rue_sym, !!num_sym))
         # }
       }
     } else {
       if (integrated_postcode) {
         # if (situation == "no_num_rue_postal_i") {
-        data_to_geocode <- data_to_geocode %>%
+        data_to_geocode <- data_to_geocode |>
           select(-!!rue_sym)
         # }
       }
       # if (situation == "no_num_rue_postal_s") {
-      data_to_geocode <- data_to_geocode %>%
+      data_to_geocode <- data_to_geocode |>
         select(-!!rue_sym)
       # }
     }
 
 
-    FULL_GEOCODING <- FULL_GEOCODING %>%
+    FULL_GEOCODING <- FULL_GEOCODING |>
       mutate(phaco_anonymous = ifelse(!is.na(cd_sector), 1, NA),  # On cree cette colonne pour signifier a phaco_map que c'est anonyme
              x_31370 = cd_sector_x_31370, # Dans le cas d'une anonymisation : les coordonnees = centroides des secteurs
              y_31370 = cd_sector_y_31370) |>
@@ -898,9 +897,9 @@ phaco_geocode <- function(data_to_geocode,
 
   if (sum(!is.na(FULL_GEOCODING$x_31370)) > 0){ # On cree un objet sf uniquement s'il y a des coordonnees
     # NOTE : l'objet sf ne peut pas contenir de NA pour les coordonnees
-    FULL_GEOCODING_sf <- FULL_GEOCODING %>%
-      filter(!is.na(x_31370)) %>%
-      st_as_sf(coords = c("x_31370", "y_31370")) %>%  # on cree l'objet sf
+    FULL_GEOCODING_sf <- FULL_GEOCODING |>
+      # filter(!is.na(x_31370)) |>
+      st_as_sf(coords = c("x_31370", "y_31370"), na.fail = FALSE) |>  # on cree l'objet sf na become empty points
       st_set_crs(31370) # on definit le systeme de projection
   }
 
