@@ -1,3 +1,5 @@
+`%ni%` <- Negate(`%in%`)
+
 slice_sample_seeded <- function(df, seed_cols, n = 1) {
   df |>
     group_split() |>

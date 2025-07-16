@@ -332,7 +332,7 @@ phaco_geocode <- function(data_to_geocode,
     stop(paste0("\u2716"," il n'y a aucun code postal belge dans le fichier (ou erreur d'encodage)"))
   }
 
-  cat(paste0("\n",colourise("\u2139", fg= "blue")," R","\u00e9","gion(s) d","\u00e9","tect","\u00e9","e(s) : ",
+  cat(paste0("\n",colourise("\u2139", fg = "blue")," R","\u00e9","gion(s) d","\u00e9","tect","\u00e9","e(s) : ",
              paste(unique(data_to_geocode$Region[!is.na(data_to_geocode$Region)]),
                    collapse = ', ')))
 
@@ -418,14 +418,6 @@ phaco_geocode <- function(data_to_geocode,
         rue_recoded = regex_correct_street(rue_recoded),
         rue_recoded = if_else(rue_recoded == "", NA, rue_recoded))
 
-    # On fusionne toutes les colonnes qui commencent par "rue_recoded_" en une
-    data_to_geocode_REGEX <- data_to_geocode |>
-      select(ID_address, starts_with("rue_recoded_")) |>
-      unite("recode", 2:last_col(), sep = " ; ", remove = TRUE, na.rm = TRUE)
-
-    data_to_geocode <- data_to_geocode |>
-      select(-starts_with("rue_recoded_")) |>
-      left_join(data_to_geocode_REGEX, by = "ID_address")
 
     # A FAIRE EN NL :
     #boulevard => blv
@@ -473,7 +465,8 @@ phaco_geocode <- function(data_to_geocode,
 
   # J'importe les rues
   # postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) |>
-    postal_street <- arrow::open_dataset(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet")) |> collect()
+    postal_street <- arrow::open_dataset(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.parquet")) |>
+    mutate(address_join_street = str_to_lower(str_trim(street_FINAL_detected))) |> select(-rue_recoded) |> collect()
 
   if (length(lang_encoded) != 3){
     postal_street <- postal_street |>
@@ -546,8 +539,7 @@ phaco_geocode <- function(data_to_geocode,
       filter(is.na(dist_fuzzy)) |>
       mutate(address_join = str_to_lower(str_trim(rue_recoded))) |>
       # On supprime les colonnes jointes par le fuzzy_join, puisqu'on va en refaire un elargi
-      select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy,
-             -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector)
+      select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy)
 
     if (nrow(ADDRESS_last_tentative) > 0) { # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
 
@@ -675,8 +667,8 @@ phaco_geocode <- function(data_to_geocode,
 
       # On selectionne les lignes pour lesquelles un numero de police a ete encode, on a trouve la rue, mais pour lesquelles on n'a pas trouve de correspondance dans les fichiers openaddress.
       FULL_GEOCODING_APPROX <- FULL_GEOCODING |>
-        filter(!is.na(street_id_phaco) & !is.na(num_rue_clean) & is.na(address_id)) |>
-        select(-x_31370, -y_31370, -cd_sector, -address_id, -approx_num)
+        filter(!is.na(street_id_phaco) & !is.na(num_rue_clean)) |>
+        select(-x_31370, -y_31370, -cd_sector, -approx_num)
 
 
       FULL_GEOCODING_APPROX <- FULL_GEOCODING_APPROX |>
