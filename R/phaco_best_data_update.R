@@ -79,11 +79,11 @@ phaco_best_data_update <- function(force=FALSE,
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
   if(sum(
-    file.exists(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg"),
+    file.exists(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.gpkg"),
                 paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg"),
                 paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"),
                 paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"),
-                paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx")
+                paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012025.xlsx")
     )
   ) != 5) {
     cat("\n")
@@ -394,7 +394,7 @@ phaco_best_data_update <- function(force=FALSE,
     }
 
     # Charger le fichier secteurs statistiques
-    BE_SS <- st_read(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg"), quiet=T, crs= 31370) %>%
+    BE_SS <- st_read(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.gpkg"), quiet=T, crs= 31370) %>%
       st_zm(drop = TRUE)
 
     BE_SS_lite_sector_arrond <- BE_SS %>%
@@ -537,8 +537,13 @@ phaco_best_data_update <- function(force=FALSE,
     # On cree la table de conversion codes postaux > arrondissements
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
-    code_postal_INS <- read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx"), progress= F) %>%
+    code_postal_INS <- read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012025.xlsx"), progress= F) %>%
       rename("code_postal" = "Postal code")
+
+    test <- code_postal_INS |>
+      group_by(code_postal) |>
+      count() |>
+      filter(n > 1)
 
     BE_SS_lite_comm_arrond_rgn <- BE_SS %>%
       as.data.frame() %>%
@@ -676,7 +681,7 @@ phaco_best_data_update <- function(force=FALSE,
     # Quartiers du monitoring
     BXL_QUARTIERS_sf <- st_read(paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg"), quiet=T,crs=31370)
     # jointure spatiale avec le centroid des secteurs statistiques
-    BXL_QUARTIERS <- st_join(BXL_QUARTIERS_sf, st_centroid(BE_SS)) %>%
+    BXL_QUARTIERS <- st_join(BXL_QUARTIERS_sf, st_point_on_surface(BE_SS)) %>%
       as.data.frame() %>%
       select(cd_sector, MDRC, NAME_FRE, NAME_DUT)
 
@@ -725,10 +730,9 @@ phaco_best_data_update <- function(force=FALSE,
     mat <- mat %>%
       as.data.frame() %>%
       mutate(cd_munty_refnis= BE_communes$cd_munty_refnis) %>%
-      pivot_longer(cols= 1:578, names_to= "cd_munty_refnis_voisin", values_to= "voisin") %>%
+      pivot_longer(cols= 1:(last_col()-1), names_to= "cd_munty_refnis_voisin", values_to= "voisin") %>%
       filter(voisin==1) %>%
       select(-voisin)
-
 
     write_delim(mat, paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.csv"), delim = ";", progress=F)
 
