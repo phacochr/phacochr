@@ -54,13 +54,18 @@ phaco_data <- function(data=NULL,
     cat("\n")
     stop(paste0("\u2716 Indiquez quel jeux de donn","\u00e9","es vous voulez charger. Par exemple communes_bel <- phaco_data(data= \"communes_bel\") "))}
 
-  if(sum(data %in% c("rues", "adresses", "sec", "communes_bel", "provinces", "regions", "belgique", "rbc", "communes_bxl", "quartiers_bxl", "rbc", "sec_bxl")) == 0) {
+  if(sum(data %in% c("rues", "adresses",
+                     "sec","sec2024","sec2025","sec2011",
+                     "sec_bxl","sec_bxl2011", "sec_bxl2024", "sec_bxl2025",
+                     "communes", "communes2011","communes2024","communes2025",
+                     "provinces", "regions", "belgique", "rbc",
+                     "communes_bxl", "quartiers_bxl", "rbc", "sec_bxl")) == 0) {
     cat("\n")
-    stop(paste0("\u2716"," data doit prendre une des valeurs : \"rues\", \"adresses\", \"sec\", \"communes_bel\", \"provinces\", \"regions\", \"belgique\", \"rbc\", \"communes_bxl\", \"quartiers_bxl\", \"rbc\", \"sec_bxl\"'"))
+    stop(paste0("\u2716"," Dans phaco_data(\"data\") \"data\" doit prendre une des valeurs : \n\"rues\", \"adresses\", \"sec\", \"sec2024\",\"sec2025\",\"sec2011\",  \"sec_bxl\",\"sec_bxl2011\", \"sec_bxl2024\", \"sec_bxl2025\",\"communes\", \"communes2011\",\"communes2024\",\"communes2025\",\"provinces\", \"regions\", \"belgique\", \"rbc\",\"communes_bxl\", \"quartiers_bxl\", \"rbc\", \"sec_bxl\" "))
   }
 
 # PATH -----
- if(is.null(path_data)){path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochrdev"),"/data_phacochr/"))}
+ if(is.null(path_data)){path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/"))}
 
 # DATA -----
 #  BeST
@@ -72,16 +77,50 @@ phaco_data <- function(data=NULL,
               )}
 
 # STATBEL
-  if(data=="sec"){result<- st_read(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg"))}
-  if(data=="communes_bel"){result<- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_communes_PREPROCESSED.gpkg"))}
+  if(data=="sec2011"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds"))}
+  if(data=="sec2024"|data=="sec"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds"))}
+  if(data=="sec2025"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"))}
+
+  if(data=="sec_bxl2011"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds")) %>%
+    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+  if(data=="sec_bxl"|data=="sec_bxl2024"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds")) %>%
+    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+  if(data=="sec_bxl2025"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds")) %>%
+    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+
+
+  if(data=="communes2011"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2011.rds"))}
+  if(data=="communes2024"|data=="communes"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2024.rds"))}
+  if(data=="communes2025"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2025.rds"))}
+
+  if(data=="communes_bxl"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2025.rds")) %>%
+    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+
+
   if(data=="provinces"){result<- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_provinces_PREPROCESSED.gpkg"))}
   if(data=="regions"){result<- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_regions_PREPROCESSED.gpkg"))}
   if(data=="belgique"){result<- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BELGIQUE_PREPROCESSED.gpkg"))}
   if(data=="rbc"){result<- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BRUXELLES_PREPROCESSED.gpkg"))}
-  if(data=="communes_bxl"){result<- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BXL_communes_PREPROCESSED.gpkg"))}
+
   if(data=="quartiers_bxl"){result<- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BXL_quartiers_PREPROCESSED.gpkg"))}
-  if(data=="rbc"){result<- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BRUXELLES_PREPROCESSED.gpkg"))}
-  if(data=="sec_bxl"){result<- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BXL_SS_PREPROCESSED.gpkg"))}
+
+  # WARNINGS
+
+  if(data=="sec2011"){warning("Vous chargez les secteurs statistique 2011-2017 (Statbel).",call. = F)}
+  if(data=="sec2024"|data=="sec"){warning("Vous chargez les secteurs statistique 2019-2024 (Statbel).",call. = F)}
+  if(data=="sec2025"){warning("Vous chargez les secteurs statistique 2025-... (Statbel).",call. = F)}
+
+  if(data=="sec_bxl2011"){warning("Vous chargez les secteurs statistique 2011-2017 (Statbel).",call. = F)}
+  if(data=="sec_bxl2024"|data=="sec_bxl"){warning("Vous chargez les secteurs statistique 2019-2024 (Statbel).",call. = F)}
+  if(data=="sec_bxl2025"){warning("Vous chargez les secteurs statistique 2025-... (Statbel).",call. = F)}
+
+  if(data=="communes2011"){warning("Vous chargez les communes 2011-2017 (Statbel).",call. = F)}
+  if(data=="communes2024"|data=="communes"){warning("Vous chargez les communes 2019-2024 (Statbel).",call. = F)}
+  if(data=="communes2025"){warning("Vous chargez les communes 2025-... (Statbel).",call. = F)}
+
+  if(data=="communes_bxl"){warning("Vous chargez les communes de Bruxelles 2025 (Statbel).",call. = F)}
+
+
 
   return(result)
 }
