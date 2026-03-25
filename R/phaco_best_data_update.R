@@ -540,11 +540,6 @@ phaco_best_data_update <- function(force=FALSE,
     code_postal_INS <- read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012025.xlsx"), progress= F) %>%
       rename("code_postal" = "Postal code")
 
-    test <- code_postal_INS |>
-      group_by(code_postal) |>
-      count() |>
-      filter(n > 1)
-
     BE_SS_lite_comm_arrond_rgn <- BE_SS %>%
       as.data.frame() %>%
       select(cd_munty_refnis, cd_dstr_refnis, tx_rgn_descr_fr) %>%
@@ -730,7 +725,7 @@ phaco_best_data_update <- function(force=FALSE,
     mat <- mat %>%
       as.data.frame() %>%
       mutate(cd_munty_refnis= BE_communes$cd_munty_refnis) %>%
-      pivot_longer(cols= 1:(last_col()-1), names_to= "cd_munty_refnis_voisin", values_to= "voisin") %>%
+      pivot_longer(cols= 1:last_col(1), names_to= "cd_munty_refnis_voisin", values_to= "voisin") %>%
       filter(voisin==1) %>%
       select(-voisin)
 
