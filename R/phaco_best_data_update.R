@@ -367,8 +367,11 @@ phaco_best_data_update <- function(force=FALSE,
       temp <- x %>%
         rename("x_31370" = "EPSG:31370_x",
                "y_31370" = "EPSG:31370_y") %>%
-        filter(x_31370 != "0.00000") %>%
+        # On enleve les adresses sans coordonnees et celles rejetees
+        filter(x_31370 != "0.00000" & status != "rejected") %>%
         mutate(house_number_sans_lettre = str_extract(house_number, regex("[0-9]+", ignore_case = TRUE))) %>%
+        # On classe selon le status pour creer la priorite current > proposed > retired dans le distinct
+        arrange(postcode, streetname_fr, streetname_nl, streetname_de, as.numeric(house_number_sans_lettre), status) |>
         select(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, x_31370, y_31370) %>%
         distinct(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, .keep_all = TRUE) %>%
         pivot_longer(cols=  c("streetname_de", "streetname_fr", "streetname_nl"),
@@ -378,7 +381,8 @@ phaco_best_data_update <- function(force=FALSE,
         mutate(key_street_unique = paste(street_name, postcode)) %>%
         left_join(belgium_street, by = "key_street_unique") %>%
         select(house_number_sans_lettre, street_id_phaco, x_31370, y_31370, postcode) %>%
-        distinct(house_number_sans_lettre, street_id_phaco, postcode, .keep_all = TRUE) # J'enleve les coordonnees car 1 adresse en double avec des coordonnees differentes (?)
+        # J'enleve les coordonnees car 1 adresse en double avec des coordonnees differentes (?)
+        distinct(house_number_sans_lettre, street_id_phaco, postcode, .keep_all = TRUE)
       return(temp)
     }
 
@@ -406,6 +410,7 @@ phaco_best_data_update <- function(force=FALSE,
     openaddress_bebru <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), progress= F, col_types = cols(.default = col_character()))
     openaddress_bebru <- select_id_street(openaddress_bebru)
     openaddress_bebru <- join_ss_adress(openaddress_bebru)
+
     # Wallonie
     openaddress_bewal <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), progress= F, col_types = cols(.default = col_character()))
     openaddress_bewal <- select_id_street(openaddress_bewal)
