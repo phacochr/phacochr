@@ -13,13 +13,9 @@ dir.create(paste0(path_data,"IBSA"), recursive = TRUE)
 # Correspondance ...-2024
 httr::GET(
   "https://monitoringdesquartiers.brussels/Home/DownloadFile?fileName=MQ_Communes_Quartiers_Secteurs.xlsx",
-  write_disk(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx"), overwrite = TRUE),
-  add_headers(
-    "User-Agent" = "Mozilla/5.0",
-    "Accept" = "*/*"
-  ))
+  httr::write_disk(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx"), overwrite = TRUE))
 
-# Correspondance ...-2024
+# Correspondance 2025-...
 download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/conversion_secteur_quartier_2025.csv",
               paste0(path_data,"IBSA//conversion_secteur_quartier_2025.csv"))
 
@@ -58,9 +54,9 @@ saveRDS(sec2025, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statb
 
 # 2024 -------------------
 
-url <- "https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_statistical_sectors_31370_20240101.sqlite.zip"
 
-download.file(url, "sh_statbel_statistical_sectors_31370_20240101.sqlite.zip")
+download.file("https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_statistical_sectors_31370_20240101.sqlite.zip"
+              , "sh_statbel_statistical_sectors_31370_20240101.sqlite.zip")
 unzip("sh_statbel_statistical_sectors_31370_20240101.sqlite.zip", exdir = "sh_statbel_statistical_sectors_31370_20240101.sqlite")
 
 sec2024<- st_read("sh_statbel_statistical_sectors_31370_20240101.sqlite/sh_statbel_statistical_sectors_31370_20240101.sqlite/sh_statbel_statistical_sectors_31370_20240101.sqlite")
@@ -86,12 +82,10 @@ sec2024<- sec2024%>%
 saveRDS(sec2024, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds"))
 # saveRDS(sec_bxl2024, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds"))
 
-unlink("tmp", recursive = TRUE, force = TRUE)
-unlink("tmp.zip", recursive = TRUE, force = TRUE)
-
 # 2011 -------------------
 
-download.file( "https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_spatialite.zip", "sh_statbel_spatialite2011.zip")
+download.file( "https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_spatialite.zip",
+               "sh_statbel_spatialite2011.zip")
 unzip("sh_statbel_spatialite2011.zip", exdir = "sh_statbel_spatialite2011")
 
 sec2011<- st_read("sh_statbel_spatialite2011/sh_statbel_statistical_sectors.sqlite") %>%
@@ -116,10 +110,6 @@ nrow(sec_bxl2011)==nrow( sec2011 %>% filter(tx_rgn_descr_fr=="Région de Bruxell
 
 # SAVE
 saveRDS(sec2011, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds"))
-
-unlink("tmp", recursive = TRUE, force = TRUE)
-unlink("tmp.zip", recursive = TRUE, force = TRUE)
-
 
 
 # QUARTIERS -------------------
