@@ -897,7 +897,7 @@ phaco_geocode <- function(data_to_geocode,
     ADDRESS_last_tentative <- res %>%
       filter(is.na(dist_fuzzy)) %>%
       mutate(address_join = str_to_lower(str_trim(rue_recoded))) %>%
-      select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -dist_fuzzy,
+      select(-street_FINAL_detected, -street_id_phaco, -langue_FINAL_detected, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy,
              -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector)
 
     if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
@@ -1166,15 +1166,17 @@ phaco_geocode <- function(data_to_geocode,
       select(-num_rue_to_geocode)
   }
 
-  # On remet les bons noms de rue (ils sont abreges dans le cas des noms propres abreges)
+  # On remet les bons noms de rue (ils sont abreges dans le cas des noms propres abreges, et on indique les nouvelles rues pour les anciennes)
   postal_street_join_final <- postal_street %>%
-    filter(is.na(nom_propre_abv)) %>%
+    filter(is.na(nom_propre_abv) & is.na(ancien_nom_rue)) |>
     select(street_id_phaco, street_FINAL_detected_full = street_FINAL_detected, langue_FINAL_detected)
 
   FULL_GEOCODING <- as.data.frame(FULL_GEOCODING) %>% # On transforme en dataframe sinon ca pose pb dans la suite (a cause du foreach a priori ?)
     left_join(postal_street_join_final, by = c("street_id_phaco", "langue_FINAL_detected")) %>%
     relocate(street_FINAL_detected_full, .after = street_FINAL_detected) %>%
     select(-street_FINAL_detected, street_FINAL_detected = street_FINAL_detected_full)
+
+  # @@@@@@@@@@ QUESTION : DOIT-ON AUSSI REMPLACER LES NOMS DES ANCIENNES RUES (CHARLEROI) PAR LES NOUVELLES ? @@@@@@@@@@
 
   # On joint les donnees de region, provinces, communes, quartiers (BXL)... aux secteurs stat
   table_secteurs_prov_commune_quartier <- readr::read_delim(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", progress= F, col_types = cols(.default = col_character()))

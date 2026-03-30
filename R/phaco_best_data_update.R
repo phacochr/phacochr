@@ -508,6 +508,101 @@ phaco_best_data_update <- function(force=FALSE,
 
     cat(paste0("\r",  colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
 
+    # Ajout des rues de Charleroi
+
+    cat(paste0("\n", "\u29D7", " Ajout des anciens noms de rue pour la commune de Charleroi"))
+
+    # Certaines rues sont mal ecrites dans le fichier de la commune, on les corrige
+    rue_charleroi <- read_excel(paste0(path_data,"CHARLEROI/Rues-Nouveaux-noms_2024-01-17.xlsx")) %>%
+      mutate(
+        section = substr(section, 1, 4),
+        nouveau_nom = str_replace(nouveau_nom, "' ", "'"),
+        nouveau_nom = str_replace(nouveau_nom, "  ", " "),
+        nouveau_nom = str_replace(nouveau_nom, "\u2019", "'"),# apostrophe courbe ’ different de '
+        nouveau_nom = str_replace(nouveau_nom, "rue ", "Rue "),
+        nouveau_nom = str_replace(nouveau_nom, paste0("Ch", "\u00e8", "vres"), paste0("Ch", "\u00ea", "vres")), # "Chevre" avec accent circ.
+        nouveau_nom = str_replace(nouveau_nom, paste0("Br", "\u00e8", "y", "\u00f6", "d"), paste0("Br", "\u00e8", "y", "\u00f4", "d")), # "Breyod" avec accent circ.
+        nouveau_nom = str_replace(nouveau_nom, paste0("Tr", "\u00ef"), paste0("Tr", "\u00ee")), # "Tri" avec accent circ.
+        nouveau_nom = str_replace(nouveau_nom, "Helleputte", "Hellepute")
+      ) |>
+      # Ces anciennes rues ont 2 nouveaux noms au sein du meme code postal => ambiguite, on n'en selectionne qu'une
+      # group_by(section, ancienne_denomination) |>
+      # mutate(dup = n()) |>
+      filter(!(ancienne_denomination == "Place Albert Ier" & nouveau_nom == "Petite Rue")) |>
+      filter(!(ancienne_denomination == paste0("Rue Jules Destr", "\u00e9", "e") & nouveau_nom == "Rue des Raspes"))
+
+    # On identifie les (nouveaux noms de) rues dans Best qui correspondent aux anciens noms de rue de Charleroi
+    rue_charleroi_old <- belgium_street %>%
+      mutate(street_FINAL_detected = str_replace(street_FINAL_detected, "\u2019", "'")) %>% # apostrophe courbe ’ different de  '
+      inner_join(rue_charleroi, by = c(
+        "postal_id" = "section",
+        "street_FINAL_detected" = "nouveau_nom"
+      )) %>%
+      mutate(
+        street_FINAL_detected = ancienne_denomination,
+        ancien_nom_rue = 1
+      ) |>
+      select(-ancienne_denomination)
+
+    # On remplace les noms propres par leurs abreviations (y compris noms composes)
+    rue_charleroi_old_abv <- rue_charleroi_old %>%
+      mutate(
+        detect = str_detect(
+          street_FINAL_detected,
+          str_c(
+            "\\b(?<!\\-)(",
+            str_c(prenoms$TX_FST_NAME,
+                  collapse = "|"
+            ),
+            ")\\b(?!\\-)"
+          )
+        ),
+        street_FINAL_detected_abv = str_replace(
+          street_FINAL_detected,
+          str_c(
+            "\\b(?<!\\-)(",
+            str_c(prenoms$TX_FST_NAME,
+                  collapse = "|"
+            ),
+            ")\\b(?!\\-)"
+          ),
+          str_remove_all(str_replace(str_extract(
+            street_FINAL_detected,
+            str_c(
+              "\\b(?<!\\-)(",
+              str_c(prenoms$TX_FST_NAME,
+                    collapse = "|"
+              ),
+              ")\\b(?!\\-)"
+            )
+          ), "-", " "), "(?<!^|[:space:]).")
+        )
+      ) |>
+      filter(detect==TRUE) %>%
+      rename("street_FINAL_detected_Origin" = "street_FINAL_detected", "street_FINAL_detected" = "street_FINAL_detected_abv") %>%
+      mutate(nom_propre_abv = 1)
+
+    # On supprime qques abreviations fausses
+    rue_charleroi_old_abv <- rue_charleroi_old_abv |>
+      mutate(Count = str_length(street_FINAL_detected),
+             Saint = str_detect(street_FINAL_detected, regex("(Sint-[a-z])|(Saint(|e)-[a-z])", ignore_case = TRUE)),
+             Last = str_detect(street_FINAL_detected, regex("(\\s|'|-)[A-Z]$", ignore_case = TRUE)),
+             Last_double = str_detect(street_FINAL_detected, regex("((\\s|'|-)[A-Z][A-Z]$)", ignore_case = TRUE)),
+             King = str_detect(street_FINAL_detected_Origin, regex("( Ier|1er)$|II|Roi\\s|Koning(|in)\\s", ignore_case = TRUE))
+      ) %>%
+      filter(Last == FALSE) %>%
+      filter(Last_double == FALSE) %>%
+      filter(Count >= 10 & Count <= 25) %>%
+      filter(Saint == FALSE) %>%
+      filter(King == FALSE) %>%
+      select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected, ancien_nom_rue, nom_propre_abv)
+
+    rue_charleroi_old_abv <- bind_rows(rue_charleroi_old, rue_charleroi_old_abv)
+
+    belgium_street_abv <- bind_rows(belgium_street_abv, rue_charleroi_old_abv)
+
+    cat(paste0("\r", colourise("\u2714", fg="green"), " Ajout des anciens noms de rue pour la commune de Charleroi"))
+
     # Assigner a chaque rue par code postal les coordonnees du numero du milieu
     cat(paste0("\n", "\u29D7", " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
 
