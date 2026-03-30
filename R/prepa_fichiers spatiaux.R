@@ -7,6 +7,22 @@ library(readxl)
 
 path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/"))
 
+# Fichiers IBSA
+dir.create(paste0(path_data,"IBSA"), recursive = TRUE)
+
+# Correspondance ...-2024
+httr::GET(
+  "https://monitoringdesquartiers.brussels/Home/DownloadFile?fileName=MQ_Communes_Quartiers_Secteurs.xlsx",
+  write_disk(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx"), overwrite = TRUE),
+  add_headers(
+    "User-Agent" = "Mozilla/5.0",
+    "Accept" = "*/*"
+  ))
+
+# Correspondance ...-2024
+download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/conversion_secteur_quartier_2025.csv",
+              paste0(path_data,"IBSA//conversion_secteur_quartier_2025.csv"))
+
 # SECTEURS STAISTIQUES
 
 dir.create(paste0(path_data,"STATBEL/secteurs_statistiques"), recursive = TRUE)
@@ -14,12 +30,11 @@ dir.create(paste0(path_data,"STATBEL/secteurs_statistiques"), recursive = TRUE)
 
 # 2025 -------------------
 
-url <- "https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_statistical_sectors_31370_20250101.sqlite.zip"
+download.file("https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_statistical_sectors_31370_20250101.sqlite.zip",
+              "sh_statbel_statistical_sectors_31370_20250101.sqlite.zip")
+unzip("sh_statbel_statistical_sectors_31370_20250101.sqlite.zip", exdir = "sh_statbel_statistical_sectors_31370_20250101.sqlite")
 
-download.file(url, "tmp.zip", mode = "wb")
-unzip("tmp.zip", exdir = "tmp")
-
-sec2025<- st_read("tmp/sh_statbel_statistical_sectors_31370_20250101.sqlite/sh_statbel_statistical_sectors_31370_20250101.sqlite")
+sec2025<- st_read("sh_statbel_statistical_sectors_31370_20250101.sqlite/sh_statbel_statistical_sectors_31370_20250101.sqlite/sh_statbel_statistical_sectors_31370_20250101.sqlite")
 
 quartier_sec_2025<-read_delim(paste0(path_data,"IBSA/conversion_secteur_quartier_2025.csv")) %>%
   rename(cd_sector2025= secteurstatistique_code) %>%
@@ -39,17 +54,18 @@ sec2025<- sec2025 %>%
 saveRDS(sec2025, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"))
 # saveRDS(sec_bxl2025, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"))
 
-unlink("tmp", recursive = TRUE, force = TRUE)
-unlink("tmp.zip", recursive = TRUE, force = TRUE)
+
 
 # 2024 -------------------
 
 url <- "https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_statistical_sectors_31370_20240101.sqlite.zip"
 
-download.file(url, "tmp.zip", mode = "wb")
-unzip("tmp.zip", exdir = "tmp")
+download.file(url, "sh_statbel_statistical_sectors_31370_20240101.sqlite.zip")
+unzip("sh_statbel_statistical_sectors_31370_20240101.sqlite.zip", exdir = "sh_statbel_statistical_sectors_31370_20240101.sqlite")
 
-sec2024<- st_read("tmp/sh_statbel_statistical_sectors_31370_20240101.sqlite/sh_statbel_statistical_sectors_31370_20240101.sqlite")
+sec2024<- st_read("sh_statbel_statistical_sectors_31370_20240101.sqlite/sh_statbel_statistical_sectors_31370_20240101.sqlite/sh_statbel_statistical_sectors_31370_20240101.sqlite")
+
+
 
 quartier_sec_2024<-read_excel(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx")) %>%
   rename(cd_sector2024= SecteurStatistique_Code,
@@ -75,12 +91,10 @@ unlink("tmp.zip", recursive = TRUE, force = TRUE)
 
 # 2011 -------------------
 
-url<- "https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_spatialite.zip"
+download.file( "https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_spatialite.zip", "sh_statbel_spatialite2011.zip")
+unzip("sh_statbel_spatialite2011.zip", exdir = "sh_statbel_spatialite2011")
 
-download.file(url, "tmp.zip", mode = "wb")
-unzip("tmp.zip", exdir = "tmp")
-
-sec2011<- st_read("tmp/sh_statbel_statistical_sectors.sqlite") %>%
+sec2011<- st_read("sh_statbel_spatialite2011/sh_statbel_statistical_sectors.sqlite") %>%
   st_set_crs(31370)
 
 quartier_sec_2024<-read_excel(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx")) %>%
@@ -110,7 +124,6 @@ unlink("tmp.zip", recursive = TRUE, force = TRUE)
 
 # QUARTIERS -------------------
 
-dir.create(paste0(path_data,"IBSA"), recursive = TRUE)
 
 # 2025
 sec_bxl2025<- sec2025%>%
@@ -206,13 +219,22 @@ rbc <-  regions %>%
   filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")
 saveRDS(rbc, file = paste0(path_data,"STATBEL/autres/rbc.rds"))
 
+# Supression des fichiers temporaires
 
+unlink("sh_statbel_statistical_sectors_31370_20250101.sqlite", recursive = TRUE, force = TRUE)
+unlink("sh_statbel_statistical_sectors_31370_20250101.sqlite.zip", recursive = TRUE, force = TRUE)
+
+unlink("sh_statbel_statistical_sectors_31370_20240101.sqlite", recursive = TRUE, force = TRUE)
+unlink("sh_statbel_statistical_sectors_31370_20240101.sqlite.zip", recursive = TRUE, force = TRUE)
+
+unlink("sh_statbel_spatialite2011", recursive = TRUE, force = TRUE)
+unlink("sh_statbel_spatialite2011.zip", recursive = TRUE, force = TRUE)
 
 # TESTS
 
 for (i in
 c(
-  # "rues", "adresses",
+  "rues", "adresses",
   "sec","sec2024","sec2025","sec2011",
   "sec_bxl","sec_bxl2011", "sec_bxl2024", "sec_bxl2025",
   "communes", "communes2011","communes2024","communes2025",
