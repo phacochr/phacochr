@@ -7,6 +7,16 @@ library(readxl)
 
 path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/"))
 
+# Codes postaux
+
+dir.create(paste0(path_data,"STATBEL/code_postaux"), recursive = TRUE)
+
+download.file("https://statbel.fgov.be/sites/default/files/files/documents/Over%20Statbel/Conversion%20Postal%20code_Refnis%20code_va01012019.xlsx",
+              paste0(path_data,"STATBEL/code_postaux/Conversion\ Postal\ code_Refnis\ code_va01012019.xlsx"))
+
+download.file("https://statbel.fgov.be/sites/default/files/Over_Statbel_FR/Nomenclaturen/Conversion%20Postal%20code_Refnis%20code_va01012025.xlsx",
+              paste0(path_data,"STATBEL/code_postaux/Conversion\ Postal\ code_Refnis\ code_va01012025.xlsx"))
+
 # Fichiers IBSA
 dir.create(paste0(path_data,"IBSA"), recursive = TRUE)
 

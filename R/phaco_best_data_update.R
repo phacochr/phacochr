@@ -27,7 +27,7 @@
 #'
 
 phaco_best_data_update <- function(force=FALSE,
-                                   precision="m",
+                                   precision="mm",
                                    corrections_REGEX=TRUE) {
 
   # Ne pas lancer la fonction si les arguments ne sont pas corrects
@@ -79,8 +79,8 @@ phaco_best_data_update <- function(force=FALSE,
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
   if(sum(
-    file.exists(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.gpkg"),
-                paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg"),
+    file.exists(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"),
+                paste0(path_data, "IBSA/quartiers2025.rds"),
                 paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"),
                 paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"),
                 paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012025.xlsx")
@@ -172,16 +172,16 @@ phaco_best_data_update <- function(force=FALSE,
       temp <- x %>%
         mutate(street_id_phaco=1:n()) %>%
         pivot_longer(cols = c("street_fr", "street_nl", "street_de"),
-                     values_to = "street_FINAL_detected",
-                     names_to = "langue_FINAL_detected") %>%
-        filter(!is.na(street_FINAL_detected)) %>%
-        mutate(langue_FINAL_detected = recode(langue_FINAL_detected,
+                     values_to = "street_detected",
+                     names_to = "langue_detected") %>%
+        filter(!is.na(street_detected)) %>%
+        mutate(langue_detected = recode(langue_detected,
                                               "street_fr" = "FR",
                                               "street_nl" = "NL",
                                               "street_de" ="DE"),
-               key_street_unique = paste(street_FINAL_detected, postal_id)) %>%
+               key_street_unique = paste(street_detected, postal_id)) %>%
         distinct(key_street_unique, .keep_all = TRUE) %>%
-        select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected, key_street_unique) %>%
+        select(street_id_phaco, postal_id, street_detected, langue_detected, key_street_unique) %>%
         return(temp)
     }
 
@@ -203,7 +203,7 @@ phaco_best_data_update <- function(force=FALSE,
       cat(paste0("\n","\u29D7"," Correction orthographique des rues BeST"))
 
       belgium_street <- belgium_street %>%
-        mutate(rue_recoded = street_FINAL_detected,
+        mutate(rue_recoded = street_detected,
                id_regex_belgium_street = 1:n(),
 
                rue_recoded_virgule = str_detect(rue_recoded, regex("[,]", ignore_case = TRUE)),
@@ -349,9 +349,9 @@ phaco_best_data_update <- function(force=FALSE,
         left_join(belgium_street_REGEX, by = "id_regex_belgium_street") %>%
 
         # Pour revenir a la structure originale pre correction
-        select(-id_regex_belgium_street, -recode, -street_FINAL_detected) %>%
-        rename("street_FINAL_detected" = "rue_recoded") %>%
-        relocate(street_FINAL_detected, .after = postal_id)
+        select(-id_regex_belgium_street, -recode, -street_detected) %>%
+        rename("street_detected" = "rue_recoded") %>%
+        relocate(street_detected, .after = postal_id)
 
       cat(paste0("\033[K","\r",colourise("\u2714", fg="green")," Correction orthographique des rues BeST", "\033[K"))
 
@@ -391,20 +391,26 @@ phaco_best_data_update <- function(force=FALSE,
       temp <- x %>%
         st_as_sf(coords = c("x_31370", "y_31370"), remove = FALSE) %>%
         st_set_crs(31370) %>%
-        st_join(BE_SS_lite_sector_arrond) %>%
+        st_join(BE_SS_lite_sector_arrond2024) %>%
+        st_join(BE_SS_lite_sector2025) %>%
         as.data.frame() %>%
         select(- geometry) %>%
         return(temp)
     }
 
     # Charger le fichier secteurs statistiques
-    BE_SS <- st_read(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.gpkg"), quiet=T, crs= 31370) %>%
-      st_zm(drop = TRUE)
+    BE_SS2025 <- phaco_data("sec2025")
+    BE_SS2024 <- phaco_data("sec2024")
 
-    BE_SS_lite_sector_arrond <- BE_SS %>%
+    BE_SS_lite_sector_arrond2024 <- BE_SS2024 %>%
       select(cd_sector, cd_dstr_refnis) %>%
+      rename(cd_sector2024= cd_sector) %>%
       mutate(arrond= as.numeric(substr(cd_dstr_refnis, 1, 2))) %>%
       select(-cd_dstr_refnis)
+
+    BE_SS_lite_sector2025 <- BE_SS2025 %>%
+      select(cd_sector) %>%
+      rename(cd_sector2025= cd_sector)
 
     # Bruxelles
     openaddress_bebru <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), progress= F, col_types = cols(.default = col_character()))
@@ -450,7 +456,7 @@ phaco_best_data_update <- function(force=FALSE,
     belgium_street_abv <- belgium_street %>%
       mutate(
         detect = str_detect(
-          street_FINAL_detected,
+          street_detected,
           str_c(
             "\\b(?<!\\-)(",
             str_c(prenoms$TX_FST_NAME,
@@ -459,8 +465,8 @@ phaco_best_data_update <- function(force=FALSE,
             ")\\b(?!\\-)"
           )
         ),
-        street_FINAL_detected_abv = str_replace(
-          street_FINAL_detected,
+        street_detected_abv = str_replace(
+          street_detected,
           str_c(
             "\\b(?<!\\-)(",
             str_c(prenoms$TX_FST_NAME,
@@ -469,7 +475,7 @@ phaco_best_data_update <- function(force=FALSE,
             ")\\b(?!\\-)"
           ),
           str_remove_all(str_replace(str_extract(
-            street_FINAL_detected,
+            street_detected,
             str_c(
               "\\b(?<!\\-)(",
               str_c(prenoms$TX_FST_NAME,
@@ -481,23 +487,23 @@ phaco_best_data_update <- function(force=FALSE,
         )
       ) %>%
       filter(detect == TRUE) %>%
-      select(-key_street_unique, "street_FINAL_detected_Origin" = "street_FINAL_detected", "street_FINAL_detected" = "street_FINAL_detected_abv", nom_propre_abv = detect) %>%
+      select(-key_street_unique, "street_detected_Origin" = "street_detected", "street_detected" = "street_detected_abv", nom_propre_abv = detect) %>%
       mutate(nom_propre_abv = 1)
 
     # On supprime qques abreviations fausses
     belgium_street_abv <- belgium_street_abv %>%
-      mutate(Count = str_length(street_FINAL_detected),
-             Saint = str_detect(street_FINAL_detected, regex("(Sint-[a-z])|(Saint(|e)-[a-z])", ignore_case = TRUE)),
-             Last = str_detect(street_FINAL_detected, regex("(\\s|'|-)[A-Z]$", ignore_case = TRUE)),
-             Last_double = str_detect(street_FINAL_detected, regex("((\\s|'|-)[A-Z][A-Z]$)", ignore_case = TRUE)),
-             King = str_detect(street_FINAL_detected_Origin, regex("1er$|II|Roi\\s|Koning(|in)\\s", ignore_case = TRUE))
+      mutate(Count = str_length(street_detected),
+             Saint = str_detect(street_detected, regex("(Sint-[a-z])|(Saint(|e)-[a-z])", ignore_case = TRUE)),
+             Last = str_detect(street_detected, regex("(\\s|'|-)[A-Z]$", ignore_case = TRUE)),
+             Last_double = str_detect(street_detected, regex("((\\s|'|-)[A-Z][A-Z]$)", ignore_case = TRUE)),
+             King = str_detect(street_detected_Origin, regex("1er$|II|Roi\\s|Koning(|in)\\s", ignore_case = TRUE))
       ) %>%
       filter(Last == FALSE) %>%
       filter(Last_double == FALSE) %>%
       filter(Count >= 10 & Count <= 25) %>%
       filter(Saint == FALSE) %>%
       filter(King == FALSE) %>%
-      select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected, nom_propre_abv)
+      select(street_id_phaco, postal_id, street_detected, langue_detected, nom_propre_abv)
 
     # Export Belgium street
     belgium_street <- belgium_street %>%
@@ -533,13 +539,13 @@ phaco_best_data_update <- function(force=FALSE,
 
     # On identifie les (nouveaux noms de) rues dans Best qui correspondent aux anciens noms de rue de Charleroi
     rue_charleroi_old <- belgium_street %>%
-      mutate(street_FINAL_detected = str_replace(street_FINAL_detected, "\u2019", "'")) %>% # apostrophe courbe ’ different de  '
+      mutate(street_detected = str_replace(street_detected, "\u2019", "'")) %>% # apostrophe courbe ’ different de  '
       inner_join(rue_charleroi, by = c(
         "postal_id" = "section",
-        "street_FINAL_detected" = "nouveau_nom"
+        "street_detected" = "nouveau_nom"
       )) %>%
       mutate(
-        street_FINAL_detected = ancienne_denomination,
+        street_detected = ancienne_denomination,
         ancien_nom_rue = 1
       ) |>
       select(-ancienne_denomination)
@@ -548,7 +554,7 @@ phaco_best_data_update <- function(force=FALSE,
     rue_charleroi_old_abv <- rue_charleroi_old %>%
       mutate(
         detect = str_detect(
-          street_FINAL_detected,
+          street_detected,
           str_c(
             "\\b(?<!\\-)(",
             str_c(prenoms$TX_FST_NAME,
@@ -557,8 +563,8 @@ phaco_best_data_update <- function(force=FALSE,
             ")\\b(?!\\-)"
           )
         ),
-        street_FINAL_detected_abv = str_replace(
-          street_FINAL_detected,
+        street_detected_abv = str_replace(
+          street_detected,
           str_c(
             "\\b(?<!\\-)(",
             str_c(prenoms$TX_FST_NAME,
@@ -567,7 +573,7 @@ phaco_best_data_update <- function(force=FALSE,
             ")\\b(?!\\-)"
           ),
           str_remove_all(str_replace(str_extract(
-            street_FINAL_detected,
+            street_detected,
             str_c(
               "\\b(?<!\\-)(",
               str_c(prenoms$TX_FST_NAME,
@@ -579,23 +585,23 @@ phaco_best_data_update <- function(force=FALSE,
         )
       ) |>
       filter(detect==TRUE) %>%
-      rename("street_FINAL_detected_Origin" = "street_FINAL_detected", "street_FINAL_detected" = "street_FINAL_detected_abv") %>%
+      rename("street_detected_Origin" = "street_detected", "street_detected" = "street_detected_abv") %>%
       mutate(nom_propre_abv = 1)
 
     # On supprime qques abreviations fausses
     rue_charleroi_old_abv <- rue_charleroi_old_abv |>
-      mutate(Count = str_length(street_FINAL_detected),
-             Saint = str_detect(street_FINAL_detected, regex("(Sint-[a-z])|(Saint(|e)-[a-z])", ignore_case = TRUE)),
-             Last = str_detect(street_FINAL_detected, regex("(\\s|'|-)[A-Z]$", ignore_case = TRUE)),
-             Last_double = str_detect(street_FINAL_detected, regex("((\\s|'|-)[A-Z][A-Z]$)", ignore_case = TRUE)),
-             King = str_detect(street_FINAL_detected_Origin, regex("( Ier|1er)$|II|Roi\\s|Koning(|in)\\s", ignore_case = TRUE))
+      mutate(Count = str_length(street_detected),
+             Saint = str_detect(street_detected, regex("(Sint-[a-z])|(Saint(|e)-[a-z])", ignore_case = TRUE)),
+             Last = str_detect(street_detected, regex("(\\s|'|-)[A-Z]$", ignore_case = TRUE)),
+             Last_double = str_detect(street_detected, regex("((\\s|'|-)[A-Z][A-Z]$)", ignore_case = TRUE)),
+             King = str_detect(street_detected_Origin, regex("( Ier|1er)$|II|Roi\\s|Koning(|in)\\s", ignore_case = TRUE))
       ) %>%
       filter(Last == FALSE) %>%
       filter(Last_double == FALSE) %>%
       filter(Count >= 10 & Count <= 25) %>%
       filter(Saint == FALSE) %>%
       filter(King == FALSE) %>%
-      select(street_id_phaco, postal_id, street_FINAL_detected, langue_FINAL_detected, ancien_nom_rue, nom_propre_abv)
+      select(street_id_phaco, postal_id, street_detected, langue_detected, ancien_nom_rue, nom_propre_abv)
 
     rue_charleroi_old_abv <- bind_rows(rue_charleroi_old, rue_charleroi_old_abv)
 
@@ -615,9 +621,9 @@ phaco_best_data_update <- function(force=FALSE,
              mid_x_31370 = x_31370,
              mid_y_31370= y_31370,
              mid_postcode= postcode,
-             mid_cd_sector= cd_sector,
+             mid_cd_sector2024= cd_sector2024,
              mid_arrond= arrond) %>%
-      select(street_id_phaco, postal_id, mid_num, mid_x_31370, mid_y_31370, mid_cd_sector) %>%
+      select(street_id_phaco, postal_id, mid_num, mid_x_31370, mid_y_31370, mid_cd_sector2024) %>%
       unique()
 
     belgium_street_abv<-belgium_street_abv %>%
@@ -637,10 +643,10 @@ phaco_best_data_update <- function(force=FALSE,
     # On cree la table de conversion codes postaux > arrondissements
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
-    code_postal_INS <- read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012025.xlsx"), progress= F) %>%
+    code_postal_INS <- read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx"), progress= F) %>%
       rename("code_postal" = "Postal code")
 
-    BE_SS_lite_comm_arrond_rgn <- BE_SS %>%
+    BE_SS_lite_comm_arrond_rgn <- BE_SS2024 %>%
       as.data.frame() %>%
       select(cd_munty_refnis, cd_dstr_refnis, tx_rgn_descr_fr) %>%
       mutate(arrond = as.numeric(substr(cd_dstr_refnis, 1, 2))) %>%
@@ -771,39 +777,41 @@ phaco_best_data_update <- function(force=FALSE,
     # 7. Table secteurs - quartiers - communes -  arrond - region -----------------------------------------------------------------------------
 
     # On cree une table avec les infos administratives pour jointure a la fin de phaco_geocode()
-    cat(paste0("\n", "\u29D7", " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers Urbis)"))
+    cat(paste0("\n", "\u29D7", " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers IBSA)"))
 
     # Quartiers du monitoring
-    BXL_QUARTIERS_sf <- st_read(paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg"), quiet=T,crs=31370)
+    # BXL_QUARTIERS_sf <- st_read(paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg"), quiet=T,crs=31370)
     # jointure spatiale avec le centroid des secteurs statistiques
-    BXL_QUARTIERS <- st_join(BXL_QUARTIERS_sf, st_point_on_surface(BE_SS)) %>%
-      as.data.frame() %>%
-      select(cd_sector, MDRC, NAME_FRE, NAME_DUT)
+    # BXL_QUARTIERS <- st_join(BXL_QUARTIERS_sf, st_point_on_surface(BE_SS)) %>%
+    #   as.data.frame() %>%
+    #   select(cd_sector, MDRC, NAME_FRE, NAME_DUT)
 
     # On calcule les centroides des secteurs stats (en cas d'anonymisation des donnees)
-    BE_SS_coord <- BE_SS %>%
+    BE_SS_coord2024 <- BE_SS2024 %>%
       st_point_on_surface() %>%
-      dplyr::mutate(cd_sector_x_31370 = sf::st_coordinates(.)[,1],
-                    cd_sector_y_31370 = sf::st_coordinates(.)[,2],
-                    cd_sector_x_31370 = str_replace(cd_sector_x_31370, ",", "."),
-                    cd_sector_y_31370 = str_replace(cd_sector_y_31370, ",", "."),
-                    cd_sector_x_31370 = round(as.numeric(cd_sector_x_31370), precision_digits),
-                    cd_sector_y_31370 = round(as.numeric(cd_sector_y_31370), precision_digits)) %>%
+      dplyr::mutate(cd_sector2024_x_31370 = sf::st_coordinates(.)[,1] %>%
+                      str_replace(",", ".") %>%
+                      as.numeric() %>%
+                      round(precision_digits),
+                    cd_sector2024_y_31370 = sf::st_coordinates(.)[,2]%>%
+                      str_replace(",", ".") %>%
+                      as.numeric() %>%
+                      round(precision_digits)) %>%
       as.data.frame() %>%
-      select(cd_sector, cd_sector_x_31370, cd_sector_y_31370)
+      select(cd_sector, cd_sector2024_x_31370, cd_sector2024_y_31370)
 
-    table_secteurs_prov_commune_quartier <- BE_SS %>%
-      left_join(BXL_QUARTIERS, by="cd_sector") %>%
-      left_join(BE_SS_coord, by="cd_sector") %>%
+    table_secteurs_prov_commune_quartier <- BE_SS2024 %>%
+      left_join(BE_SS_coord2024, by="cd_sector") %>%
       as.data.frame() %>%
+      dplyr::rename(cd_sector2024= cd_sector) %>%
       select(-tx_sector_descr_de, -tx_munty_descr_de, -tx_adm_dstr_descr_de,
              -tx_rgn_descr_de, -cd_country,- cd_nuts_lvl1, -cd_nuts_lvl2, -cd_nuts_lvl3,
-             -ms_area_ha, -ms_perimeter_m, -dt_situation, -geom, -tx_prov_descr_de) # NOTE : dans BE_SS version gpkg, le champ geometrie = "geom" et non "geometry" => PKOI ?
+             -ms_area_ha, -ms_perimeter_m, -dt_situation, -GEOMETRY, -tx_prov_descr_de) # NOTE : dans BE_SS version gpkg, le champ geometrie = "geom" et non "geometry" => PKOI ? Réponse: une histoire de convention parfois liés aux formats des fichiers, ça peut être geom, geometry, the_geom en minuscule ou majuscule ...
 
 
     write_delim(table_secteurs_prov_commune_quartier, paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", na = "", progress=F)
 
-    cat(paste0("\r", colourise("\u2714", fg="green"), " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers Urbis)"))
+    cat(paste0("\r", colourise("\u2714", fg="green"), " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers IBSA)"))
 
 
     # 8. Liste des communes adjacentes par commune --------------------------------------------------------------------------------------------
@@ -812,15 +820,18 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))
 
     # D'abord un recodage car codes postaux et INS n'ont pas de relation bi-univoque : https://statbel.fgov.be/fr/propos-de-statbel/methodologie/classifications/geographie
-    BE_communes <- BE_SS %>%
-      mutate(cd_munty_refnis = case_when(cd_munty_refnis == "21004" | cd_munty_refnis == "21005" | cd_munty_refnis == "21009" ~ "21004-21005-21009",
-                                         cd_munty_refnis == "23088" | cd_munty_refnis == "23096" ~ "23088-23096",
+    BE_communes <- BE_SS2024 %>%
+      mutate(cd_munty_refnis = case_when(cd_munty_refnis == "21004" |
+                                         cd_munty_refnis == "21005" |
+                                         cd_munty_refnis == "21009" ~ "21004-21005-21009",
+                                         cd_munty_refnis == "23088" |
+                                         cd_munty_refnis == "23096" ~ "23088-23096",
                                          TRUE ~ cd_munty_refnis)) %>%
       group_by(cd_munty_refnis) %>%
-      summarize(geom = st_union(geom))
+      summarize(GEOMETRY = st_union(GEOMETRY))
 
-    nb <- poly2nb(BE_communes)
-    mat <- nb2mat(nb, style="B")
+    nb <- spdep::poly2nb(BE_communes)
+    mat <- spdep::nb2mat(nb, style="B")
     colnames(mat) <- BE_communes$cd_munty_refnis
     mat <- mat %>%
       as.data.frame() %>%
