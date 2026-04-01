@@ -61,6 +61,7 @@ phaco_geocode <- function(data_to_geocode,
                           error_max = 4,
                           approx_num_max = 50,
                           elargissement_com_adj = TRUE,
+                          error_max_adj= 4,
                           mid_street = TRUE,
                           lang_encoded = c("FR", "NL", "DE"),
                           anonymous = FALSE,
@@ -934,7 +935,7 @@ phaco_geocode <- function(data_to_geocode,
                                                  postal_street_adj_i,
                                                  by = c("address_join" = "address_join_street"),
                                                  method = method_stringdist,
-                                                 max_dist = error_max/2,
+                                                 max_dist = error_max_adj,
                                                  distance_col = "dist_fuzzy")
                           }
 

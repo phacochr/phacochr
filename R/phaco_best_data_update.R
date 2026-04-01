@@ -79,13 +79,14 @@ phaco_best_data_update <- function(force=FALSE,
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
   if(sum(
-    file.exists(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"),
-                paste0(path_data, "IBSA/quartiers2025.rds"),
+    file.exists(
+      # paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"),
+                paste0(path_data, "CHARLEROI/Rues-Nouveaux-noms_2024-01-17.xlsx"),
                 paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"),
                 paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"),
-                paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012025.xlsx")
+                paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx")
     )
-  ) != 5) {
+  ) != 4) {
     cat("\n")
     stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
   }
