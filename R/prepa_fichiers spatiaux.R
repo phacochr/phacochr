@@ -12,19 +12,21 @@ path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/
 
 dir.create(paste0(path_data,"STATBEL/code_postaux"), recursive = TRUE)
 
-download.file("https://statbel.fgov.be/sites/default/files/files/documents/Over%20Statbel/Conversion%20Postal%20code_Refnis%20code_va01012019.xlsx",
+# download.file("https://statbel.fgov.be/sites/default/files/files/documents/Over%20Statbel/Conversion%20Postal%20code_Refnis%20code_va01012019.xlsx",
+#               paste0(path_data,"STATBEL/code_postaux/Conversion\ Postal\ code_Refnis\ code_va01012019.xlsx"))
+
+download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/ConversionPostalcode_Refniscode_va01012019.xlsx",
               paste0(path_data,"STATBEL/code_postaux/Conversion\ Postal\ code_Refnis\ code_va01012019.xlsx"))
 
-download.file("https://statbel.fgov.be/sites/default/files/Over_Statbel_FR/Nomenclaturen/Conversion%20Postal%20code_Refnis%20code_va01012025.xlsx",
-              paste0(path_data,"STATBEL/code_postaux/Conversion\ Postal\ code_Refnis\ code_va01012025.xlsx"))
+# download.file("https://statbel.fgov.be/sites/default/files/Over_Statbel_FR/Nomenclaturen/Conversion%20Postal%20code_Refnis%20code_va01012025.xlsx",
+#               paste0(path_data,"STATBEL/code_postaux/Conversion\ Postal\ code_Refnis\ code_va01012025.xlsx"))
 
 # Fichiers IBSA
 dir.create(paste0(path_data,"IBSA"), recursive = TRUE)
 
 # Correspondance ...-2024
-httr::GET(
-  "https://monitoringdesquartiers.brussels/Home/DownloadFile?fileName=MQ_Communes_Quartiers_Secteurs.xlsx",
-  httr::write_disk(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx"), overwrite = TRUE))
+download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/MQ_Communes_Quartiers_Secteurs.xlsx",
+              paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx"))
 
 # Correspondance 2025-...
 download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/conversion_secteur_quartier_2025.csv",
