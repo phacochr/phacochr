@@ -6,7 +6,7 @@
 \usage{
 phaco_best_data_update(
   force = FALSE,
-  precision = "m",
+  precision = "mm",
   corrections_REGEX = TRUE
 )
 }

@@ -1,8 +1,9 @@
 
 
 library(sf)
-library(tidyverse)
-library( rappdirs)
+library(readr)
+library(dplyr)
+library(rappdirs)
 library(readxl)
 
 path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/"))
@@ -42,7 +43,7 @@ unzip("sh_statbel_statistical_sectors_31370_20250101.sqlite.zip", exdir = "sh_st
 
 sec2025<- st_read("sh_statbel_statistical_sectors_31370_20250101.sqlite/sh_statbel_statistical_sectors_31370_20250101.sqlite/sh_statbel_statistical_sectors_31370_20250101.sqlite")
 
-quartier_sec_2025<-read_delim(paste0(path_data,"IBSA/conversion_secteur_quartier_2025.csv")) %>%
+quartier_sec_2025<-read_delim(paste0(path_data,"IBSA/conversion_secteur_quartier_2025.csv"), delim = ";") %>%
   rename(cd_sector2025= secteurstatistique_code) %>%
   select(cd_sector2025, quartier_code,quartier_nom_fr, quartier_nom_nl  )
 
