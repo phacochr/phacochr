@@ -11,9 +11,10 @@
 #' @param colonne_num_rue_code_postal Nom de la colonne avec numéros, rues et code postaux ensemble.
 #' @param method_stringdist Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles: "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw","soundex".
 #' @param corrections_REGEX Correction orthographique. Par défaut: TRUE. Cette option n'est désactivable que si la rue est contenue dans une colonne séparée (c'est-à-dire qu'elle ne contient ni le numéro ni le code postal).
-#' @param error_max Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: TRUE.
+#' @param error_max Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: 4.
 #' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50.
 #' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE.
+#' @param error_max_adj Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST), en cas d'élargissement aux communes limitrophes. Par défaut: error_max/2.
 #' @param mid_street Indique les coordonnées du milieu de la rue si les coordonnées du numéro ne sont pas trouvée. Par défaut: TRUE.
 #' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE").
 #' @param anonymous Anonymisation des résultats en ajoutant uniquement les informations des entités administratives (secteurs statistiques, quartiers, (sous-)communes, etc.). Dans ce cas, les coordonnées X-Y indiquées sont le centroïde du secteur statistique. De plus, toutes les informations relatives à l'adresse dans les données originales sont supprimées. Par défaut: FALSE.
@@ -61,7 +62,7 @@ phaco_geocode <- function(data_to_geocode,
                           error_max = 4,
                           approx_num_max = 50,
                           elargissement_com_adj = TRUE,
-                          error_max_adj= 4,
+                          error_max_adj= NULL,
                           mid_street = TRUE,
                           lang_encoded = c("FR", "NL", "DE"),
                           anonymous = FALSE,
@@ -69,6 +70,11 @@ phaco_geocode <- function(data_to_geocode,
 
 
   start_time <- Sys.time()
+
+  # Si error_max_adj pas defini (NULL), alors il est égal a error_max/2
+  if(is.null(error_max_adj)){
+    error_max_adj <- error_max/2
+  }
 
   # Definition du chemin ou se trouve les donnees
   if(is.null(path_data)){
@@ -118,7 +124,8 @@ phaco_geocode <- function(data_to_geocode,
   }
 
   list_arg_num <- list(error_max = error_max,
-                       approx_num_max = approx_num_max)
+                       approx_num_max = approx_num_max,
+                       error_max_adj = error_max_adj)
 
   for (i in seq_along(list_arg_num)) {
     if(length(list_arg_num[[i]]) > 1) {

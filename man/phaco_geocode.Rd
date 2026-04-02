@@ -17,7 +17,7 @@ phaco_geocode(
   error_max = 4,
   approx_num_max = 50,
   elargissement_com_adj = TRUE,
-  error_max_adj = 4,
+  error_max_adj = NULL,
   mid_street = TRUE,
   lang_encoded = c("FR", "NL", "DE"),
   anonymous = FALSE,
