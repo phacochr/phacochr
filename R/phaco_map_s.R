@@ -70,15 +70,21 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
   if(sum(
-    file.exists(paste0(path_data,"STATBEL/PREPROCESSED/BXL_communes_PREPROCESSED.gpkg"),
-                paste0(path_data,"STATBEL/PREPROCESSED/BXL_SS_PREPROCESSED.gpkg"),
-                paste0(path_data,"STATBEL/PREPROCESSED/BRUXELLES_PREPROCESSED.gpkg"),
-                paste0(path_data,"STATBEL/PREPROCESSED/BE_communes_PREPROCESSED.gpkg"),
-                paste0(path_data,"STATBEL/PREPROCESSED/BE_provinces_PREPROCESSED.gpkg"),
-                paste0(path_data,"STATBEL/PREPROCESSED/BE_regions_PREPROCESSED.gpkg"),
-                paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg")
+    file.exists(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds"),
+                paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds"),
+                paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"),
+                paste0(path_data,"STATBEL/communes/communes2011.rds"),
+                paste0(path_data,"STATBEL/communes/communes2024.rds"),
+                paste0(path_data,"STATBEL/communes/communes2025.rds"),
+                paste0(path_data,"IBSA/quartiers2011.rds"),
+                paste0(path_data,"IBSA/quartiers2024.rds"),
+                paste0(path_data,"IBSA/quartiers2025.rds"),
+                paste0(path_data,"STATBEL/autres/provinces.rds"),
+                paste0(path_data,"STATBEL/autres/regions.rds"),
+                paste0(path_data,"STATBEL/autres/belgique.rds"),
+                paste0(path_data,"STATBEL/autres/rbc.rds")
     )
-  ) != 7) {
+  ) != 13) {
     cat("\n")
     stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
   }
@@ -124,14 +130,14 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
 
     # a) Geopackages --------------------------------------------------------------------------------------------------------------------------
 
-    BXL_communes <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BXL_communes_PREPROCESSED.gpkg"), quiet=T)
+    BXL_communes <- phaco_data("communes_bxl")
     if(aggreg_sector == TRUE){
-      BXL_SS <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BXL_SS_PREPROCESSED.gpkg"), quiet=T) %>%
+      BXL_SS <- phaco_data("sec_bxl") %>%
         left_join(n_geocoding, by = "cd_sector") # Je joins les effectifs par sect stat
     } else {
-      BXL_SS <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BXL_SS_PREPROCESSED.gpkg"), quiet=T)
+      BXL_SS <-phaco_data("sec_bxl")
     }
-    BRUXELLES <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BRUXELLES_PREPROCESSED.gpkg"), quiet=T)
+    BRUXELLES <-BXL_SS <- phaco_data("rbc")
 
 
     # b) Carto --------------------------------------------------------------------------------------------------------------------------------
@@ -184,11 +190,11 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
 
     # a) Geopackages --------------------------------------------------------------------------------------------------------------------------
 
-    BE_communes <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_communes_PREPROCESSED.gpkg"), quiet=T)
-    BE_provinces <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_provinces_PREPROCESSED.gpkg"), quiet=T)
-    BE_regions <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BE_regions_PREPROCESSED.gpkg"), quiet=T)
+    BE_communes <- phaco_data("communes")
+    BE_provinces <- phaco_data("provinces")
+    BE_regions <- phaco_data("regions")
     if(aggreg_sector == TRUE){
-      BE_SS <- st_read(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg"), quiet=T, crs= 31370) %>%
+      BE_SS <- phaco_data("sec") %>%
         st_set_crs(31370) %>%
         st_zm(drop = TRUE) %>%
         left_join(n_geocoding, by = "cd_sector") # Je joins les effectifs par sect stat
