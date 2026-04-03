@@ -1132,14 +1132,14 @@ phaco_geocode <- function(data_to_geocode,
                 )
               ) |>
               filter(selection == TRUE) %>%
-              select(-street_id_phaco, -num_rue_clean, -ecart, -street_detected_utf8, -n_selection, -selection)
+              select(-street_id_phaco, -street_detected, -num_rue_clean, -ecart, -street_detected_utf8, -n_selection, -selection)
 
             #sum(duplicated(APPROX_2$ID_address))
           }
 
           if (nrow(APPROX_2) == 0){
             APPROX_2 <- APPROX_2 %>%
-              select(-street_id_phaco, -num_rue_clean)
+              select(-street_id_phaco, -street_detected, -num_rue_clean)
           }
 
           # On rassemble les resultats
