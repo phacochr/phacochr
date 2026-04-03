@@ -62,7 +62,7 @@ phaco_geocode <- function(data_to_geocode,
                           error_max = 4,
                           approx_num_max = 50,
                           elargissement_com_adj = TRUE,
-                          error_max_adj= NULL,
+                          error_max_adj = NULL,
                           mid_street = TRUE,
                           lang_encoded = c("FR", "NL", "DE"),
                           anonymous = FALSE,
@@ -882,7 +882,9 @@ phaco_geocode <- function(data_to_geocode,
       group_by(ID_address) %>%
       mutate(min_jw = min(distance_jw)) %>%
       filter(distance_jw == min_jw | is.na(distance_jw)) %>%
-      sample_n(1) %>% # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
+      # Au cas ou il reste ENCORE des doublons : on classe par ordre alphabetique et on selectionne le 1er (arrive uniquement lorsque la tolerance est elevee)
+      arrange(street_detected) |>
+      slice_head() %>%
       select(-min_jw, -distance_jw, -address_join, -address_join_street)
 
     cat(paste0("\r",colourise("\u2714", fg="green")," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
@@ -968,7 +970,9 @@ phaco_geocode <- function(data_to_geocode,
             group_by(ID_address) %>%
             mutate(min_jw = min(distance_jw)) %>%
             filter(distance_jw == min_jw | is.na(distance_jw)) %>%
-            sample_n(1) %>% # Au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
+            # Au cas ou il reste ENCORE des doublons : on classe par ordre alphabetique et on selectionne le 1er (arrive uniquement lorsque la tolerance est elevee)
+            arrange(street_detected) |>
+            slice_head() %>%
             select(-min_jw, -distance_jw, -address_join, -address_join_street)
         }
 
@@ -1042,7 +1046,7 @@ phaco_geocode <- function(data_to_geocode,
       if (nrow(FULL_GEOCODING_APPROX) > 0) { # A partir d'ici, plein de if statement pour eviter d'appliquer les operations sur un tableau vide (possible a chaque etape)
         # On fait une jointure avec openaddress sur base des noms de rue, uniquement du meme cote de la rue
         APPROX_1 <- FULL_GEOCODING_APPROX %>%
-          select(ID_address, num_rue_clean, street_id_phaco) %>%
+          select(ID_address, num_rue_clean, street_id_phaco, street_detected) %>%
           inner_join(select(openaddress_be, street_id_phaco, house_number_sans_lettre, x_31370, y_31370, cd_sector2024, cd_sector2025),
                      by=c("street_id_phaco")) %>%
           distinct() %>%
@@ -1051,25 +1055,48 @@ phaco_geocode <- function(data_to_geocode,
         if (nrow(APPROX_1) > 0){
           # On ne retient que le numero avec la distance minimale
           APPROX_1 <- APPROX_1 %>%
-            mutate(approx_num = abs(num_rue_clean - house_number_sans_lettre)) %>%
+            mutate(ecart = num_rue_clean - house_number_sans_lettre,
+                   approx_num = abs(ecart)) %>%
             group_by(ID_address) %>%
             mutate(min = min(approx_num)) %>%
-            filter(min == approx_num) %>%  # selection plus proche
-            sample_n(1) %>%
-            select(-street_id_phaco, -num_rue_clean)
+            filter(min == approx_num)  # selection plus proche
+
+          # Nous essayons de faire la meme approximation pour une rue donnee
+          # Pour cela, on transforme les caracteres de la rue en codes UFTF8, et on les somme => selon que cette somme est paire/impaire, on choisira en dessous ou au dessus
+          APPROX_1$street_detected_utf8 <- NA
+          for(i in 1:nrow(APPROX_1)){
+            APPROX_1$street_detected_utf8[i] <- sum(utf8ToInt(APPROX_1$street_detected[i]))
+          }
+
+          APPROX_1 <- APPROX_1 |>
+            mutate(
+              n_selection = n(),
+              selection = case_when(
+                # Pour les adresse qui n'apparaissent qu'1X, la question ne se pose pas => on selectionne
+                n_selection == 1 ~ TRUE,
+                # Pour les adresse qui n'apparaissent 2X (approx sup et low) => on selectionne si :
+                # - lorsque la somme UTF8 est paire => ecart positif
+                n_selection == 2 & street_detected_utf8%%2 == 0 & ecart > 0 ~ TRUE,
+                # - lorsque la somme UTF8 est impaire => ecart négatif
+                n_selection == 2 & street_detected_utf8%%2 != 0 & ecart < 0 ~ TRUE,
+                .default = FALSE
+              )
+            ) |>
+            filter(selection == TRUE) %>%
+            select(-street_id_phaco, -street_detected, -num_rue_clean, -ecart, -street_detected_utf8, -n_selection, -selection)
 
           #sum(duplicated(APPROX_1$ID_address))
 
           # On selectionne ceux qu'on n'a pas trouve en repartant de FULL_GEOCODING_APPROX avec un anti_join sur APPROX_1
           APPROX_2 <- FULL_GEOCODING_APPROX %>%
-            select(ID_address, num_rue_clean, street_id_phaco) %>%
+            select(ID_address, num_rue_clean, street_id_phaco, street_detected) %>%
             anti_join(APPROX_1, by= "ID_address")
 
           if (nrow(APPROX_2) > 0){
 
             APPROX_2 <- APPROX_2 %>%
               # On fait une jointure avec openaddress sur base des noms de rue, cette fois n'importe quel cote de la rue
-              inner_join(select(openaddress_be, street_id_phaco ,house_number_sans_lettre,x_31370, y_31370, cd_sector2024,cd_sector2025 ),
+              inner_join(select(openaddress_be, street_id_phaco, house_number_sans_lettre, x_31370, y_31370, cd_sector2024, cd_sector2025),
                          by=c("street_id_phaco"))
           }
 
@@ -1077,12 +1104,35 @@ phaco_geocode <- function(data_to_geocode,
             # On ne retient que le numero avec la distance minimale
             APPROX_2 <- APPROX_2 %>%
               distinct() %>%
-              mutate(approx_num = abs(num_rue_clean - house_number_sans_lettre)) %>%
+              mutate(ecart = num_rue_clean - house_number_sans_lettre,
+                     approx_num = abs(ecart)) %>%
               group_by(ID_address) %>%
               mutate(min = min(approx_num)) %>%
-              filter(min == approx_num) %>%  # selection plus proche
-              sample_n(1) %>%
-              select(-street_id_phaco, -num_rue_clean)
+              filter(min == approx_num)  # selection plus proche
+
+            # Nous essayons de faire la meme approximation pour une rue donnee
+            # Pour cela, on transforme les caracteres de la rue en codes UFTF8, et on les somme => selon que cette somme est paire/impaire, on choisira en dessous ou au dessus
+            APPROX_2$street_detected_utf8 <- NA
+            for(i in 1:nrow(APPROX_2)){
+              APPROX_2$street_detected_utf8[i] <- sum(utf8ToInt(APPROX_2$street_detected[i]))
+            }
+
+            APPROX_2 <- APPROX_2 |>
+              mutate(
+                n_selection = n(),
+                selection = case_when(
+                  # Pour les adresse qui n'apparaissent qu'1X, la question ne se pose pas => on selectionne
+                  n_selection == 1 ~ TRUE,
+                  # Pour les adresse qui n'apparaissent 2X (approx sup et low) => on selectionne si :
+                  # - lorsque la somme UTF8 est paire => ecart positif
+                  n_selection == 2 & street_detected_utf8%%2 == 0 & ecart > 0 ~ TRUE,
+                  # - lorsque la somme UTF8 est impaire => ecart négatif
+                  n_selection == 2 & street_detected_utf8%%2 != 0 & ecart < 0 ~ TRUE,
+                  .default = FALSE
+                )
+              ) |>
+              filter(selection == TRUE) %>%
+              select(-street_id_phaco, -num_rue_clean, -ecart, -street_detected_utf8, -n_selection, -selection)
 
             #sum(duplicated(APPROX_2$ID_address))
           }
