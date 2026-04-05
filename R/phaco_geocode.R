@@ -164,55 +164,55 @@ phaco_geocode <- function(data_to_geocode,
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
   if(sum(
-    file.exists(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_11.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_12.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_13.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_21.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_23.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_24.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_25.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_31.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_32.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_33.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_34.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_35.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_36.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_37.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_38.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_41.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_42.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_43.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_44.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_45.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_46.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_51.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_52.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_53.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_55.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_56.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_57.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_58.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_61.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_62.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_63.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_64.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_71.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_72.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_73.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_81.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_82.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_83.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_84.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_85.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_91.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_92.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_93.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"),
-                paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.csv"),
-                paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv")
+    file.exists(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_11.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_12.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_13.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_21.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_23.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_24.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_25.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_31.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_32.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_33.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_34.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_35.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_36.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_37.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_38.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_41.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_42.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_43.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_44.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_45.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_46.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_51.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_52.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_53.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_55.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_56.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_57.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_58.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_61.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_62.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_63.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_64.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_71.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_72.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_73.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_81.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_82.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_83.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_84.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_85.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_91.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_92.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_93.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.rds"),
+                paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.rds"),
+                paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.rds")
     )
   ) != 49) {
 
@@ -389,7 +389,7 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 3. Detection des regions/arrondissements en Belgique -------------------------------------------------------------------------------------
   # Cette partie directement apres le code postal pour pouvoir arreter si le code postal n'est pas valide
-  table_postal_arrond <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
+  table_postal_arrond <- readRDS(paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.rds"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
 
   data_to_geocode <- data_to_geocode %>%
     left_join(table_postal_arrond, by = c("code_postal_to_geocode" = "postcode"))
@@ -465,7 +465,7 @@ phaco_geocode <- function(data_to_geocode,
     # Suppression du code postal ssi interne au champ d'adresse
     if (situation == "num_rue_postal_i" | situation == "no_num_rue_postal_i") {
 
-      table_postal_com_name <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
+      table_postal_com_name <- readRDS(paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.rds"), delim = ";", progress= F,  col_types = cols(.default = col_character()))
 
       data_to_geocode <- data_to_geocode %>%
         mutate(rue_recoded_commune = str_detect(
@@ -820,7 +820,7 @@ phaco_geocode <- function(data_to_geocode,
   ### i. Preparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
   # J'importe les rues
-  postal_street <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
+  postal_street <- readRDS(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.rds"), delim = ";", progress= F,  col_types = cols(.default = col_character())) %>%
     mutate(address_join_street = str_to_lower(str_trim(street_detected)))
 
   if (length(lang_encoded) != 3){
@@ -913,7 +913,7 @@ phaco_geocode <- function(data_to_geocode,
     if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
 
       # On charge la table de conversion code postal > code INS recode (voir preprocessing)
-      table_INS_recod_code_postal <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";",progress= F, col_types = cols(.default = col_character()))
+      table_INS_recod_code_postal <- readRDS(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.rds"), delim = ";",progress= F, col_types = cols(.default = col_character()))
 
       # On ajoute ce code INS recode 1) aux rues et 2) aux adresses non trouvees
       postal_street_adj <- postal_street %>%
@@ -922,7 +922,7 @@ phaco_geocode <- function(data_to_geocode,
         left_join(table_INS_recod_code_postal, by = c("code_postal_to_geocode" = "code_postal"))
 
       # On charge la table des communes (= code INS recodes) adjacentes par commune (voir preprocessing)
-      table_commune_adjacentes <- readr::read_delim(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.csv"), progress= F, delim = ";", col_types = cols(.default = col_character()))
+      table_commune_adjacentes <- readRDS(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.rds"), progress= F, delim = ";", col_types = cols(.default = col_character()))
 
       res_adj <- tibble()
       res_adj <- foreach (i = unique(ADDRESS_last_tentative$`Refnis code`),
@@ -1008,8 +1008,9 @@ phaco_geocode <- function(data_to_geocode,
     # Ici on cree une liste des adresses en n'important que les arrondissements detectes dans data_to_geocode
     openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
                              unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
-                             ".csv") %>%
-      map_dfr(read_delim, delim = ";", progress= F, col_types = cols(.default = col_character())) %>%
+                             ".rds") %>%
+      map_dfr(readRDS) %>%
+      mutate(across(everything(), as.character)) %>%
       left_join(select(postal_street, street_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) %>% # On joint les noms de rue (non contenues dans le fichier openadress par economie de place) via postal_street et la cle de jointure unique "street_id_phaco" (voir preprocessing)
       mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
              address_join_geocoding = paste(house_number_sans_lettre, street_detected, postal_id)) #%>%
@@ -1237,7 +1238,7 @@ phaco_geocode <- function(data_to_geocode,
   # @@@@@@@@@@ QUESTION : DOIT-ON AUSSI REMPLACER LES NOMS DES ANCIENNES RUES (CHARLEROI) PAR LES NOUVELLES ? @@@@@@@@@@
 
   # On joint les donnees de region, provinces, communes, quartiers (BXL)... aux secteurs stat
-  table_secteurs_prov_commune_quartier <- readr::read_delim(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", progress= F, col_types = cols(.default = col_character()))
+  table_secteurs_prov_commune_quartier <- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.rds"))
 
   FULL_GEOCODING <- FULL_GEOCODING %>%
     left_join(table_secteurs_prov_commune_quartier, by = "cd_sector2024")
@@ -1289,7 +1290,7 @@ phaco_geocode <- function(data_to_geocode,
   Summary_full <- bind_rows(Summary_original, Summary_region) %>%
     slice(match(c("Total (original)", "Bruxelles", "Flandre", "Wallonie", NA, "Total"), Region))
 
-  # J'enleve la region et les arrondissements, car doublon avec jointure dans le point precedent => pas ideal, mais necessaire pour importer les CSV par arrond avec map_dfr, pour le summary et au debut pour detecter les regions et ne pas executer si pas BE => optimiser ?
+  # J'enleve la region et les arrondissements, car doublon avec jointure dans le point precedent => pas ideal, mais necessaire pour importer les rds par arrond avec map_dfr, pour le summary et au debut pour detecter les regions et ne pas executer si pas BE => optimiser ?
   # J'enleve aussi rue_to_geocode => plus besoin
   FULL_GEOCODING <- FULL_GEOCODING %>%
     select(-Region, -arrond, -rue_to_geocode)

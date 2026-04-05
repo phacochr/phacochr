@@ -634,7 +634,7 @@ phaco_best_data_update <- function(force=FALSE,
 
 
     #write_csv2(belgium_street, paste0(path_data, "BeST/PREPROCESSED/belgium_street_PREPROCESSED.csv"))
-    write_delim(belgium_street_abv, paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), delim = ";", progress=F)
+    saveRDS(belgium_street_abv, file= paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.rds"))
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
 
@@ -663,7 +663,7 @@ phaco_best_data_update <- function(force=FALSE,
     table_postal_arrond$Region[table_postal_arrond$Region == paste0("R", "\u00e9", "gion wallonne")] <- "Wallonie"
 
 
-    write_delim(table_postal_arrond, paste0(path_data, "BeST/PREPROCESSED/table_postal_arrond.csv"), delim = ";", progress=F)
+    saveRDS(table_postal_arrond, file= paste0(path_data, "BeST/PREPROCESSED/table_postal_arrond.rds"))
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
@@ -726,7 +726,7 @@ phaco_best_data_update <- function(force=FALSE,
       )
 
 
-    write_delim(table_postal_com_name, paste0(path_data, "BeST/PREPROCESSED/table_postal_com_name.csv"), delim = ";", progress=F)
+    saveRDS(table_postal_com_name, file= paste0(path_data, "BeST/PREPROCESSED/table_postal_com_name.rds"))
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table 'codes postaux - nom des communes' (Statbel)"))
 
@@ -742,7 +742,7 @@ phaco_best_data_update <- function(force=FALSE,
       distinct()
 
 
-    write_delim(table_INS_recod_code_postal, paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), delim = ";", progress=F)
+    saveRDS(table_INS_recod_code_postal,file= paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.rds"))
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - codes INS recod", "\u00e9", "es' (Statbel)"))
 
@@ -769,7 +769,7 @@ phaco_best_data_update <- function(force=FALSE,
       temp <- openaddress_be %>%
         filter(arrond == i) %>%
         select(-postcode, -arrond)
-      write_delim(temp, paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".csv"), delim = ";", na = "", progress=F)
+      saveRDS(temp,file= paste0(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_"),  i, ".rds"))
     }
 
     cat(paste0("\r", colourise("\u2714", fg="green")," Export des fichiers BeST par arrondissement"))
@@ -810,7 +810,7 @@ phaco_best_data_update <- function(force=FALSE,
              -ms_area_ha, -ms_perimeter_m, -dt_situation, -GEOMETRY, -tx_prov_descr_de) # NOTE : dans BE_SS version gpkg, le champ geometrie = "geom" et non "geometry" => PKOI ? Réponse: une histoire de convention parfois liés aux formats des fichiers, ça peut être geom, geometry, the_geom en minuscule ou majuscule ...
 
 
-    write_delim(table_secteurs_prov_commune_quartier, paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), delim = ";", na = "", progress=F)
+    saveRDS(table_secteurs_prov_commune_quartier, file=paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.rds"))
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers IBSA)"))
 
@@ -841,7 +841,7 @@ phaco_best_data_update <- function(force=FALSE,
       filter(voisin==1) %>%
       select(-voisin)
 
-    write_delim(mat, paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.csv"), delim = ";", progress=F)
+    saveRDS(mat, file= paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.rds"))
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))
 
