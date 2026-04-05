@@ -352,7 +352,10 @@ phaco_best_data_update <- function(force=FALSE,
         # Pour revenir a la structure originale pre correction
         select(-id_regex_belgium_street, -recode, -street_detected) %>%
         rename("street_detected" = "rue_recoded") %>%
-        relocate(street_detected, .after = postal_id)
+        relocate(street_detected, .after = postal_id) |>
+
+        # Pour supprimer les dupliques crees par la correction ortho
+        distinct(postal_id, street_detected, .keep_all = TRUE)
 
       cat(paste0("\033[K","\r",colourise("\u2714", fg="green")," Correction orthographique des rues BeST", "\033[K"))
 
