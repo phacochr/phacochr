@@ -792,12 +792,12 @@ phaco_best_data_update <- function(force=FALSE,
 
     # On calcule les centroides des secteurs stats (en cas d'anonymisation des donnees)
     BE_SS_coord2024 <- BE_SS2024 |>
-      st_point_on_surface() |>
+      st_point_on_surface() %>% # pipe magrittr pour utiliser le dot (.)
       dplyr::mutate(cd_sector2024_x_31370 = sf::st_coordinates(.)[,1] |>
                       str_replace(",", ".") |>
                       as.numeric() |>
                       round(precision_digits),
-                    cd_sector2024_y_31370 = sf::st_coordinates(.)[,2]|>
+                    cd_sector2024_y_31370 = sf::st_coordinates(.)[,2] |>
                       str_replace(",", ".") |>
                       as.numeric() |>
                       round(precision_digits)) |>
