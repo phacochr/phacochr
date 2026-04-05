@@ -848,6 +848,11 @@ phaco_geocode <- function(data_to_geocode,
     filter(!is.na(street_detected)) |>
     mutate(dist_fuzzy = 0)
 
+  if(sum(duplicated(res_exact$phaco_id_adress)) > 0){
+    res_exact <- res_exact |>
+      distinct(phaco_id_adress, .keep_all = TRUE)
+  }
+
   # On stocke les adresses dont la rue est pas detectee dans un autre objet data_to_geocode_inexact
   data_to_geocode_inexact <- data_to_geocode |>
     filter(phaco_id_adress %ni% unique(res_exact$phaco_id_adress))
