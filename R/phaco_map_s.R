@@ -116,9 +116,9 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     n_geocoding <- FULL_GEOCODING_sf_carto %>%
       as.data.frame() %>%
       select(-geometry) %>%
-      group_by(cd_sector) %>%
+      group_by(cd_sector2024) %>%
       summarise(n_cd_sector = sum(CARTO_weight, na.rm = T)) %>%
-      select(cd_sector, n_cd_sector)
+      select(cd_sector2024, n_cd_sector)
   }
 
 
@@ -133,11 +133,11 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     BXL_communes <- phaco_data("communes_bxl")
     if(aggreg_sector == TRUE){
       BXL_SS <- phaco_data("sec_bxl") %>%
-        left_join(n_geocoding, by = "cd_sector") # Je joins les effectifs par sect stat
+        left_join(n_geocoding, by = c("cd_sector" = "cd_sector2024")) # Je joins les effectifs par sect stat
     } else {
       BXL_SS <-phaco_data("sec_bxl")
     }
-    BRUXELLES <-BXL_SS <- phaco_data("rbc")
+    BRUXELLES <- phaco_data("rbc")
 
 
     # b) Carto --------------------------------------------------------------------------------------------------------------------------------
@@ -197,7 +197,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
       BE_SS <- phaco_data("sec") %>%
         st_set_crs(31370) %>%
         st_zm(drop = TRUE) %>%
-        left_join(n_geocoding, by = "cd_sector") # Je joins les effectifs par sect stat
+        left_join(n_geocoding, by = c("cd_sector" = "cd_sector2024")) # Je joins les effectifs par sect stat
     }
     #BELGIQUE <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BELGIQUE_PREPROCESSED.gpkg"), quiet=T)
 

@@ -815,8 +815,6 @@ phaco_geocode <- function(data_to_geocode,
 
   ## 1)  Jointure des rues  -----------------------------------------------------------------------------------------------------------------
 
-  cat(paste0("\n","\u29D7"," D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)"))
-
   ### i. Preparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
   # J'importe les rues
@@ -835,20 +833,43 @@ phaco_geocode <- function(data_to_geocode,
 
   ### ii) Boucle de jointure par commune ----------------------------------------------------------------------------------------------------
 
+  #### Matching exact -----------------------------------------------------------------------------------------------------------------------
+
+  cat(paste0("\n","\u29D7"," D","\u00e9","tection des rues (matching exact)"))
+
+  # /!\ /!\ /!\ NOTE : ICI RISQUE DE DUPLIQUES => TROUVER UN MOYEN D'EVITER CA /!\ /!\ /!\
+
+  # On detecte les rues avec un matching exact et on isole les detections dans un objet res_exact
+  res_exact <- data_to_geocode |>
+    left_join(postal_street, by = c("code_postal_to_geocode" = "postal_id", "address_join" = "address_join_street")) |>
+    filter(!is.na(street_detected)) |>
+    mutate(dist_fuzzy = 0)
+
+  # On stocke les adresses dont la rue est pas detectee dans un autre objet data_to_geocode_inexact
+  data_to_geocode_inexact <- data_to_geocode |>
+    filter(phaco_id_adress %ni% unique(res_exact$phaco_id_adress))
+
+  cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","tection des rues (matching exact)", "\033[K"))
+
+
+  #### Matching inexact ---------------------------------------------------------------------------------------------------------------------
+
+  cat(paste0("\n","\u29D7"," D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)"))
+
   # /!\ NOTE : la cle de jointure est en minuscule (d'ou les str_to_lower() avant), car stringdist identifie la diff de case comme une diff !
   # /!\ NOTE2 : la jointure cree les colonnes de postal_street, meme si 0 match ! Important pour la suite, notamment le if statement pour la creation de l'objet sf
   res <- tibble()
-  res <- foreach (i = unique(data_to_geocode$code_postal_to_geocode),
+  res <- foreach (i = unique(data_to_geocode_inexact$code_postal_to_geocode),
                   .combine = 'bind_rows',
                   .packages=c("dplyr","fuzzyjoin"))  %dopar% {
 
-                    data_to_geocode_i <- data_to_geocode %>%
+                    data_to_geocode_inexact_i <- data_to_geocode_inexact %>%
                       filter(code_postal_to_geocode == i)
 
                     postal_street_i <- postal_street %>%
                       filter(postal_id == i)
 
-                    stringdist_left_join(data_to_geocode_i,
+                    stringdist_left_join(data_to_geocode_inexact_i,
                                          postal_street_i,
                                          by = c("address_join" = "address_join_street"),
                                          method = method_stringdist,
@@ -995,6 +1016,10 @@ phaco_geocode <- function(data_to_geocode,
 
     cat(paste0("\r",colourise("\u2714", fg="green")," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes"))
   }
+
+  # On remet les rues detectee avec le matching exact
+  res <- res %>%
+    bind_rows(res_exact)
 
 
   ## 2)  Jointure des adresses --------------------------------------------------------------------------------------------------------------
