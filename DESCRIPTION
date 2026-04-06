@@ -13,7 +13,7 @@ Description: From a list of addresses, it allows the finding of the X-Y
 License: GPL (>= 3)
 URL: https://phacochr.github.io/phacochr/, https://github.com/phacochr
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.1.0)
 Imports: 
     doParallel,
     dplyr,
@@ -27,8 +27,8 @@ Imports:
     sf,
     stringdist,
     stringr,
+    tibble,
     tidyr,
-    sp,
     spdep,
     lubridate,
     readr,

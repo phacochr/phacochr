@@ -6,16 +6,8 @@
 #' @param precision Indique la précision des coordonnées désirées. Par défaut : "m". Choix possibles : "m", "dm", "cm", "mm".
 #' @param corrections_REGEX Correction orthographique des adresses BEST. Par défaut: TRUE, car les adresses BEST ne sont pas toujours homogènes : elles contiennent des précisions entre parenthèses, des abréviations, etc. qui nuisent à la détection des rues.
 #'
-#' @import rappdirs
-#' @import readr
-#' @import readxl
 #' @import dplyr
-#' @import tidyr
 #' @import stringr
-#' @import lubridate
-#' @import sf
-#' @import sp
-#' @import spdep
 #'
 #' @export
 #' @examples
@@ -74,7 +66,7 @@ phaco_best_data_update <- function(force=FALSE,
 
   # 0. Mise a jour --------------------------------------------------------------------------------------------------------------------------
 
-  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+  path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
   if(sum(
@@ -99,14 +91,14 @@ phaco_best_data_update <- function(force=FALSE,
   # Premiere fois
   if (!file.exists(paste0(path_data, "BeST/openaddress/log.csv"))){
     log <- data.frame(update = "0001-01-01 00:00:00 UTC")
-    write_delim(log, paste0(path_data, "BeST/openaddress/log.csv"), delim = ";", progress=F)
+    readr::write_delim(log, paste0(path_data, "BeST/openaddress/log.csv"), delim = ";", progress=F)
   }
-
 
   log <- readr::read_delim(paste0(path_data, "BeST/openaddress/log.csv"), delim= ",", progress= F, show_col_types = FALSE)
   log$update <- as.POSIXct(log$update)
 
-  if (max(as.Date(log$update)) + days(7) < Sys.Date() | force==TRUE) {
+  # @@@@@@@@ REMPLACER LUBRIDATE PAR FONCTION DE BASE @@@@@@@@
+  if (max(as.Date(log$update)) + lubridate::days(7) < Sys.Date() | force==TRUE) {
 
     options(timeout=300)
 
@@ -158,7 +150,7 @@ phaco_best_data_update <- function(force=FALSE,
     }
 
     log[nrow(log)+1,] <- Sys.time()
-    write_delim(log, paste0(path_data, "BeST/openaddress/log.csv"), delim = ";", progress=F)
+    readr::write_delim(log, paste0(path_data, "BeST/openaddress/log.csv"), delim = ";", progress=F)
 
     cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","compression des donn","\u00e9","es BeST"))
 
@@ -170,24 +162,29 @@ phaco_best_data_update <- function(force=FALSE,
     # Fonction pour extraire les rues
     extract_street <- function(x) {
       temp <- x |>
-        mutate(street_id_phaco=1:n()) |>
-        pivot_longer(cols = c("street_fr", "street_nl", "street_de"),
-                     values_to = "street_detected",
-                     names_to = "langue_detected") |>
+        mutate(street_id_phaco = 1:n()) |>
+        tidyr::pivot_longer(
+          cols = c("street_fr", "street_nl", "street_de"),
+          values_to = "street_detected",
+          names_to = "langue_detected"
+        ) |>
         filter(!is.na(street_detected)) |>
-        mutate(langue_detected = recode(langue_detected,
-                                              "street_fr" = "FR",
-                                              "street_nl" = "NL",
-                                              "street_de" ="DE"),
-               key_street_unique = paste(street_detected, postal_id))  |>
+        mutate(
+          langue_detected = recode(langue_detected,
+            "street_fr" = "FR",
+            "street_nl" = "NL",
+            "street_de" = "DE"
+          ),
+          key_street_unique = paste(street_detected, postal_id)
+        ) |>
         distinct(key_street_unique, .keep_all = TRUE) |>
         select(street_id_phaco, postal_id, street_detected, langue_detected, key_street_unique)
       return(temp)
     }
 
-    Brussels_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
-    Wallonia_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
-    Flanders_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), progress= F, col_types = cols(.default = col_character()))
+    Brussels_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Brussels_postal_street.csv"), progress= F, col_types = readr::cols(.default = readr::col_character()))
+    Wallonia_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Wallonia_postal_street.csv"), progress= F, col_types = readr::cols(.default = readr::col_character()))
+    Flanders_postal_street <- readr::read_delim(paste0(path_data, "BeST/openaddress/Flanders_postal_street.csv"), progress= F, col_types = readr::cols(.default = readr::col_character()))
 
     belgium_street <- bind_rows(Brussels_postal_street,Wallonia_postal_street, Flanders_postal_street)
     belgium_street <- extract_street(belgium_street)
@@ -342,7 +339,7 @@ phaco_best_data_update <- function(force=FALSE,
       # On fusionne toutes les colonnes qui commencent par "rue_recoded_" en une
       belgium_street_REGEX <- belgium_street |>
         select(id_regex_belgium_street, starts_with("rue_recoded_")) |>
-        unite("recode", 2:last_col(), sep = " ; ", remove = TRUE, na.rm = TRUE)
+        tidyr::unite("recode", 2:last_col(), sep = " ; ", remove = TRUE, na.rm = TRUE)
 
       belgium_street <- belgium_street |>
         select(-starts_with("rue_recoded_")) |>
@@ -368,8 +365,10 @@ phaco_best_data_update <- function(force=FALSE,
     # Fonction pour selectionner les variables et creer un ID street
     select_id_street <- function(x) {
       temp <- x |>
-        rename("x_31370" = "EPSG:31370_x",
-               "y_31370" = "EPSG:31370_y") |>
+        rename(
+          "x_31370" = "EPSG:31370_x",
+          "y_31370" = "EPSG:31370_y"
+        ) |>
         # On enleve les adresses sans coordonnees et celles rejetees
         filter(x_31370 != "0.00000" & status != "rejected") |>
         mutate(house_number_sans_lettre = str_extract(house_number, regex("[0-9]+", ignore_case = TRUE))) |>
@@ -377,9 +376,11 @@ phaco_best_data_update <- function(force=FALSE,
         arrange(postcode, streetname_fr, streetname_nl, streetname_de, as.numeric(house_number_sans_lettre), status) |>
         select(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, x_31370, y_31370) |>
         distinct(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, .keep_all = TRUE) |>
-        pivot_longer(cols=  c("streetname_de", "streetname_fr", "streetname_nl"),
-                     values_to = "street_name",
-                     names_to = "langue") |>
+        tidyr::pivot_longer(
+          cols = c("streetname_de", "streetname_fr", "streetname_nl"),
+          values_to = "street_name",
+          names_to = "langue"
+        ) |>
         filter(!is.na(street_name)) |>
         mutate(key_street_unique = paste(street_name, postcode)) |>
         left_join(belgium_street, by = "key_street_unique") |>
@@ -392,10 +393,10 @@ phaco_best_data_update <- function(force=FALSE,
     # Fonction pour faire la jointure spatiale avec les secteurs statistiques
     join_ss_adress <- function(x) {
       temp <- x |>
-        st_as_sf(coords = c("x_31370", "y_31370"), remove = FALSE) |>
-        st_set_crs(31370) |>
-        st_join(BE_SS_lite_sector_arrond2024) |>
-        st_join(BE_SS_lite_sector2025) |>
+        sf::st_as_sf(coords = c("x_31370", "y_31370"), remove = FALSE) |>
+        sf::st_set_crs(31370) |>
+        sf::st_join(BE_SS_lite_sector_arrond2024) |>
+        sf::st_join(BE_SS_lite_sector2025) |>
         as.data.frame() |>
         select(- geometry)
       return(temp)
@@ -416,16 +417,16 @@ phaco_best_data_update <- function(force=FALSE,
       rename(cd_sector2025= cd_sector)
 
     # Bruxelles
-    openaddress_bebru <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), progress= F, col_types = cols(.default = col_character()))
+    openaddress_bebru <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), progress= F, col_types = readr::cols(.default = readr::col_character()))
     openaddress_bebru <- select_id_street(openaddress_bebru)
     openaddress_bebru <- join_ss_adress(openaddress_bebru)
 
     # Wallonie
-    openaddress_bewal <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), progress= F, col_types = cols(.default = col_character()))
+    openaddress_bewal <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bewal.csv"), progress= F, col_types = readr::cols(.default = readr::col_character()))
     openaddress_bewal <- select_id_street(openaddress_bewal)
     openaddress_bewal <- join_ss_adress(openaddress_bewal)
     # Flandres
-    openaddress_bevlg <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), progress= F, col_types = cols(.default = col_character()))
+    openaddress_bevlg <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bevlg.csv"), progress= F, col_types = readr::cols(.default = readr::col_character()))
     openaddress_bevlg <- select_id_street(openaddress_bevlg)
     openaddress_bevlg <- join_ss_adress(openaddress_bevlg)
 
@@ -444,8 +445,8 @@ phaco_best_data_update <- function(force=FALSE,
 
     # Creer les rues avec abreviations de noms
 
-    TA_POP_2018_M <- read_excel(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"), progress= F)
-    TA_POP_2018_F <-read_excel(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"),  progress= F)
+    TA_POP_2018_M <- readxl::read_excel(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"), progress= F)
+    TA_POP_2018_F <- readxl::read_excel(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"),  progress= F)
 
     prenoms <- bind_rows(TA_POP_2018_M, TA_POP_2018_F) |>
       select(TX_FST_NAME, MS_FREQUENCY) |>
@@ -522,7 +523,7 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\n", "\u29D7", " Ajout des anciens noms de rue pour la commune de Charleroi"))
 
     # Certaines rues sont mal ecrites dans le fichier de la commune, on les corrige
-    rue_charleroi <- read_excel(paste0(path_data,"CHARLEROI/Rues-Nouveaux-noms_2024-01-17.xlsx")) |>
+    rue_charleroi <- readxl::read_excel(paste0(path_data,"CHARLEROI/Rues-Nouveaux-noms_2024-01-17.xlsx")) |>
       mutate(
         section = substr(section, 1, 4),
         nouveau_nom = str_replace(nouveau_nom, "' ", "'"),
@@ -629,7 +630,7 @@ phaco_best_data_update <- function(force=FALSE,
       select(street_id_phaco, postal_id, mid_num, mid_x_31370, mid_y_31370, mid_cd_sector2024) |>
       unique()
 
-    belgium_street_abv<-belgium_street_abv |>
+    belgium_street_abv <- belgium_street_abv |>
       left_join(num_mid, by=c("street_id_phaco", "postal_id")) |>
       mutate(mid_x_31370 = round(as.numeric(mid_x_31370), precision_digits),
              mid_y_31370 = round(as.numeric(mid_y_31370), precision_digits))
@@ -646,7 +647,7 @@ phaco_best_data_update <- function(force=FALSE,
     # On cree la table de conversion codes postaux > arrondissements
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
-    code_postal_INS <- read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx"), progress= F) |>
+    code_postal_INS <- readxl::read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx"), progress= F) |>
       rename("code_postal" = "Postal code")
 
     BE_SS_lite_comm_arrond_rgn <- BE_SS2024 |>
@@ -676,45 +677,61 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table 'codes postaux - nom des communes' (Statbel)"))
 
     table_postal_com_name <- code_postal_INS |>
-      add_row(code_postal = "1020", # On ajoute qques communes a la main dont l'orthographe a ete detectee dans une base de donnee (pour BXL uniquement)
-              Gemeentenaam = "Laken",
-              `Nom commune` = "Laeken") |>
-      add_row(code_postal = "1120",
-              `Nom commune` = "Neder-Over-Heembeek",
-              Gemeentenaam = "Neder-Over-Heembeek") |>
-      add_row(code_postal = "1080",
-              Gemeentenaam = "Molenbeek",
-              `Nom commune` = "Molenbeek") |>
-      add_row(code_postal = "1130",
-              Gemeentenaam = "Haren",
-              `Nom commune` = "Haren") |>
-      mutate(cp_n_fr = paste(code_postal, `Nom commune`),
-             cp_n_nl = paste(code_postal, Gemeentenaam),
-             n_cp_fr = paste(`Nom commune`, code_postal),
-             n_cp_nl = paste(Gemeentenaam, code_postal)) |>
+      tibble::add_row(
+        code_postal = "1020", # On ajoute qques communes a la main dont l'orthographe a ete detectee dans une base de donnee (pour BXL uniquement)
+        Gemeentenaam = "Laken",
+        `Nom commune` = "Laeken"
+      ) |>
+      tibble::add_row(
+        code_postal = "1120",
+        `Nom commune` = "Neder-Over-Heembeek",
+        Gemeentenaam = "Neder-Over-Heembeek"
+      ) |>
+      tibble::add_row(
+        code_postal = "1080",
+        Gemeentenaam = "Molenbeek",
+        `Nom commune` = "Molenbeek"
+      ) |>
+      tibble::add_row(
+        code_postal = "1130",
+        Gemeentenaam = "Haren",
+        `Nom commune` = "Haren"
+      ) |>
+      mutate(
+        cp_n_fr = paste(code_postal, `Nom commune`),
+        cp_n_nl = paste(code_postal, Gemeentenaam),
+        n_cp_fr = paste(`Nom commune`, code_postal),
+        n_cp_nl = paste(Gemeentenaam, code_postal)
+      ) |>
       select(cp_n_fr, cp_n_nl, n_cp_fr, n_cp_nl) |>
-      pivot_longer(cols = c("cp_n_fr", "cp_n_nl", "n_cp_fr", "n_cp_nl"),
-                   values_to = "CP_NAME") |>
+      tidyr::pivot_longer(
+        cols = c("cp_n_fr", "cp_n_nl", "n_cp_fr", "n_cp_nl"),
+        values_to = "CP_NAME"
+      ) |>
       select(-name)
 
     # Ici partie pour ajouter "tous les codes postaux X Bruxelles"
     table_postal_com_name_BXL <- code_postal_INS |>
       filter(substr(`Refnis code`, 1, 2) == 21) |>
-      mutate(Gemeentenaam = "Brussel",
-             `Nom commune` = "Bruxelles",
-             name_eng = "Brussels",
-             name_abv = "BXL",
-             cp_n_fr = paste(code_postal, `Nom commune`),
-             cp_n_nl = paste(code_postal, Gemeentenaam),
-             cp_n_eng = paste(code_postal, name_eng),
-             cp_n_abv = paste(code_postal, name_abv),
-             n_cp_fr = paste(`Nom commune`, code_postal),
-             n_cp_nl = paste(Gemeentenaam, code_postal),
-             n_cp_eng = paste(name_eng, code_postal),
-             n_cp_abv = paste(name_abv, code_postal)) |>
+      mutate(
+        Gemeentenaam = "Brussel",
+        `Nom commune` = "Bruxelles",
+        name_eng = "Brussels",
+        name_abv = "BXL",
+        cp_n_fr = paste(code_postal, `Nom commune`),
+        cp_n_nl = paste(code_postal, Gemeentenaam),
+        cp_n_eng = paste(code_postal, name_eng),
+        cp_n_abv = paste(code_postal, name_abv),
+        n_cp_fr = paste(`Nom commune`, code_postal),
+        n_cp_nl = paste(Gemeentenaam, code_postal),
+        n_cp_eng = paste(name_eng, code_postal),
+        n_cp_abv = paste(name_abv, code_postal)
+      ) |>
       select(cp_n_fr, cp_n_nl, cp_n_eng, cp_n_abv, n_cp_fr, n_cp_nl, n_cp_eng, n_cp_abv) |>
-      pivot_longer(cols = c("cp_n_fr", "cp_n_nl", "cp_n_eng", "cp_n_abv", "n_cp_fr", "n_cp_nl", "n_cp_eng", "n_cp_abv"),
-                   values_to = "CP_NAME") |>
+      tidyr::pivot_longer(
+        cols = c("cp_n_fr", "cp_n_nl", "cp_n_eng", "cp_n_abv", "n_cp_fr", "n_cp_nl", "n_cp_eng", "n_cp_abv"),
+        values_to = "CP_NAME"
+      ) |>
       select(-name)
 
     table_postal_com_name <- table_postal_com_name |>
@@ -791,8 +808,8 @@ phaco_best_data_update <- function(force=FALSE,
 
     # On calcule les centroides des secteurs stats (en cas d'anonymisation des donnees)
     BE_SS_coord2024 <- BE_SS2024 |>
-      st_point_on_surface() %>% # pipe magrittr pour utiliser le dot (.)
-      dplyr::mutate(cd_sector2024_x_31370 = sf::st_coordinates(.)[,1] |>
+      sf::st_point_on_surface() %>% # pipe magrittr pour utiliser le dot (.)
+      mutate(cd_sector2024_x_31370 = sf::st_coordinates(.)[,1] |>
                       str_replace(",", ".") |>
                       as.numeric() |>
                       round(precision_digits),
@@ -806,7 +823,7 @@ phaco_best_data_update <- function(force=FALSE,
     table_secteurs_prov_commune_quartier <- BE_SS2024 |>
       left_join(BE_SS_coord2024, by="cd_sector") |>
       as.data.frame() |>
-      dplyr::rename(cd_sector2024= cd_sector) |>
+      rename(cd_sector2024= cd_sector) |>
       select(-tx_sector_descr_de, -tx_munty_descr_de, -tx_adm_dstr_descr_de,
              -tx_rgn_descr_de, -cd_country,- cd_nuts_lvl1, -cd_nuts_lvl2, -cd_nuts_lvl3,
              -ms_area_ha, -ms_perimeter_m, -dt_situation, -GEOMETRY, -tx_prov_descr_de) # NOTE : dans BE_SS version gpkg, le champ geometrie = "geom" et non "geometry" => PKOI ? Réponse: une histoire de convention parfois liés aux formats des fichiers, ça peut être geom, geometry, the_geom en minuscule ou majuscule ...
@@ -831,7 +848,7 @@ phaco_best_data_update <- function(force=FALSE,
                                          cd_munty_refnis == "23096" ~ "23088-23096",
                                          TRUE ~ cd_munty_refnis)) |>
       group_by(cd_munty_refnis) |>
-      summarize(GEOMETRY = st_union(GEOMETRY))
+      summarize(GEOMETRY = sf::st_union(GEOMETRY))
 
     nb <- spdep::poly2nb(BE_communes)
     mat <- spdep::nb2mat(nb, style="B")
@@ -839,7 +856,7 @@ phaco_best_data_update <- function(force=FALSE,
     mat <- mat |>
       as.data.frame() |>
       mutate(cd_munty_refnis= BE_communes$cd_munty_refnis) |>
-      pivot_longer(cols= 1:last_col(1), names_to= "cd_munty_refnis_voisin", values_to= "voisin") |>
+      tidyr::pivot_longer(cols= 1:last_col(1), names_to= "cd_munty_refnis_voisin", values_to= "voisin") |>
       filter(voisin==1) |>
       select(-voisin)
 

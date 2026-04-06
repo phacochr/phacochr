@@ -804,7 +804,7 @@ phaco_geocode <- function(data_to_geocode,
   cat(paste0("\r",colourise("\u2714", fg="green")," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur"))
 
 
-  ## 1)  Jointure des rues  -----------------------------------------------------------------------------------------------------------------
+  ## 1.  Jointure des rues  -----------------------------------------------------------------------------------------------------------------
 
   ### i. Preparation des fichiers rues (BeST) -----------------------------------------------------------------------------------------------
 
@@ -823,7 +823,7 @@ phaco_geocode <- function(data_to_geocode,
     mutate(address_join = str_to_lower(str_trim(rue_recoded)))
 
 
-  ### ii) Boucle de jointure par commune ----------------------------------------------------------------------------------------------------
+  ### ii. Boucle de jointure par commune ----------------------------------------------------------------------------------------------------
 
   #### Matching exact -----------------------------------------------------------------------------------------------------------------------
 
@@ -914,7 +914,7 @@ phaco_geocode <- function(data_to_geocode,
            type_geocoding = as.character(type_geocoding)) # pour compatibilite avec res_adj si res = NA
 
 
-  ### iii) Elargissement de la boucle aux communes adjacentes -------------------------------------------------------------------------------
+  ### iii. Elargissement de la boucle aux communes adjacentes -------------------------------------------------------------------------------
   # On supprime la contrainte de recherche de la rue dans la commune, pour augmenter le % de rues detectees
 
   if (elargissement_com_adj == TRUE) {
@@ -1021,11 +1021,11 @@ phaco_geocode <- function(data_to_geocode,
     bind_rows(res_exact)
 
 
-  ## 2)  Jointure des adresses --------------------------------------------------------------------------------------------------------------
+  ## 2. Jointure des adresses --------------------------------------------------------------------------------------------------------------
 
   if (situation != "no_num_rue_postal_s" & situation != "no_num_rue_postal_i") {
 
-    #### i. Preparation des fichiers adresses (BeST) ------------------------------------------------------------------------------------------
+    ### i. Preparation des fichiers adresses (BeST) ----------------------------------------------------------------------------------------
 
     cat(paste0("\n","\u29D7"," Chargement du fichier openaddress"))
 
@@ -1043,7 +1043,7 @@ phaco_geocode <- function(data_to_geocode,
     cat(paste0("\r",colourise("\u2714", fg="green")," Chargement du fichier openaddress "))
 
 
-    #### ii. Jointure avec les adresses  ------------------------------------------------------------------------------------------------------
+    ### ii. Jointure avec les adresses  ------------------------------------------------------------------------------------------------------
 
     cat(paste0("\n","\u29D7"," Jointure avec les coordonn","\u00e9","es X-Y"))
 
@@ -1186,7 +1186,7 @@ phaco_geocode <- function(data_to_geocode,
   }
 
 
-  ## 3) Geocodage sans numero ---------------------------------------------------------------------------------------------------------------
+  ## 3. Geocodage sans numero ---------------------------------------------------------------------------------------------------------------
 
   # On cree FULLGEOCODING si on est dans le cas d'absence de num (on geocode a la rue) => FULLGEOCODING n'a alors pas encore ete cree
   # On renomme les variables pour etre compatible avec le reste du script
@@ -1212,7 +1212,7 @@ phaco_geocode <- function(data_to_geocode,
              cd_sector2024 = ifelse(is.na(cd_sector2024) & !is.na(mid_cd_sector2024), mid_cd_sector2024, cd_sector2024))
 
     FULL_GEOCODING <- FULL_GEOCODING |>
-      unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite doit fonctionne en dehors de mutate
+      tidyr::unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite doit fonctionne en dehors de mutate
 
   }
 
@@ -1225,7 +1225,7 @@ phaco_geocode <- function(data_to_geocode,
   cat(paste0("\n","\u29D7"," Cr","\u00e9","ation du fichier final et formatage des tables de v","\u00e9","rification"))
 
 
-  ## 1) Jointure ----------------------------------------------------------------------------------------------------------------------------
+  ## 1. Jointure ----------------------------------------------------------------------------------------------------------------------------
 
   # Il manque potentiellement des lignes par rapport a la BD originale, car pas de code postal, ou qui ne matchent pas avec les donnees BeST => on les recupere par un antijoin(), et les ajoute
   MISSING <- data_to_geocode |>
@@ -1268,7 +1268,7 @@ phaco_geocode <- function(data_to_geocode,
     left_join(table_secteurs_prov_commune_quartier, by = "cd_sector2024")
 
 
-  ## 2) Resultats recapitulatifs ------------------------------------------------------------------------------------------------------------
+  ## 2. Resultats recapitulatifs ------------------------------------------------------------------------------------------------------------
 
   Summary_region <- bind_rows(
     FULL_GEOCODING,
@@ -1320,7 +1320,7 @@ phaco_geocode <- function(data_to_geocode,
     select(-Region, -arrond, -rue_to_geocode)
 
 
-  ## 3) Anonymisation potentielle -----------------------------------------------------------------------------------------------------------
+  ## 3. Anonymisation potentielle -----------------------------------------------------------------------------------------------------------
 
   # Si l'anonymat est enclenche, supression de toutes les colonnes permettant de reconnaitre l'adresse
   if (anonymous == TRUE) {
@@ -1371,7 +1371,7 @@ phaco_geocode <- function(data_to_geocode,
   }
 
 
-  ## 4) Creation de l'objet SF avec les coordonnees -----------------------------------------------------------------------------------------
+  ## 4. Creation de l'objet SF avec les coordonnees -----------------------------------------------------------------------------------------
 
   if (sum(!is.na(FULL_GEOCODING$x_31370)) > 0){ # On cree un objet sf uniquement s'il y a des coordonnees
     # NOTE : l'objet sf ne peut pas contenir de NA pour les coordonnees
