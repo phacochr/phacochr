@@ -89,7 +89,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
   # Filtrer ou pas BXL
   if (filter_bxl == TRUE){
     FULL_GEOCODING_sf_carto <- FULL_GEOCODING_sf %>%
-      filter(cd_rgn_refnis == "04000")
+      filter(as.numeric(cd_rgn_refnis) == 04000)
   } else {
     FULL_GEOCODING_sf_carto <- FULL_GEOCODING_sf
   }
