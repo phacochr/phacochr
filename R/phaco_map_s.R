@@ -11,10 +11,7 @@
 #' @param nom_admin Afficher les noms des entités administratives sur la carte.
 #'
 #' @import dplyr
-#' @import sf
 #' @import mapsf
-#' @import rappdirs
-#' @importFrom scales alpha
 #'
 #' @export
 #'
@@ -66,7 +63,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
   }
 
   # Definition du chemin ou se trouve les donnees
-  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+  path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
   if(sum(
@@ -135,7 +132,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
       BXL_SS <- phaco_data("sec_bxl") %>%
         left_join(n_geocoding, by = c("cd_sector" = "cd_sector2024")) # Je joins les effectifs par sect stat
     } else {
-      BXL_SS <-phaco_data("sec_bxl")
+      BXL_SS <- phaco_data("sec_bxl")
     }
     BRUXELLES <- phaco_data("rbc")
 
@@ -147,7 +144,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     mf_map(x = BRUXELLES, col = NA, border = "black", lwd = 2, add = TRUE)
     if(aggreg_sector == TRUE){
       mf_map(
-        x = suppressWarnings(st_point_on_surface(BXL_SS[!is.na(BXL_SS$n_cd_sector),])),
+        x = suppressWarnings(sf::st_point_on_surface(BXL_SS[!is.na(BXL_SS$n_cd_sector),])),
         var = "n_cd_sector",
         type = "prop",
         inches = 0.10,
@@ -160,14 +157,14 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
       )
     } else {
       mf_map(x = FULL_GEOCODING_sf_carto,
-             col = alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
+             col = scales::alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
              cex = 0.8,
              pch = 16,
              add = TRUE)
     }
     if(nom_admin == TRUE){
       mf_label(
-       x = suppressWarnings(st_point_on_surface(BXL_communes)),
+       x = suppressWarnings(sf::st_point_on_surface(BXL_communes)),
        var = "tx_munty_descr_fr",
        col= "#18707b",
        halo = TRUE,
@@ -195,11 +192,11 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     BE_regions <- phaco_data("regions")
     if(aggreg_sector == TRUE){
       BE_SS <- phaco_data("sec") %>%
-        st_set_crs(31370) %>%
-        st_zm(drop = TRUE) %>%
+        sf::st_set_crs(31370) %>%
+        sf::st_zm(drop = TRUE) %>%
         left_join(n_geocoding, by = c("cd_sector" = "cd_sector2024")) # Je joins les effectifs par sect stat
     }
-    #BELGIQUE <- st_read(paste0(path_data,"STATBEL/PREPROCESSED/BELGIQUE_PREPROCESSED.gpkg"), quiet=T)
+    #BELGIQUE <- sf::st_read(paste0(path_data,"STATBEL/PREPROCESSED/BELGIQUE_PREPROCESSED.gpkg"), quiet=T)
 
 
     # b) Carto --------------------------------------------------------------------------------------------------------------------------------
@@ -215,7 +212,7 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
     #mf_map(x = BELGIQUE, col = NA, border = "black", lwd = 2.5, add = TRUE)
     if(aggreg_sector == TRUE){
       mf_map(
-        x = suppressWarnings(st_point_on_surface(BE_SS[!is.na(BE_SS$n_cd_sector),])),
+        x = suppressWarnings(sf::st_point_on_surface(BE_SS[!is.na(BE_SS$n_cd_sector),])),
         var = "n_cd_sector",
         type = "prop",
         inches = 0.04,
@@ -228,14 +225,14 @@ phaco_map_s <- function(FULL_GEOCODING_sf,
       )
     } else {
       mf_map(x = FULL_GEOCODING_sf_carto,
-             col = alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
+             col = scales::alpha("#d61d5e", FULL_GEOCODING_sf_carto$CARTO_weight*0.5),
              cex = 0.4,
              pch = 16,
              add = TRUE)
     }
     if(nom_admin == TRUE){
       mf_label(
-       x = suppressWarnings(st_point_on_surface(BE_provinces)),
+       x = suppressWarnings(sf::st_point_on_surface(BE_provinces)),
        var = "tx_prov_descr_fr",
        col= "#18707b",
        halo = TRUE,
