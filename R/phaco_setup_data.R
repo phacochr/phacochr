@@ -30,15 +30,16 @@ phaco_setup_data <- function(){
   options(timeout=300)
 
   cat(paste0("\n","\u29D7"," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es ...","\n"))
-  utils::download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_best.zip",
-                paste0(path_data,"/phacochr_data_best.zip"))
-  utils::download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_statbel_urbis.zip",
-                paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
+
+  utils::download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_statbel_secteurs.zip",
+                paste0(path_data,"/phacochr_data_statbel_secteurs.zip"))
+  utils::download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_autre.zip",
+                paste0(path_data,"/phacochr_data_autre.zip"))
 
   # Test si les donnees ont ete telechargees
   if(sum(
-    file.exists(paste0(path_data,"/phacochr_data_best.zip"),
-                paste0(path_data,"/phacochr_data_statbel_urbis.zip")
+    file.exists(paste0(path_data,"/phacochr_data_statbel_secteurs.zip"),
+                paste0(path_data,"/phacochr_data_autre.zip")
                 )
     ) != 2) {
     options(timeout=60)
@@ -50,12 +51,14 @@ phaco_setup_data <- function(){
 
   # dezippe et supprimer le fichier zip telecharge
   cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es"))
-  utils::unzip(paste0(path_data,"/phacochr_data_best.zip"),exdir= path_data)
-  utils::unzip(paste0(path_data,"/phacochr_data_statbel_urbis.zip"),exdir= path_data)
+
+  utils::unzip(paste0(path_data,"/phacochr_data_statbel_secteurs.zip"),exdir= path_data)
+  utils::unzip(paste0(path_data,"/phacochr_data_autre.zip"),exdir= path_data)
+
 
   # supression des fichiers .zip
-  file.remove(paste0(path_data,"/phacochr_data_best.zip"))
-  file.remove(paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
+  file.remove(paste0(path_data,"/phacochr_data_statbel_secteurs.zip"))
+  file.remove(paste0(path_data,"/phacochr_data_autre.zip"))
 
   cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","compression des donn","\u00e9","es"))
 

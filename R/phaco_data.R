@@ -83,22 +83,22 @@ phaco_data <- function(data=NULL,
   if(data=="sec2025"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"))}
 
   if(data=="sec_bxl2011"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds")) %>%
-    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+    filter(cd_rgn_refnis==04000)}
   if(data=="sec_bxl"|data=="sec_bxl2024"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds")) %>%
-    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+    filter(cd_rgn_refnis==04000)}
   if(data=="sec_bxl2025"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds")) %>%
-    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+    filter(cd_rgn_refnis==04000)}
 
   if(data=="communes2011"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2011.rds"))}
   if(data=="communes2024"|data=="communes"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2024.rds"))}
   if(data=="communes2025"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2025.rds"))}
 
   if(data=="communes_bxl2011"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2011.rds")) %>%
-    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+    filter(cd_rgn_refnis==04000)}
   if(data=="communes_bxl2024"|data=="communes_bxl"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2024.rds")) %>%
-    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+    filter(cd_rgn_refnis==04000)}
   if(data=="communes_bxl2025"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2025.rds")) %>%
-    filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale")}
+    filter(cd_rgn_refnis==04000)}
 
   if(data=="quartiers2011"){result<- readRDS(paste0(path_data,"IBSA/quartiers2011.rds"))}
   if(data=="quartiers2024"|data=="quartiers"){result<- readRDS(paste0(path_data,"IBSA/quartiers2024.rds"))}
