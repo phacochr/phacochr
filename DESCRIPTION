@@ -1,21 +1,44 @@
 Package: phacochr
 Title: Geocoder for Belgium - Geocodeur pour la Belgique
-Version: 0.9.1.14
-Authors@R: 
-    c(person("Joel", "Gires", email = "jgires@ccc.brussels", role = c("aut", "cre")),
-    person("Hugo", "Perilleux", email = "hugo.perilleux@ulb.be", role = "aut"))
-Description: From a list of addresses, it allows the finding of the X-Y coordinates necessary for any spatial analysis, at a level of precision of the building. - A partir d’une liste d’adresses, il permet de retrouver les coordonnées X-Y nécessaires à toute analyse spatiale, à un niveau de précision du bâtiment.
-URL: https://phacochr.github.io/phacochr/, https://github.com/phacochr
+Version: 0.9.2
+Authors@R: c(
+    person("Joel", "Gires", , "jgires@ccc.brussels", role = c("aut", "cre")),
+    person("Hugo", "Perilleux", , "hugo.perilleux@ulb.be", role = "aut")
+  )
+Description: From a list of addresses, it allows the finding of the X-Y
+    coordinates necessary for any spatial analysis, at a level of
+    precision of the building. - A partir d’une liste d’adresses, il
+    permet de retrouver les coordonnées X-Y nécessaires à toute analyse
+    spatiale, à un niveau de précision du bâtiment.
 License: GPL (>= 3)
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
-Imports: dplyr, doParallel, foreach, fuzzyjoin, lubridate, purrr, stats,
-    readr, readxl, stringdist, sf, sp, spdep, knitr, 
-    stringr, tidyr, rappdirs, utils, mapsf, scales
-Language: fr
-LazyData: true
-Depends: R (>= 3.5.0)
-VignetteBuilder: knitr
+URL: https://phacochr.github.io/phacochr/, https://github.com/phacochr
+Depends: 
+    R (>= 3.5.0)
+Imports: 
+    doParallel,
+    dplyr,
+    foreach,
+    fuzzyjoin,
+    knitr,
+    mapsf,
+    purrr,
+    rappdirs,
+    scales,
+    sf,
+    stringdist,
+    stringr,
+    tidyr,
+    sp,
+    spdep,
+    lubridate,
+    readr,
+    readxl
 Suggests: 
     rmarkdown
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+Language: fr
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3

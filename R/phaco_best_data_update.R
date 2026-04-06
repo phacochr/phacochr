@@ -16,7 +16,6 @@
 #' @import sf
 #' @import sp
 #' @import spdep
-#' @importFrom stats quantile
 #'
 #' @export
 #' @examples
@@ -111,10 +110,10 @@ phaco_best_data_update <- function(force=FALSE,
 
     options(timeout=300)
 
-    download.file("https://opendata.bosa.be/download/best/postalstreets-latest.zip", paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"))
-    download.file("https://opendata.bosa.be/download/best/openaddress-bevlg.zip", paste0(path_data, "BeST/openaddress/openaddress-bevlg.zip"))
-    download.file("https://opendata.bosa.be/download/best/openaddress-bebru.zip", paste0(path_data, "BeST/openaddress/openaddress-bebru.zip"))
-    download.file("https://opendata.bosa.be/download/best/openaddress-bewal.zip", paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"))
+    utils::download.file("https://opendata.bosa.be/download/best/postalstreets-latest.zip", paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"))
+    utils::download.file("https://opendata.bosa.be/download/best/openaddress-bevlg.zip", paste0(path_data, "BeST/openaddress/openaddress-bevlg.zip"))
+    utils::download.file("https://opendata.bosa.be/download/best/openaddress-bebru.zip", paste0(path_data, "BeST/openaddress/openaddress-bebru.zip"))
+    utils::download.file("https://opendata.bosa.be/download/best/openaddress-bewal.zip", paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"))
 
     # Test si les donnees ont ete telechargees
     if(sum(
@@ -132,16 +131,16 @@ phaco_best_data_update <- function(force=FALSE,
 
     cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es BeST"))
 
-    unzip(paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"), exdir= paste0(path_data, "BeST/openaddress"))
+    utils::unzip(paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/postalstreets-latest.zip"))
 
-    unzip(paste0(path_data, "BeST/openaddress/openaddress-bevlg.zip"), exdir= paste0(path_data, "BeST/openaddress"))
+    utils::unzip(paste0(path_data, "BeST/openaddress/openaddress-bevlg.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/openaddress-bevlg.zip"))
 
-    unzip(paste0(path_data, "BeST/openaddress/openaddress-bebru.zip"), exdir= paste0(path_data, "BeST/openaddress"))
+    utils::unzip(paste0(path_data, "BeST/openaddress/openaddress-bebru.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/openaddress-bebru.zip"))
 
-    unzip(paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"), exdir= paste0(path_data, "BeST/openaddress"))
+    utils::unzip(paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"), exdir= paste0(path_data, "BeST/openaddress"))
     file.remove(paste0(path_data, "BeST/openaddress/openaddress-bewal.zip"))
 
     # Test si les donnees ont ete ecrite (plus pour la suite => si ca marche ici ca marchera apres)
@@ -620,7 +619,7 @@ phaco_best_data_update <- function(force=FALSE,
       inner_join(openaddress_be, by = "street_id_phaco" ) |> # certaines rues n'ont pas de numero, on les ecartes
       mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre)) |>
       group_by(street_id_phaco, postal_id) |> # par rue et code postal
-      filter(house_number_sans_lettre == as.numeric(quantile(house_number_sans_lettre, p = 0.5, type = 3, na.rm=T))) |> # quantile parce que median() prend la valeur du milieu quand paire, type 3 arrondi vers le bas
+      filter(house_number_sans_lettre == as.numeric(stats::quantile(house_number_sans_lettre, p = 0.5, type = 3, na.rm=T))) |> # quantile parce que median() prend la valeur du milieu quand paire, type 3 arrondi vers le bas
       rename(mid_num = house_number_sans_lettre,
              mid_x_31370 = x_31370,
              mid_y_31370= y_31370,

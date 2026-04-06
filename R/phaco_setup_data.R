@@ -2,9 +2,6 @@
 #'
 #' Cette fonction permet d'installer sur l'ordinateur les fichiers nécessaires pour le geocodage des adresses.
 #'
-#' @import rappdirs
-#' @import utils
-#'
 #' @export
 #'
 #' @examples
@@ -18,7 +15,7 @@ phaco_setup_data <- function(){
   start_time <- Sys.time()
 
   # Creer le chemin en fonction du systeme d'exploitation (Mac, Windows ou Linux)
-  path_data <- gsub("\\\\", "/", paste0(user_data_dir("phacochr"),"/data_phacochr")) # bricolage pour windows
+  path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr")) # bricolage pour windows
   cat(paste0("\n",colourise("\u2714", fg="green"), " Cr","\u00e9","ation du dossier : ", path_data))
   dir.create(path_data, recursive = T, showWarnings = F)
 
@@ -33,9 +30,9 @@ phaco_setup_data <- function(){
   options(timeout=300)
 
   cat(paste0("\n","\u29D7"," T","\u00e9","l","\u00e9","chargement des donn","\u00e9","es ...","\n"))
-  download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_best.zip",
+  utils::download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_best.zip",
                 paste0(path_data,"/phacochr_data_best.zip"))
-  download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_statbel_urbis.zip",
+  utils::download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/phacochr_data_statbel_urbis.zip",
                 paste0(path_data,"/phacochr_data_statbel_urbis.zip"))
 
   # Test si les donnees ont ete telechargees
@@ -53,8 +50,8 @@ phaco_setup_data <- function(){
 
   # dezippe et supprimer le fichier zip telecharge
   cat(paste0("\n","\u29D7"," D","\u00e9","compression des donn","\u00e9","es"))
-  unzip(paste0(path_data,"/phacochr_data_best.zip"),exdir= path_data)
-  unzip(paste0(path_data,"/phacochr_data_statbel_urbis.zip"),exdir= path_data)
+  utils::unzip(paste0(path_data,"/phacochr_data_best.zip"),exdir= path_data)
+  utils::unzip(paste0(path_data,"/phacochr_data_statbel_urbis.zip"),exdir= path_data)
 
   # supression des fichiers .zip
   file.remove(paste0(path_data,"/phacochr_data_best.zip"))

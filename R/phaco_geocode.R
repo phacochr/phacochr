@@ -21,19 +21,8 @@
 #' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
 #'
 #' @import dplyr
-#' @import tidyr
-#' @import readr
 #' @import stringr
-#' @import purrr
-#' @import doParallel
-#' @importFrom foreach %dopar% foreach getDoParRegistered
-#' @import readxl
-#' @import lubridate
-#' @import fuzzyjoin
-#' @importFrom stringdist stringdist
-#' @import sf
-#' @import rappdirs
-#' @import knitr
+#' @importFrom foreach %dopar%
 #'
 #' @export
 #'
@@ -756,7 +745,7 @@ phaco_geocode <- function(data_to_geocode,
     # On fusionne toutes les colonnes qui commencent par "rue_recoded_" en une
     data_to_geocode_REGEX <- data_to_geocode |>
       select(phaco_id_adress, starts_with("rue_recoded_")) |>
-      unite("recode", 2:last_col(), sep = " ; ", remove = TRUE, na.rm = TRUE)
+      tidyr::unite("recode", 2:last_col(), sep = " ; ", remove = TRUE, na.rm = TRUE)
 
     data_to_geocode <- data_to_geocode |>
       select(-starts_with("rue_recoded_")) |>
@@ -840,14 +829,13 @@ phaco_geocode <- function(data_to_geocode,
 
   cat(paste0("\n","\u29D7"," D","\u00e9","tection des rues (matching exact)"))
 
-  # /!\ /!\ /!\ NOTE : ICI RISQUE DE DUPLIQUES => TROUVER UN MOYEN D'EVITER CA /!\ /!\ /!\
-
   # On detecte les rues avec un matching exact et on isole les detections dans un objet res_exact
   res_exact <- data_to_geocode |>
     left_join(postal_street, by = c("code_postal_to_geocode" = "postal_id", "address_join" = "address_join_street")) |>
     filter(!is.na(street_detected)) |>
     mutate(dist_fuzzy = 0)
 
+  # /!\ NOTE : Securite pour eviter les dupliques
   if(sum(duplicated(res_exact$phaco_id_adress)) > 0){
     res_exact <- res_exact |>
       distinct(phaco_id_adress, .keep_all = TRUE)
@@ -867,24 +855,25 @@ phaco_geocode <- function(data_to_geocode,
   # /!\ NOTE : la cle de jointure est en minuscule (d'ou les str_to_lower() avant), car stringdist identifie la diff de case comme une diff !
   # /!\ NOTE2 : la jointure cree les colonnes de postal_street, meme si 0 match ! Important pour la suite, notamment le if statement pour la creation de l'objet sf
   res <- tibble()
-  res <- foreach (i = unique(data_to_geocode_inexact$code_postal_to_geocode),
-                  .combine = 'bind_rows',
-                  .packages=c("dplyr","fuzzyjoin"))  %dopar% {
+  res <- foreach::foreach(i = unique(data_to_geocode_inexact$code_postal_to_geocode),
+                          .combine = 'bind_rows',
+                          .packages=c("dplyr","fuzzyjoin"))  %dopar% {
 
-                    data_to_geocode_inexact_i <- data_to_geocode_inexact |>
-                      filter(code_postal_to_geocode == i)
+                            data_to_geocode_inexact_i <- data_to_geocode_inexact |>
+                              filter(code_postal_to_geocode == i)
 
-                    postal_street_i <- postal_street |>
-                      filter(postal_id == i)
+                            postal_street_i <- postal_street |>
+                              filter(postal_id == i)
 
-                    stringdist_left_join(data_to_geocode_inexact_i,
-                                         postal_street_i,
-                                         by = c("address_join" = "address_join_street"),
-                                         method = method_stringdist,
-                                         max_dist = error_max,
-                                         distance_col = "dist_fuzzy",
-                                         nthread= n.cores)
-                  }
+                            fuzzyjoin::stringdist_left_join(data_to_geocode_inexact_i,
+                              postal_street_i,
+                              by = c("address_join" = "address_join_street"),
+                              method = method_stringdist,
+                              max_dist = error_max,
+                              distance_col = "dist_fuzzy",
+                              nthread = n.cores
+                            )
+                          }
 
   cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)", "\033[K"))
 
@@ -907,7 +896,7 @@ phaco_geocode <- function(data_to_geocode,
     cat(paste0("\n","\u29D7"," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
 
     res <- res |>
-      mutate(distance_jw = stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) |>  # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
+      mutate(distance_jw = stringdist::stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) |>  # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
       group_by(phaco_id_adress) |>
       mutate(min_jw = min(distance_jw)) |>
       filter(distance_jw == min_jw | is.na(distance_jw)) |>
@@ -956,28 +945,28 @@ phaco_geocode <- function(data_to_geocode,
         mutate(across(everything(), as.character))
 
       res_adj <- tibble()
-      res_adj <- foreach (i = unique(ADDRESS_last_tentative$`Refnis code`),
-                          .combine = 'bind_rows',
-                          .packages=c("dplyr","fuzzyjoin"))  %dopar% {
+      res_adj <- foreach::foreach(i = unique(ADDRESS_last_tentative$`Refnis code`),
+                                  .combine = 'bind_rows',
+                                  .packages=c("dplyr","fuzzyjoin"))  %dopar% {
 
-                            # On calcule un vecteur reprenant les communes adjacentes par commune i
-                            com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == i]
+                                    # On calcule un vecteur reprenant les communes adjacentes par commune i
+                                    com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == i]
 
-                            ADDRESS_last_tentative_i <- ADDRESS_last_tentative |>
-                              filter(`Refnis code` %in% i) |>
-                              select(-`Refnis code`)
+                                    ADDRESS_last_tentative_i <- ADDRESS_last_tentative |>
+                                      filter(`Refnis code` %in% i) |>
+                                      select(-`Refnis code`)
 
-                            postal_street_adj_i <- postal_street_adj |>
-                              filter(`Refnis code` %in% c(i, com_adj_i)) |>  # On inclut i dans c(i, com_adj_i) car le code postal est plus petit que i
-                              select(-`Refnis code`)
+                                    postal_street_adj_i <- postal_street_adj |>
+                                      filter(`Refnis code` %in% c(i, com_adj_i)) |>  # On inclut i dans c(i, com_adj_i) car le code postal est plus petit que i
+                                      select(-`Refnis code`)
 
-                            fuzzyjoin::stringdist_left_join(ADDRESS_last_tentative_i,
-                                                 postal_street_adj_i,
-                                                 by = c("address_join" = "address_join_street"),
-                                                 method = method_stringdist,
-                                                 max_dist = error_max_adj,
-                                                 distance_col = "dist_fuzzy")
-                          }
+                                    fuzzyjoin::stringdist_left_join(ADDRESS_last_tentative_i,
+                                                         postal_street_adj_i,
+                                                         by = c("address_join" = "address_join_street"),
+                                                         method = method_stringdist,
+                                                         max_dist = error_max_adj,
+                                                         distance_col = "dist_fuzzy")
+                                  }
 
       # Ce if statement car res_adj peut avoir 0 observations => NOTE : elucider pourquoi ? Pourquoi ca n'arrive pas avec "res" (boucle precedente) ?
       if(nrow(res_adj) > 0){
@@ -1044,7 +1033,7 @@ phaco_geocode <- function(data_to_geocode,
     openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
                              unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
                              ".rds") |>
-      map_dfr(readRDS) |>
+      purrr::map_dfr(readRDS) |>
       mutate(across(everything(), as.character)) |>
       left_join(select(postal_street, street_detected, postal_id, street_id_phaco), by= "street_id_phaco" ) |>  # On joint les noms de rue (non contenues dans le fichier openadress par economie de place) via postal_street et la cle de jointure unique "street_id_phaco" (voir preprocessing)
       mutate(house_number_sans_lettre = as.numeric(house_number_sans_lettre), # @@@@@@@@ QUESTION : POURQUOI ON FAIT CA ???????????????????
@@ -1077,7 +1066,7 @@ phaco_geocode <- function(data_to_geocode,
       # On selectionne les lignes pour lesquelles un numero de police a ete encode, on a trouve la rue, mais pour lesquelles on n'a pas trouve de correspondance dans les fichiers openaddress.
       FULL_GEOCODING_APPROX <- FULL_GEOCODING |>
         filter(!is.na(street_id_phaco) & !is.na(num_rue_clean) & is.na(house_number_sans_lettre)) |>
-        select (-address_join_geocoding, -x_31370, -y_31370, -cd_sector2024,-cd_sector2025, -house_number_sans_lettre, -approx_num)
+        select(-address_join_geocoding, -x_31370, -y_31370, -cd_sector2024,-cd_sector2025, -house_number_sans_lettre, -approx_num)
 
       if (nrow(FULL_GEOCODING_APPROX) > 0) { # A partir d'ici, plein de if statement pour eviter d'appliquer les operations sur un tableau vide (possible a chaque etape)
         # On fait une jointure avec openaddress sur base des noms de rue, uniquement du meme cote de la rue
@@ -1210,7 +1199,7 @@ phaco_geocode <- function(data_to_geocode,
              y_31370 = mid_y_31370)
 
     FULL_GEOCODING <- FULL_GEOCODING |>
-      unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite doit fonctionner en dehors de mutate
+      tidyr::unite(type_geocoding, c(type_geocoding, type_geocoding2), sep = " ; ", na.rm = TRUE) # unite doit fonctionner en dehors de mutate
 
   }
 
@@ -1376,7 +1365,7 @@ phaco_geocode <- function(data_to_geocode,
     # Le cas est particulier si pas de num, les colonnes de num n'existant pas !
     if (situation == "no_num_rue_postal_s" | situation == "no_num_rue_postal_i") {
       FULL_GEOCODING <- FULL_GEOCODING |>
-        select(-rue_recoded, -recode, -street_detected,                 -street_id_phaco, -langue_detected, -nom_propre_abv, -mid_num,                                                                        -cd_sector2024_x_31370, -cd_sector2024_y_31370)
+        select(-rue_recoded, -recode, -street_detected, -street_id_phaco, -langue_detected, -nom_propre_abv, -mid_num, -cd_sector2024_x_31370, -cd_sector2024_y_31370)
     }
 
   }
@@ -1388,8 +1377,8 @@ phaco_geocode <- function(data_to_geocode,
     # NOTE : l'objet sf ne peut pas contenir de NA pour les coordonnees
     FULL_GEOCODING_sf <- FULL_GEOCODING |>
       filter(!is.na(x_31370)) |>
-      st_as_sf(coords = c("x_31370", "y_31370")) |>   # on cree l'objet sf
-      st_set_crs(31370) # on definit le systeme de projection
+      sf::st_as_sf(coords = c("x_31370", "y_31370")) |>   # on cree l'objet sf
+      sf::st_set_crs(31370) # on definit le systeme de projection
   }
 
   result <- list()
