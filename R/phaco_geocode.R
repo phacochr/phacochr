@@ -210,22 +210,8 @@ phaco_geocode <- function(data_to_geocode,
 
   }
 
-  # On ne lance pas la fonction si des noms de colonnes du fichier a geocoder ont des noms de colonnes similaires a ceux utilises en interne
-  # Pour l'instant on demande de changer les noms en indiquant ceux qui posent pb
-  # Alternatives plus performantes dans le futur :
-  # 1) d'abord mettre des noms moins communs a l'aide d'un prefixe
-  # 2) changer automatiquement les noms qui posent pb avec un suffice _2, _3, etc.
-  forbidden_names <- c("phaco_id_adress", "rue_to_geocode", "num_rue_to_geocode", "code_postal_to_geocode", "arrond", "Region", "num_rue_text", "num_rue_clean", "rue_recoded", "rue_recoded_commune",
-                       "rue_recoded_code_postal", "rue_recoded_virgule", "rue_recoded_deux_points", "rue_recoded_parenthese", "rue_recoded_slash", "rue_recoded_boite", "rue_recoded_BP_CP",
-                       "rue_recoded_No", "rue_recoded_num", "rue_recoded_Rez", "rue_recoded_Bis", "rue_recoded_Rdc", "rue_recoded_Commandant", "rue_recoded_Lieutenant", "rue_recoded_Saint",
-                       "rue_recoded_chaussee", "rue_recoded_avenue", "rue_recoded_koning", "rue_recoded_professor", "rue_recoded_square", "rue_recoded_steenweg", "rue_recoded_burg",
-                       "rue_recoded_dokter", "rue_recoded_boulevard", "rue_recoded_route", "rue_recoded_place", "rue_recoded_Rue", "rue_recoded_apostrophe", "rue_recoded_lettre_end",
-                       "rue_recoded_lettre_end2", "rue_recoded_tiret", "recode", "street_id_phaco", "postal_id", "street_detected", "langue_detected", "nom_propre_abv", "mid_num",
-                       "mid_x_31370", "mid_y_31370", "mid_cd_sector2024", "dist_fuzzy", "min", "address_join", "address_join_street", "distance_jw", "min_jw", "type_geocoding", "Refnis code",
-                       "house_number_sans_lettre", "x_31370", "y_31370", "cd_sector2024","cd_sector2025", "address_join_geocoding", "approx_num", "type_geocoding2", "tx_sector_descr_nl", "tx_sector_descr_fr",
-                       "cd_sub_munty", "tx_sub_munty_nl", "tx_sub_munty_fr", "tx_munty_dstr", "cd_munty_refnis", "tx_munty_descr_nl", "tx_munty_descr_fr", "cd_dstr_refnis", "tx_adm_dstr_descr_nl",
-                       "tx_adm_dstr_descr_fr", "cd_prov_refnis", "tx_prov_descr_nl", "tx_prov_descr_fr", "cd_rgn_refnis", "tx_rgn_descr_nl", "tx_rgn_descr_fr", "MDRC", "NAME_FRE", "NAME_DUT",
-                       "cd_sector2024_x_31370", "cd_sector2024_y_31370", "phaco_anonymous")
+  # On ne lance pas la fonction si elle contient une colonne phaco_id_adress (car on l'ecraserait)
+  forbidden_names <- c("phaco_id_adress")
 
   if(sum(names(data_to_geocode) %in% forbidden_names) > 0){
     cat("\n")
@@ -309,6 +295,11 @@ phaco_geocode <- function(data_to_geocode,
     mutate(phaco_id_adress = row_number()) |>
     relocate(phaco_id_adress)
 
+
+  # On sauvegarde la BDD a geocoder avant les operations => sera joint à la fin pour recuperer les donnees
+  data_rest_to_join <- data_to_geocode
+
+
   # Creation/formatage des colonnes pour le geocodage
 
   # Rue et num (si separe) : le principe est de creer la colonne rue_to_geocode pour qu'elle contienne le nom de la rue => dans le cas ou elle contient aussi le num ou le code postal, c'est separe dans la suite
@@ -374,6 +365,12 @@ phaco_geocode <- function(data_to_geocode,
       mutate(code_postal_to_geocode = str_extract(rue_to_geocode, regex("([0-9]{4}\\s[\\p{Letter}-' ]+\\z)|([0-9]{4}(|\\s)\\z)", ignore_case = TRUE)),
              code_postal_to_geocode = str_extract(code_postal_to_geocode, regex("[0-9]{4}", ignore_case = TRUE)))
   }
+
+
+  # On ne garde que les colonnes necessaires dans data_to_geocode
+  data_to_geocode <- data_to_geocode |>
+    # dans un any_of() au cas ou num_rue_to_geocode n'existe pas
+    select(any_of(c("phaco_id_adress", "rue_to_geocode", "num_rue_to_geocode", "code_postal_to_geocode")))
 
 
   ## 3. Detection des regions/arrondissements en Belgique -------------------------------------------------------------------------------------
@@ -1318,6 +1315,11 @@ phaco_geocode <- function(data_to_geocode,
   # J'enleve aussi rue_to_geocode => plus besoin
   FULL_GEOCODING <- FULL_GEOCODING |>
     select(-Region, -arrond, -rue_to_geocode)
+
+
+  # On remet les colonnes originales
+  FULL_GEOCODING <- data_rest_to_join |>
+    left_join(FULL_GEOCODING, by = "phaco_id_adress")
 
 
   ## 3. Anonymisation potentielle -----------------------------------------------------------------------------------------------------------
