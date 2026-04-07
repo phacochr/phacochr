@@ -8,7 +8,7 @@ library(readxl)
 path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/"))
 
 
-# Codes postaux -----
+# Codes postaux - REFNIS (Statbel) -----
 dir.create(paste0(path_data,"STATBEL/code_postaux"), recursive = TRUE)
 dir.create(paste0(path_data,"TEMP"))
 
@@ -35,7 +35,7 @@ download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/
               paste0(path_data,"IBSA//conversion_secteur_quartier_2025.csv"))
 
 
-# Secteurs statistiques -----
+# Secteurs statistiques (Statbel) -----
 dir.create(paste0(path_data,"STATBEL/secteurs_statistiques"), recursive = TRUE)
 
 ## 2025 -----
@@ -45,19 +45,19 @@ unzip(paste0(path_data,"TEMP/sh_statbel_statistical_sectors_31370_20250101.sqlit
 
 sec2025 <- st_read(paste0(path_data,"TEMP/sh_statbel_statistical_sectors_31370_20250101.sqlite/sh_statbel_statistical_sectors_31370_20250101.sqlite/sh_statbel_statistical_sectors_31370_20250101.sqlite"))
 
-quartier_sec_2025<-read_delim(paste0(path_data,"IBSA/conversion_secteur_quartier_2025.csv"), delim = ";") %>%
-  rename(cd_sector2025= secteurstatistique_code) %>%
+quartier_sec_2025<-read_delim(paste0(path_data,"IBSA/conversion_secteur_quartier_2025.csv"), delim = ";") |>
+  rename(cd_sector2025= secteurstatistique_code) |>
   select(cd_sector2025, quartier_code,quartier_nom_fr, quartier_nom_nl  )
 
-sec2025 <- sec2025 %>%
+sec2025 <- sec2025 |>
   left_join(quartier_sec_2025, by = c("cd_sector"= "cd_sector2025"))
 
 # #BXL
-# sec_bxl2025<-sec2025%>%
+# sec_bxl2025<-sec2025|>
 #   filter(!is.na(quartier_code))
 #
 # # test
-# nrow(sec_bxl2025)==nrow( sec2025 %>% filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale"))
+# nrow(sec_bxl2025)==nrow( sec2025 |> filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale"))
 
 # SAVE
 saveRDS(sec2025, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"))
@@ -70,22 +70,22 @@ unzip(paste0(path_data,"TEMP/sh_statbel_statistical_sectors_31370_20240101.sqlit
 
 sec2024 <- st_read(paste0(path_data,"TEMP/sh_statbel_statistical_sectors_31370_20240101.sqlite/sh_statbel_statistical_sectors_31370_20240101.sqlite/sh_statbel_statistical_sectors_31370_20240101.sqlite"))
 
-quartier_sec_2024 <- read_excel(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx")) %>%
+quartier_sec_2024 <- read_excel(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx")) |>
   rename(cd_sector2024 = SecteurStatistique_Code,
          quartier_nom_nl = Quartier_Nom_NL,
          quartier_nom_fr = Quartier_Nom_FR,
-         quartier_code = Quartier_Code) %>%
+         quartier_code = Quartier_Code) |>
   select(cd_sector2024, quartier_code,quartier_nom_fr, quartier_nom_nl  )
 
-sec2024 <- sec2024 %>%
+sec2024 <- sec2024 |>
   left_join(quartier_sec_2024, by = c("cd_sector"= "cd_sector2024"))
 
 # #BXL
-# sec_bxl2024<-sec2024%>%
+# sec_bxl2024<-sec2024|>
 #   filter(!is.na(quartier_code))
 #
 # # test
-# nrow(sec_bxl2024)==nrow( sec2024 %>% filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale"))
+# nrow(sec_bxl2024)==nrow( sec2024 |> filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale"))
 
 saveRDS(sec2024, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds"))
 # saveRDS(sec_bxl2024, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds"))
@@ -95,25 +95,25 @@ download.file("https://statbel.fgov.be/sites/default/files/files/opendata/Statis
               paste0(path_data,"TEMP/sh_statbel_spatialite2011.zip"))
 unzip(paste0(path_data,"TEMP/sh_statbel_spatialite2011.zip"), exdir = paste0(path_data,"TEMP/sh_statbel_spatialite2011"))
 
-sec2011 <- st_read(paste0(path_data,"TEMP/sh_statbel_spatialite2011/sh_statbel_statistical_sectors.sqlite")) %>%
+sec2011 <- st_read(paste0(path_data,"TEMP/sh_statbel_spatialite2011/sh_statbel_statistical_sectors.sqlite")) |>
   st_set_crs(31370)
 
-quartier_sec_2024 <- read_excel(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx")) %>%
+quartier_sec_2024 <- read_excel(paste0(path_data,"IBSA/MQ_Communes_Quartiers_Secteurs.xlsx")) |>
   rename(cd_sector2024 = SecteurStatistique_Code,
          quartier_nom_nl = Quartier_Nom_NL,
          quartier_nom_fr = Quartier_Nom_FR,
-         quartier_code = Quartier_Code) %>%
+         quartier_code = Quartier_Code) |>
   select(cd_sector2024, quartier_code,quartier_nom_fr, quartier_nom_nl  )
 
-sec2011 <- sec2011 %>%
+sec2011 <- sec2011 |>
   left_join(quartier_sec_2024, by = c("cd_sector"= "cd_sector2024"))
 
 # # BXL
-# sec_bxl2011<-sec2011%>%
+# sec_bxl2011<-sec2011|>
 #   filter(!is.na(quartier_code))
 #
 # # test
-# nrow(sec_bxl2011)==nrow( sec2011 %>% filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale"))
+# nrow(sec_bxl2011)==nrow( sec2011 |> filter(tx_rgn_descr_fr=="Région de Bruxelles-Capitale"))
 
 # SAVE
 saveRDS(sec2011, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds"))
@@ -122,61 +122,91 @@ saveRDS(sec2011, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statb
 # Quartiers du monitoring -----
 
 ## 2025 -----
-sec_bxl2025 <- sec2025 %>%
+sec_bxl2025 <- sec2025 |>
   filter(tx_rgn_descr_fr == "Région de Bruxelles-Capitale")
-quartiers2025 <- sec_bxl2025 %>%
-  group_by(quartier_code,quartier_nom_fr, quartier_nom_nl ) %>%
-  summarise(GEOMETRY = st_union(GEOMETRY)) %>%
+quartiers2025 <- sec_bxl2025 |>
+  group_by(quartier_code,quartier_nom_fr, quartier_nom_nl ) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
   ungroup()
 
 saveRDS(quartiers2025, file = paste0(path_data,"IBSA/quartiers2025.rds"))
 
 ## 2024 -----
-sec_bxl2024 <- sec2024 %>%
+sec_bxl2024 <- sec2024 |>
   filter(tx_rgn_descr_fr == "Région de Bruxelles-Capitale")
-quartiers2024 <- sec_bxl2024 %>%
-  group_by(quartier_code,quartier_nom_fr, quartier_nom_nl ) %>%
-  summarise(GEOMETRY = st_union(GEOMETRY)) %>%
+quartiers2024 <- sec_bxl2024 |>
+  group_by(quartier_code,quartier_nom_fr, quartier_nom_nl ) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
   ungroup()
 
 saveRDS(quartiers2024, file = paste0(path_data,"IBSA/quartiers2024.rds"))
 
 ## 2011 -----
-sec_bxl2011 <- sec2011 %>%
+sec_bxl2011 <- sec2011 |>
   filter(tx_rgn_descr_fr == "Région de Bruxelles-Capitale")
-quartiers2011 <- sec_bxl2011 %>%
-  group_by(quartier_code,quartier_nom_fr, quartier_nom_nl) %>%
-  summarise(GEOMETRY = st_union(GEOMETRY)) %>%
+quartiers2011 <- sec_bxl2011 |>
+  group_by(quartier_code,quartier_nom_fr, quartier_nom_nl) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
   ungroup()
 
 saveRDS(quartiers2011, file = paste0(path_data,"IBSA/quartiers2011.rds"))
 
 
+# Fichiers OBSS -----
+download.file("https://github.com/phacochr/phacochr_data/blob/main/data_phacochr/SS_QSS_2024.xlsx",
+              paste0(path_data,"TEMP/SS_QSS_2024.xlsx"), mode = "wb")
+
+QSS_2024_original <- read_excel(paste0(path_data,"OBSS/SS_QSS_2024.xlsx")) |>
+  select(CodeSector, QuartierSS_Gwwijk, NomQuartierSSFR, NaamGWwijkNL, BassinFR, ZoneNL)
+
+## QSS -----
+QSS_2024 <- sec_bxl2024 |>
+  left_join(QSS_2024_original, by = c("cd_sector" = "CodeSector")) |>
+  group_by(QuartierSS_Gwwijk) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
+  ungroup() |>
+  left_join(QSS_2024_original |> group_by(QuartierSS_Gwwijk, NomQuartierSSFR, NaamGWwijkNL, BassinFR, ZoneNL) |> summarise(), by = "QuartierSS_Gwwijk")
+
+# QSS_2024 |> st_geometry() |> plot()
+saveRDS(QSS_2024, file = paste0(path_data,"OBSS/QSS_2024.rds"))
+
+
+## Bassins -----
+Bassins_2024 <- sec_bxl2024 |>
+  left_join(QSS_2024_original, by = c("cd_sector" = "CodeSector")) |>
+  group_by(BassinFR, ZoneNL) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
+  ungroup()
+
+# Bassins_2024 |> st_geometry() |> plot()
+saveRDS(QSS_2024, file = paste0(path_data,"OBSS/Bassins_2024.rds"))
+
+
 # Communes -----
 dir.create(paste0(path_data,"STATBEL/communes"), recursive = TRUE)
 
-communes2025 <- sec2025 %>%
+communes2025 <- sec2025 |>
   group_by(cd_munty_refnis,tx_munty_descr_fr, tx_munty_descr_nl, tx_munty_descr_de,
            cd_prov_refnis, tx_prov_descr_fr, tx_prov_descr_nl, tx_prov_descr_de,
-           cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) %>%
-  summarise(GEOMETRY = st_union(GEOMETRY)) %>%
+           cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
   ungroup()
 
 saveRDS(communes2025, file = paste0(path_data,"STATBEL/communes/communes2025.rds"))
 
-communes2024 <- sec2024 %>%
+communes2024 <- sec2024 |>
   group_by(cd_munty_refnis,tx_munty_descr_fr, tx_munty_descr_nl, tx_munty_descr_de,
            cd_prov_refnis, tx_prov_descr_fr, tx_prov_descr_nl, tx_prov_descr_de,
-           cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) %>%
-  summarise(GEOMETRY = st_union(GEOMETRY)) %>%
+           cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
   ungroup()
 saveRDS(communes2024, file = paste0(path_data,"STATBEL/communes/communes2024.rds"))
 
-communes2011 <- sec2011 %>%
+communes2011 <- sec2011 |>
   group_by(cd_munty_refnis,tx_munty_descr_fr, tx_munty_descr_nl, tx_munty_descr_de,
            cd_prov_refnis, tx_prov_descr_fr, tx_prov_descr_nl, tx_prov_descr_de,
-           cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) %>%
-  summarise(GEOMETRY = st_union(GEOMETRY)) %>%
+           cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
   ungroup()
 saveRDS(communes2011, file = paste0(path_data,"STATBEL/communes/communes2011.rds"))
 
@@ -184,25 +214,25 @@ saveRDS(communes2011, file = paste0(path_data,"STATBEL/communes/communes2011.rds
 # Autres -----
 dir.create(paste0(path_data,"STATBEL/autres"), recursive = TRUE)
 
-provinces <- communes2024 %>%
+provinces <- communes2024 |>
   group_by(cd_prov_refnis, tx_prov_descr_fr, tx_prov_descr_nl, tx_prov_descr_de,
-           cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) %>%
-  summarise(GEOMETRY = st_union(GEOMETRY)) %>%
+           cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
   ungroup()
 saveRDS(provinces, file = paste0(path_data,"STATBEL/autres/provinces.rds"))
 
-regions <- provinces %>%
-  group_by(cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) %>%
-  summarise(GEOMETRY = st_union(GEOMETRY)) %>%
+regions <- provinces |>
+  group_by(cd_rgn_refnis,tx_rgn_descr_fr, tx_rgn_descr_nl, tx_rgn_descr_de) |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
   ungroup()
 saveRDS(regions, file = paste0(path_data,"STATBEL/autres/regions.rds"))
 
-belgique <- regions %>%
-  summarise(GEOMETRY = st_union(GEOMETRY)) %>%
+belgique <- regions |>
+  summarise(GEOMETRY = st_union(GEOMETRY)) |>
   ungroup()
 saveRDS(belgique, file = paste0(path_data,"STATBEL/autres/belgique.rds"))
 
-rbc <- regions %>%
+rbc <- regions |>
   filter(tx_rgn_descr_fr == "Région de Bruxelles-Capitale")
 saveRDS(rbc, file = paste0(path_data,"STATBEL/autres/rbc.rds"))
 

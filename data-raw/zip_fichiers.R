@@ -8,6 +8,7 @@ zip::zip(
   zipfile = file.path(path_data, "phacochr_data_autre.zip"),
   files = c("CHARLEROI",
             "IBSA",
+            "OBSS",
             "BeST",
             "STATBEL/autres" ,
             "STATBEL/code_postaux",

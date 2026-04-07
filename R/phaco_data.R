@@ -52,6 +52,7 @@ phaco_data <- function(data=NULL,
                      "communes", "communes2011","communes2024","communes2025",
                      "communes_bxl", "communes_bxl2011","communes_bxl2024","communes_bxl2025",
                      "quartiers", "quartiers2011","quartiers2024", "quartiers2025",
+                     "QSS_2024", "Bassins_2024",
                      "provinces", "regions", "belgique", "rbc")) == 0) {
     cat("\n")
     stop(paste0(
@@ -103,6 +104,9 @@ phaco_data <- function(data=NULL,
   if(data=="quartiers2011"){result<- readRDS(paste0(path_data,"IBSA/quartiers2011.rds"))}
   if(data=="quartiers2024"|data=="quartiers"){result<- readRDS(paste0(path_data,"IBSA/quartiers2024.rds"))}
   if(data=="quartiers2025"){result<- readRDS(paste0(path_data,"IBSA/quartiers2025.rds"))}
+
+  if(data=="QSS_2024"){result<- readRDS(paste0(path_data,"OBSS/QSS_2024.rds"))}
+  if(data=="Bassins_2024"){result<- readRDS(paste0(path_data,"OBSS/Bassins_2024.rds"))}
 
   if(data=="provinces"){result<- readRDS(paste0(path_data,"STATBEL/autres/provinces.rds"))}
   if(data=="regions"){result<- readRDS(paste0(path_data,"STATBEL/autres/regions.rds"))}
