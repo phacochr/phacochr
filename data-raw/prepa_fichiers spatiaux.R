@@ -153,10 +153,10 @@ saveRDS(quartiers2011, file = paste0(path_data,"IBSA/quartiers2011.rds"))
 
 
 # Fichiers OBSS -----
-download.file("https://github.com/phacochr/phacochr_data/blob/main/data_phacochr/SS_QSS_2024.xlsx",
+download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/SS_QSS_2024.xlsx",
               paste0(path_data,"TEMP/SS_QSS_2024.xlsx"), mode = "wb")
 
-QSS_2024_original <- read_excel(paste0(path_data,"OBSS/SS_QSS_2024.xlsx")) |>
+QSS_2024_original <- read_excel(paste0(path_data,"TEMP/SS_QSS_2024.xlsx")) |>
   select(CodeSector, QuartierSS_Gwwijk, NomQuartierSSFR, NaamGWwijkNL, BassinFR, ZoneNL)
 
 ## QSS -----
@@ -179,7 +179,7 @@ Bassins_2024 <- sec_bxl2024 |>
   ungroup()
 
 # Bassins_2024 |> st_geometry() |> plot()
-saveRDS(QSS_2024, file = paste0(path_data,"OBSS/Bassins_2024.rds"))
+saveRDS(Bassins_2024, file = paste0(path_data,"OBSS/Bassins_2024.rds"))
 
 
 # Communes -----
