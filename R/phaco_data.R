@@ -52,7 +52,7 @@ phaco_data <- function(data=NULL,
                      "communes", "communes2011","communes2024","communes2025",
                      "communes_bxl", "communes_bxl2011","communes_bxl2024","communes_bxl2025",
                      "quartiers", "quartiers2011","quartiers2024", "quartiers2025",
-                     "QSS_2024", "Bassins_2024",
+                     "qss", "bassins",
                      "provinces", "regions", "belgique", "rbc")) == 0) {
     cat("\n")
     stop(paste0(
@@ -63,6 +63,7 @@ phaco_data <- function(data=NULL,
       "\"communes\", \"communes2011\",\"communes2024\",\"communes2025\",\n",
       "\"communes_bxl\", \"communes_bxl2011\",\"communes_bxl2024\",\"communes_bxl2025\",\n",
       "\"quartiers\", \"quartiers2011\",\"quartiers2024\", \"quartiers2025\",\n",
+      "\"qss\", \"bassins\", \"couronnes\"\n",
       "\"provinces\", \"regions\", \"belgique\", \"rbc\""
     ))
   }
@@ -105,8 +106,10 @@ phaco_data <- function(data=NULL,
   if(data=="quartiers2024"|data=="quartiers"){result<- readRDS(paste0(path_data,"IBSA/quartiers2024.rds"))}
   if(data=="quartiers2025"){result<- readRDS(paste0(path_data,"IBSA/quartiers2025.rds"))}
 
-  if(data=="QSS_2024"){result<- readRDS(paste0(path_data,"OBSS/QSS_2024.rds"))}
-  if(data=="Bassins_2024"){result<- readRDS(paste0(path_data,"OBSS/Bassins_2024.rds"))}
+  if(data=="qss"){result<- readRDS(paste0(path_data,"OBSS/QSS_2024.rds"))}
+  if(data=="bassins"){result<- readRDS(paste0(path_data,"OBSS/Bassins_2024.rds"))}
+
+  if(data=="couronnes"){result<- readRDS(paste0(path_data,"IBSA/ibsa_couronnes.rds"))}
 
   if(data=="provinces"){result<- readRDS(paste0(path_data,"STATBEL/autres/provinces.rds"))}
   if(data=="regions"){result<- readRDS(paste0(path_data,"STATBEL/autres/regions.rds"))}
@@ -135,6 +138,12 @@ phaco_data <- function(data=NULL,
   if(data=="quartiers2011"){warning("Vous chargez les quartiers monitoring (IBSA) construits sur base des secteurs 2011-2017 (Statbel).",call. = F)}
   if(data=="quartiers2024"|data=="quartiers"){warning("Vous chargez les quartiers monitoring (IBSA) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
   if(data=="quartiers2025"){warning("Vous chargez les quartiers monitoring (IBSA) construits sur base des secteurs 2025-... (Statbel).",call. = F)}
+
+  if(data=="qss"){warning("Vous chargez les quartiers social santé (Vivalis) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
+  if(data=="bassins"){warning("Vous chargez les bassins (Vivalis) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
+
+  if(data=="couronnes"){warning("Vous chargez les couronnes (IBSA) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
+
 
 
 

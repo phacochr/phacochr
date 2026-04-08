@@ -11,6 +11,8 @@ path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data
 # Codes postaux - REFNIS (Statbel) -----
 dir.create(paste0(path_data,"STATBEL/code_postaux"), recursive = TRUE)
 dir.create(paste0(path_data,"TEMP"))
+dir.create(paste0(path_data,"OBSS"))
+
 
 
 download.file("https://statbel.fgov.be/sites/default/files/files/documents/Over%20Statbel/Conversion%20Postal%20code_Refnis%20code_va01012019.xlsx",
@@ -180,6 +182,22 @@ Bassins_2024 <- sec_bxl2024 |>
 
 # Bassins_2024 |> st_geometry() |> plot()
 saveRDS(Bassins_2024, file = paste0(path_data,"OBSS/Bassins_2024.rds"))
+
+
+# Couronnes IBSA -----
+
+download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/ibsa_couronnes.rds",
+              paste0(path_data,"TEMP/ibsa_couronnes.rds"), mode = "wb")
+
+ibsa_couronnes_original<-readRDS( paste0(path_data,"TEMP/ibsa_couronnes.rds"))
+
+
+ibsa_couronnes  <- quartiers2024 |>
+  left_join(ibsa_couronnes_original, by = c("quartier_code" = "id")) |>
+  group_by(ibsa_couronne) |>
+  summarise(GEOMETRY = st_union(GEOMETRY))
+
+saveRDS(ibsa_couronnes, file = paste0(path_data,"IBSA/ibsa_couronnes.rds"))
 
 
 # Communes -----
