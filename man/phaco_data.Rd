@@ -2,45 +2,45 @@
 % Please edit documentation in R/phaco_data.R
 \name{phaco_data}
 \alias{phaco_data}
-\title{phaco_data : Charger les données qui sont utilisées dans phacochr}
+\title{phaco_data : Charger les donn\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}es qui sont utilis\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}es dans phacochr}
 \usage{
 phaco_data(data = NULL, path_data = NULL)
 }
 \arguments{
-\item{data}{Chaîne de caractères indiquant le jeu de données à charger.
+\item{data}{Cha\if{html}{\out{<c3>}}\if{html}{\out{<ae>}}ne de caract\if{html}{\out{<c3>}}\if{html}{\out{<a8>}}res indiquant le jeu de donn\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}es \if{html}{\out{<c3>}}\if{html}{\out{<a0>}} charger.
 Les valeurs possibles sont :
 \itemize{
-\item \code{"rues"} : rues BeST prétraitées pour l'usage de \code{phacochr}
-\item \code{"adresses"} : adresses BeST prétraitées pour l'usage de \code{phacochr}
+\item \code{"rues"} : rues BeST pr\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}trait\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}es pour l'usage de \code{phacochr}
+\item \code{"adresses"} : adresses BeST pr\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}trait\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}es pour l'usage de \code{phacochr}
 \item \code{"sec"}, \code{"sec2024"} : secteurs statistiques Statbel (version 2019-2024)
 \item \code{"sec2025"} : secteurs statistiques Statbel (version 2025--...)
 \item \code{"sec2011"} : secteurs statistiques Statbel (version 2011-2017)
-\item \code{"sec_bxl"}, \code{"sec_bxl2024"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2019-2024)
-\item \code{"sec_bxl2025"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2025--...)
-\item \code{"sec_bxl2011"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2011-2017)
+\item \code{"sec_bxl"}, \code{"sec_bxl2024"} : secteurs statistiques de la R\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}gion de Bruxelles-Capitale (version 2019-2024)
+\item \code{"sec_bxl2025"} : secteurs statistiques de la R\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}gion de Bruxelles-Capitale (version 2025--...)
+\item \code{"sec_bxl2011"} : secteurs statistiques de la R\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}gion de Bruxelles-Capitale (version 2011-2017)
 \item \code{"communes"}, \code{"communes2024"} : communes de Belgique (version 2019--2024)
 \item \code{"communes2025"} : communes de Belgique (version 2025-...)
 \item \code{"communes2011"} : communes de Belgique (version 2011-2017)
-\item \code{"communes_bxl"}, \code{"communes_bxl2024"} : communes de la Région de Bruxelles-Capitale (version 2019-2024)
-\item \code{"communes_bxl2025"} : communes de la Région de Bruxelles-Capitale (version 2025-...)
-\item \code{"communes_bxl2011"} : communes de la Région de Bruxelles-Capitale (version 2011-2017)
+\item \code{"communes_bxl"}, \code{"communes_bxl2024"} : communes de la R\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}gion de Bruxelles-Capitale (version 2019-2024)
+\item \code{"communes_bxl2025"} : communes de la R\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}gion de Bruxelles-Capitale (version 2025-...)
+\item \code{"communes_bxl2011"} : communes de la R\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}gion de Bruxelles-Capitale (version 2011-2017)
 \item \code{"quartiers"}, \code{"quartiers2024"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2019-2024)
 \item \code{"quartiers2025"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2025-...)
 \item \code{"quartiers2011"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2011-2017)
 \item \code{"couronnes"} : couronnes de Bruxelles (IBSA)
-\item \code{"qss"} : quartiers social-santé (Vivalis) sur base des secteurs statistiques (version 2019-2024)
+\item \code{"qss"} : quartiers social-sant\if{html}{\out{<c3>}}\if{html}{\out{<a9>}} (Vivalis) sur base des secteurs statistiques (version 2019-2024)
 \item \code{"bassins"} : bassins (Vivalis) sur base des secteurs statistiques (version 2019-2024)
 \item \code{"provinces"} : provinces de Belgique
-\item \code{"regions"} : régions de Belgique
-\item \code{"rbc"} : limites de la Région de Bruxelles-Capitale
+\item \code{"regions"} : r\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}gions de Belgique
+\item \code{"rbc"} : limites de la R\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}gion de Bruxelles-Capitale
 \item \code{"belgique"} : limites de la Belgique
 }
-Par défaut, \code{data = NULL}.}
+Par d\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}faut, \code{data = NULL}.}
 
-\item{path_data}{Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.}
+\item{path_data}{Chemin absolu vers le dossier o\if{html}{\out{<c3>}}\if{html}{\out{<b9>}} se trouve le donn\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}es. Par d\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}faut data_path = NULL et phacochr trouve le dossier d'installation choisi par d\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}faut.}
 }
 \description{
-Cette fonction permet de charger les données utilisées par phacochr et qui sont stockée dans l'ordinateur.
+Cette fonction permet de charger les donn\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}es utilis\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}es par phacochr et qui sont stock\if{html}{\out{<c3>}}\if{html}{\out{<a9>}}e dans l'ordinateur.
 }
 \examples{
 \dontrun{
@@ -92,7 +92,7 @@ regions <- phaco_data("regions")
 belgique <- phaco_data("belgique")
 rbc <- phaco_data("rbc")
 
-Avec un chemin explicite vers les données
+Avec un chemin explicite vers les donn<c3><a9>es
 sec <- phaco_data("sec", path_data = "/chemin/vers/data_phacochr/")
 }
 }

@@ -1,38 +1,38 @@
-#' phaco_data : Charger les données qui sont utilisées dans phacochr
+#' phaco_data : Charger les donn<c3><a9>es qui sont utilis<c3><a9>es dans phacochr
 #'
-#' Cette fonction permet de charger les données utilisées par phacochr et qui sont stockée dans l'ordinateur.
+#' Cette fonction permet de charger les donn<c3><a9>es utilis<c3><a9>es par phacochr et qui sont stock<c3><a9>e dans l'ordinateur.
 #'
-#' @param data Chaîne de caractères indiquant le jeu de données à charger.
+#' @param data Cha<c3><ae>ne de caract<c3><a8>res indiquant le jeu de donn<c3><a9>es <c3><a0> charger.
 #'   Les valeurs possibles sont :
 #'   \itemize{
-#'   \item \code{"rues"} : rues BeST prétraitées pour l'usage de \code{phacochr}
-#'   \item \code{"adresses"} : adresses BeST prétraitées pour l'usage de \code{phacochr}
+#'   \item \code{"rues"} : rues BeST pr<c3><a9>trait<c3><a9>es pour l'usage de \code{phacochr}
+#'   \item \code{"adresses"} : adresses BeST pr<c3><a9>trait<c3><a9>es pour l'usage de \code{phacochr}
 #'   \item \code{"sec"}, \code{"sec2024"} : secteurs statistiques Statbel (version 2019-2024)
 #'   \item \code{"sec2025"} : secteurs statistiques Statbel (version 2025--...)
 #'   \item \code{"sec2011"} : secteurs statistiques Statbel (version 2011-2017)
-#'   \item \code{"sec_bxl"}, \code{"sec_bxl2024"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2019-2024)
-#'   \item \code{"sec_bxl2025"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2025--...)
-#'   \item \code{"sec_bxl2011"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2011-2017)
+#'   \item \code{"sec_bxl"}, \code{"sec_bxl2024"} : secteurs statistiques de la R<c3><a9>gion de Bruxelles-Capitale (version 2019-2024)
+#'   \item \code{"sec_bxl2025"} : secteurs statistiques de la R<c3><a9>gion de Bruxelles-Capitale (version 2025--...)
+#'   \item \code{"sec_bxl2011"} : secteurs statistiques de la R<c3><a9>gion de Bruxelles-Capitale (version 2011-2017)
 #'   \item \code{"communes"}, \code{"communes2024"} : communes de Belgique (version 2019--2024)
 #'   \item \code{"communes2025"} : communes de Belgique (version 2025-...)
 #'   \item \code{"communes2011"} : communes de Belgique (version 2011-2017)
-#'   \item \code{"communes_bxl"}, \code{"communes_bxl2024"} : communes de la Région de Bruxelles-Capitale (version 2019-2024)
-#'   \item \code{"communes_bxl2025"} : communes de la Région de Bruxelles-Capitale (version 2025-...)
-#'   \item \code{"communes_bxl2011"} : communes de la Région de Bruxelles-Capitale (version 2011-2017)
+#'   \item \code{"communes_bxl"}, \code{"communes_bxl2024"} : communes de la R<c3><a9>gion de Bruxelles-Capitale (version 2019-2024)
+#'   \item \code{"communes_bxl2025"} : communes de la R<c3><a9>gion de Bruxelles-Capitale (version 2025-...)
+#'   \item \code{"communes_bxl2011"} : communes de la R<c3><a9>gion de Bruxelles-Capitale (version 2011-2017)
 #'   \item \code{"quartiers"}, \code{"quartiers2024"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2019-2024)
 #'   \item \code{"quartiers2025"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2025-...)
 #'   \item \code{"quartiers2011"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2011-2017)
 #'   \item \code{"couronnes"} : couronnes de Bruxelles (IBSA)
-#'   \item \code{"qss"} : quartiers social-santé (Vivalis) sur base des secteurs statistiques (version 2019-2024)
+#'   \item \code{"qss"} : quartiers social-sant<c3><a9> (Vivalis) sur base des secteurs statistiques (version 2019-2024)
 #'   \item \code{"bassins"} : bassins (Vivalis) sur base des secteurs statistiques (version 2019-2024)
 #'   \item \code{"provinces"} : provinces de Belgique
-#'   \item \code{"regions"} : régions de Belgique
-#'   \item \code{"rbc"} : limites de la Région de Bruxelles-Capitale
+#'   \item \code{"regions"} : r<c3><a9>gions de Belgique
+#'   \item \code{"rbc"} : limites de la R<c3><a9>gion de Bruxelles-Capitale
 #'   \item \code{"belgique"} : limites de la Belgique
 #'   }
-#'   Par défaut, \code{data = NULL}.
+#'   Par d<c3><a9>faut, \code{data = NULL}.
 #'
-#' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
+#' @param path_data Chemin absolu vers le dossier o<c3><b9> se trouve le donn<c3><a9>es. Par d<c3><a9>faut data_path = NULL et phacochr trouve le dossier d'installation choisi par d<c3><a9>faut.
 #'
 #' @export
 #'
@@ -86,7 +86,7 @@
 #' belgique <- phaco_data("belgique")
 #' rbc <- phaco_data("rbc")
 #'
-#' Avec un chemin explicite vers les données
+#' Avec un chemin explicite vers les donn<c3><a9>es
 #' sec <- phaco_data("sec", path_data = "/chemin/vers/data_phacochr/")
 #' }
 
@@ -94,7 +94,7 @@
 
 phaco_data <- function(data=NULL,
                        path_data = NULL) {
-# CHECk ERROR -----
+  # CHECk ERROR -----
   if(is.null(data)) {
     cat("\n")
     stop(paste0("\u2716 Indiquez quel jeux de donn","\u00e9","es vous voulez charger. Par exemple communes_bel <- phaco_data(data= \"communes_bel\") "))}
@@ -121,18 +121,18 @@ phaco_data <- function(data=NULL,
     ))
   }
 
-# PATH -----
- if(is.null(path_data)){path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/"))}
+  # PATH -----
+  if(is.null(path_data)){path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/"))}
 
-# DATA -----
-#  BeST
+  # DATA -----
+  #  BeST
   if(data=="rues"){result<- readRDS(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.rds"))}
   if(data=="adresses"){
     result <- list.files(path = paste0(path_data,"BeST/PREPROCESSED/"), pattern = "^data_arrond_PREPROCESSED.*\\.rds$", full.names = TRUE) |>
       purrr::map_dfr(readRDS)
-    }
+  }
 
-# STATBEL
+  # STATBEL
   if(data=="sec2011"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds"))}
   if(data=="sec2024"|data=="sec"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds"))}
   if(data=="sec2025"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"))}
@@ -192,7 +192,7 @@ phaco_data <- function(data=NULL,
   if(data=="quartiers2024"|data=="quartiers"){warning("Vous chargez les quartiers monitoring (IBSA) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
   if(data=="quartiers2025"){warning("Vous chargez les quartiers monitoring (IBSA) construits sur base des secteurs 2025-... (Statbel).",call. = F)}
 
-  if(data=="qss"){warning("Vous chargez les quartiers social santé (Vivalis) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
+  if(data=="qss"){warning("Vous chargez les quartiers social sant<c3><a9> (Vivalis) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
   if(data=="bassins"){warning("Vous chargez les bassins (Vivalis) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
 
   if(data=="couronnes"){warning("Vous chargez les couronnes (IBSA) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
