@@ -2,7 +2,36 @@
 #'
 #' Cette fonction permet de charger les données utilisées par phacochr et qui sont stockée dans l'ordinateur.
 #'
-#' @param data Nom des données à charger: "rues" (les rues BeST prétaitées pour l'usage de phacochr), "adresses" (les adresses BeST prétaitées pour l'usage de phacochr), "sec" (les secteurs statistiques), "communes_bel" (les communes de Belgiques), "provinces" (les provinces de Belgiques), "regions" (les régions de Belgiques), "belgique" (les limites de la Belgiques), "rbc" (la Région de Bruxelles-Capitale), "communes_bxl" (les communes de la Région de Bruxelles-Capitale), "quartiers_bxl" (les quartiers monitoring de Bruxelles), "rbc" (les limites de la Région de Bruxelles-Capitale), "sec_bxl" (les secteurs statistiques de la Région des Bruxelles-Capitale). Par défaut: NULL
+#' @param data Chaîne de caractères indiquant le jeu de données à charger.
+#'   Les valeurs possibles sont :
+#'   \itemize{
+#'   \item \code{"rues"} : rues BeST prétraitées pour l'usage de \code{phacochr}
+#'   \item \code{"adresses"} : adresses BeST prétraitées pour l'usage de \code{phacochr}
+#'   \item \code{"sec"}, \code{"sec2024"} : secteurs statistiques Statbel (version 2019-2024)
+#'   \item \code{"sec2025"} : secteurs statistiques Statbel (version 2025--...)
+#'   \item \code{"sec2011"} : secteurs statistiques Statbel (version 2011-2017)
+#'   \item \code{"sec_bxl"}, \code{"sec_bxl2024"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2019-2024)
+#'   \item \code{"sec_bxl2025"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2025--...)
+#'   \item \code{"sec_bxl2011"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2011-2017)
+#'   \item \code{"communes"}, \code{"communes2024"} : communes de Belgique (version 2019--2024)
+#'   \item \code{"communes2025"} : communes de Belgique (version 2025-...)
+#'   \item \code{"communes2011"} : communes de Belgique (version 2011-2017)
+#'   \item \code{"communes_bxl"}, \code{"communes_bxl2024"} : communes de la Région de Bruxelles-Capitale (version 2019-2024)
+#'   \item \code{"communes_bxl2025"} : communes de la Région de Bruxelles-Capitale (version 2025-...)
+#'   \item \code{"communes_bxl2011"} : communes de la Région de Bruxelles-Capitale (version 2011-2017)
+#'   \item \code{"quartiers"}, \code{"quartiers2024"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2019-2024)
+#'   \item \code{"quartiers2025"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2025-...)
+#'   \item \code{"quartiers2011"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2011-2017)
+#'   \item \code{"couronnes"} : couronnes de Bruxelles (IBSA)
+#'   \item \code{"qss"} : quartiers social-santé (Vivalis) sur base des secteurs statistiques (version 2019-2024)
+#'   \item \code{"bassins"} : bassins (Vivalis) sur base des secteurs statistiques (version 2019-2024)
+#'   \item \code{"provinces"} : provinces de Belgique
+#'   \item \code{"regions"} : régions de Belgique
+#'   \item \code{"rbc"} : limites de la Région de Bruxelles-Capitale
+#'   \item \code{"belgique"} : limites de la Belgique
+#'   }
+#'   Par défaut, \code{data = NULL}.
+#'
 #' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
 #'
 #' @export
@@ -11,31 +40,55 @@
 #' \dontrun{
 #' # Rues BeST
 #' rues <- phaco_data("rues")
+#'
 #' # Adresses BeST
 #' adresses <- phaco_data("adresses")
-#' # Secteurs Statistiques
-#' sec<-phaco_data("sec")
-#' # Communes Belgique
-#' communes_bel <- phaco_data("communes_bel")
-#' # Provinces
-#' provinces <- phaco_data("provinces")
-#' # Regions
-#' regions <- phaco_data("regions")
-#' # Belgique
-#' belgique <- phaco_data("belgique")
-#' # Région de Bruxelles-Capital
-#' rbc <- phaco_data("rbc")
-#' # Communes de la Région de Bruxelles-Capitale
-#' communes_bxl <- phaco_data("communes_bxl")
-#' #  Quartier monitoring de la Région de Bruxelles-Capitale
-#' quartiers_bxl <- phaco_data("quartiers_bxl")
-#' # Limites de la Région de Bruxelles-Capital
-#' rbc <- phaco_data("rbc")
-#' # Secteurs Statistiques de la Région de Bruxelles-Capitale
+#'
+#' # Secteurs statistiques
+#' sec <- phaco_data("sec")
+#' sec2011 <- phaco_data("sec2011")
+#' sec2024 <- phaco_data("sec2024")
+#' sec2025 <- phaco_data("sec2025")
+#'
+#' # Secteurs statistiques de Bruxelles
 #' sec_bxl <- phaco_data("sec_bxl")
+#' sec_bxl2011 <- phaco_data("sec_bxl2011")
+#' sec_bxl2024 <- phaco_data("sec_bxl2024")
+#' sec_bxl2025 <- phaco_data("sec_bxl2025")
+#'
+#' # Communes de Belgique
+#' communes <- phaco_data("communes")
+#' communes2011 <- phaco_data("communes2011")
+#' communes2024 <- phaco_data("communes2024")
+#' communes2025 <- phaco_data("communes2025")
+#'
+#' # Communes de Bruxelles
+#' communes_bxl <- phaco_data("communes_bxl")
+#' communes_bxl2011 <- phaco_data("communes_bxl2011")
+#' communes_bxl2024 <- phaco_data("communes_bxl2024")
+#' communes_bxl2025 <- phaco_data("communes_bxl2025")
+#'
+#' # IBSA
+#' quartiers <- phaco_data("quartiers")
+#' quartiers2011 <- phaco_data("quartiers2011")
+#' quartiers2024 <- phaco_data("quartiers2024")
+#' quartiers2025 <- phaco_data("quartiers2025")
+#'
+#' couronnes <- phaco_data("couronnes")
+#'
+#' # Vivalis
+#' qss <- phaco_data("qss")
+#' bassins <- phaco_data("bassins")
+#'
+#' # Autres niveaux administratifs
+#' provinces <- phaco_data("provinces")
+#' regions <- phaco_data("regions")
+#' belgique <- phaco_data("belgique")
+#' rbc <- phaco_data("rbc")
+#'
+#' Avec un chemin explicite vers les données
+#' sec <- phaco_data("sec", path_data = "/chemin/vers/data_phacochr/")
 #' }
-#'
-#'
 
 
 
@@ -143,8 +196,6 @@ phaco_data <- function(data=NULL,
   if(data=="bassins"){warning("Vous chargez les bassins (Vivalis) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
 
   if(data=="couronnes"){warning("Vous chargez les couronnes (IBSA) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
-
-
 
 
   return(result)
