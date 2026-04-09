@@ -4,6 +4,8 @@
 #' `%ni%` is the negation of `%in%`. It returns `TRUE` for elements of `x`
 #' that are not in `y`. `%!in%`, `%ni%` or `%notin%` are equivalent.
 #'
+#' @name notin
+#'
 #' @param x A vector
 #' @param y A vector or list to match against
 #'
@@ -20,10 +22,10 @@
   !x %in% y
 }
 
-#' @rdname %ni%
+#' @rdname notin
 #' @export
 `%!in%` <- `%ni%`
 
-#' @rdname %ni%
+#' @rdname notin
 #' @export
 `%notin%` <- `%ni%`
