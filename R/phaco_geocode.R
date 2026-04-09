@@ -822,6 +822,14 @@ phaco_geocode <- function(data_to_geocode,
 
   ### ii. Boucle de jointure par commune ----------------------------------------------------------------------------------------------------
 
+
+  # data_to_geocode_id <- data_to_geocode |>
+  #   select(phaco_id_adress, rue_recoded, code_postal_to_geocode)
+  #
+  # data_to_geocode <- data_to_geocode |>
+  #   distinct(rue_recoded, code_postal_to_geocode, .keep_all = TRUE)
+
+
   #### Matching exact -----------------------------------------------------------------------------------------------------------------------
 
   cat(paste0("\n","\u29D7"," D","\u00e9","tection des rues (matching exact)"))
@@ -1017,6 +1025,9 @@ phaco_geocode <- function(data_to_geocode,
   res <- res |>
     bind_rows(res_exact)
 
+  # res <- data_to_geocode_id |>
+  #   left_join(res |> select(-phaco_id_adress), by = c("code_postal_to_geocode", "rue_recoded"))
+  # print(nrow(res))
 
   ## 2. Jointure des adresses --------------------------------------------------------------------------------------------------------------
 
