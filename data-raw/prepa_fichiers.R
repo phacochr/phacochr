@@ -8,7 +8,11 @@ library(readxl)
 path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/"))
 
 
-# Codes postaux - REFNIS (Statbel) -----
+# Version de phacochr -----
+writeLines(as.character(utils::packageVersion("phacochr")), paste0(path_data,"phacochr_version.txt"))
+
+
+# Codes postaux - Communes (Statbel) -----
 dir.create(paste0(path_data,"STATBEL/code_postaux"), recursive = TRUE)
 dir.create(paste0(path_data,"TEMP"))
 dir.create(paste0(path_data,"OBSS"))
@@ -25,7 +29,7 @@ download.file("https://statbel.fgov.be/sites/default/files/files/documents/Over%
 #               paste0(path_data,"STATBEL/code_postaux/Conversion\ Postal\ code_Refnis\ code_va01012025.xlsx"))
 
 
-# Fichiers IBSA -----
+# Communes-Quartiers-Secteurs (IBSA) -----
 dir.create(paste0(path_data,"IBSA"), recursive = TRUE)
 
 # Correspondance ...-2024
@@ -121,7 +125,7 @@ sec2011 <- sec2011 |>
 saveRDS(sec2011, file = paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds"))
 
 
-# Quartiers du monitoring -----
+# Quartiers du monitoring (IBSA) -----
 
 ## 2025 -----
 sec_bxl2025 <- sec2025 |>
@@ -154,7 +158,7 @@ quartiers2011 <- sec_bxl2011 |>
 saveRDS(quartiers2011, file = paste0(path_data,"IBSA/quartiers2011.rds"))
 
 
-# Fichiers OBSS -----
+# Quartiers SS et Bassins (OBSS) -----
 download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/SS_QSS_2024.xlsx",
               paste0(path_data,"TEMP/SS_QSS_2024.xlsx"), mode = "wb")
 
@@ -229,7 +233,7 @@ communes2011 <- sec2011 |>
 saveRDS(communes2011, file = paste0(path_data,"STATBEL/communes/communes2011.rds"))
 
 
-# Autres -----
+# Provinces-Regions-Belgique-RBC -----
 dir.create(paste0(path_data,"STATBEL/autres"), recursive = TRUE)
 
 provinces <- communes2024 |>
