@@ -2,6 +2,6 @@
   version <- utils::packageVersion(pkgname)
 
   packageStartupMessage(
-    paste0("phacochr version ", version, " chargé\nJoël t'es trop un bg")
+    paste0("phacochr version ", version, " charg","\u00e9","\nHugo c'est toi le bg")
   )
 }
