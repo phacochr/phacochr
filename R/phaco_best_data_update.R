@@ -73,8 +73,8 @@ phaco_best_data_update <- function(force=FALSE,
     file.exists(
       # paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"),
                 paste0(path_data, "CHARLEROI/Rues-Nouveaux-noms_2024-01-17.xlsx"),
-                paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"),
-                paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"),
+                paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.rds"),
+                paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.rds"),
                 paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx")
     )
   ) != 4) {
@@ -451,8 +451,8 @@ phaco_best_data_update <- function(force=FALSE,
 
     # Creer les rues avec abreviations de noms
 
-    TA_POP_2018_M <- readxl::read_excel(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"), progress= F)
-    TA_POP_2018_F <- readxl::read_excel(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"),  progress= F)
+    TA_POP_2018_M <- readRDS(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.rds"))
+    TA_POP_2018_F <- readRDS(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.rds"))
 
     prenoms <- bind_rows(TA_POP_2018_M, TA_POP_2018_F) |>
       select(TX_FST_NAME, MS_FREQUENCY) |>

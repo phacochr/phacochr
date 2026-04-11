@@ -155,19 +155,21 @@ phaco_data <- function(data=NULL,
   if(data=="communes_bxl2025"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2025.rds")) |>
     filter(as.numeric(cd_rgn_refnis)==04000)}
 
-  if(data=="quartiers2011"){result<- readRDS(paste0(path_data,"IBSA/quartiers2011.rds"))}
-  if(data=="quartiers2024"|data=="quartiers"){result<- readRDS(paste0(path_data,"IBSA/quartiers2024.rds"))}
-  if(data=="quartiers2025"){result<- readRDS(paste0(path_data,"IBSA/quartiers2025.rds"))}
-
-  if(data=="qss"){result<- readRDS(paste0(path_data,"OBSS/QSS_2024.rds"))}
-  if(data=="bassins"){result<- readRDS(paste0(path_data,"OBSS/Bassins_2024.rds"))}
-
-  if(data=="couronnes"){result<- readRDS(paste0(path_data,"IBSA/ibsa_couronnes.rds"))}
-
   if(data=="provinces"){result<- readRDS(paste0(path_data,"STATBEL/autres/provinces.rds"))}
   if(data=="regions"){result<- readRDS(paste0(path_data,"STATBEL/autres/regions.rds"))}
   if(data=="belgique"){result<- readRDS(paste0(path_data,"STATBEL/autres/belgique.rds"))}
   if(data=="rbc"){result<- readRDS(paste0(path_data,"STATBEL/autres/rbc.rds"))}
+
+  # IBSA
+  if(data=="quartiers2011"){result<- readRDS(paste0(path_data,"IBSA/quartiers2011.rds"))}
+  if(data=="quartiers2024"|data=="quartiers"){result<- readRDS(paste0(path_data,"IBSA/quartiers2024.rds"))}
+  if(data=="quartiers2025"){result<- readRDS(paste0(path_data,"IBSA/quartiers2025.rds"))}
+
+  if(data=="couronnes"){result<- readRDS(paste0(path_data,"IBSA/ibsa_couronnes.rds"))}
+
+  # OBSS
+  if(data=="qss"){result<- readRDS(paste0(path_data,"OBSS/QSS_2024.rds"))}
+  if(data=="bassins"){result<- readRDS(paste0(path_data,"OBSS/Bassins_2024.rds"))}
 
 
   # WARNINGS

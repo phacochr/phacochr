@@ -6,18 +6,27 @@ library(rappdirs)
 library(readxl)
 
 path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/"))
+dir.create(paste0(path_data,"TEMP"))
 
 
 # Version de phacochr -----
 writeLines(as.character(utils::packageVersion("phacochr")), paste0(path_data,"phacochr_version.txt"))
 
 
+# Prénoms 2018 (Statbel) -----
+dir.create(paste0(path_data,"STATBEL/prenoms"), recursive = TRUE)
+
+download.file("https://statbel.fgov.be/sites/default/files/files/opendata/Voornamen%20bevolking%20per%20gemeente/TA_POP_2018_M.xlsx",
+              paste0(path_data, "TEMP/TA_POP_2018_M.xlsx"), mode = "wb")
+download.file("https://statbel.fgov.be/sites/default/files/files/opendata/Voornamen%20bevolking%20per%20gemeente/TA_POP_2018_F.xlsx",
+              paste0(path_data, "TEMP/TA_POP_2018_F.xlsx"), mode = "wb")
+
+saveRDS(read_excel(paste0(path_data, "TEMP/TA_POP_2018_M.xlsx")), file = paste0(path_data,"STATBEL/prenoms/TA_POP_2018_M.rds"))
+saveRDS(read_excel(paste0(path_data, "TEMP/TA_POP_2018_F.xlsx")), file = paste0(path_data,"STATBEL/prenoms/TA_POP_2018_F.rds"))
+
+
 # Codes postaux - Communes (Statbel) -----
 dir.create(paste0(path_data,"STATBEL/code_postaux"), recursive = TRUE)
-dir.create(paste0(path_data,"TEMP"))
-dir.create(paste0(path_data,"OBSS"))
-
-
 
 download.file("https://statbel.fgov.be/sites/default/files/files/documents/Over%20Statbel/Conversion%20Postal%20code_Refnis%20code_va01012019.xlsx",
               paste0(path_data,"STATBEL/code_postaux/Conversion\ Postal\ code_Refnis\ code_va01012019.xlsx"), mode = "wb")
@@ -159,6 +168,8 @@ saveRDS(quartiers2011, file = paste0(path_data,"IBSA/quartiers2011.rds"))
 
 
 # Quartiers SS et Bassins (OBSS) -----
+dir.create(paste0(path_data,"OBSS"))
+
 download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/SS_QSS_2024.xlsx",
               paste0(path_data,"TEMP/SS_QSS_2024.xlsx"), mode = "wb")
 
