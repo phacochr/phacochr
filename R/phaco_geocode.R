@@ -809,14 +809,14 @@ phaco_geocode <- function(data_to_geocode,
 
   #### Matching inexact ---------------------------------------------------------------------------------------------------------------------
 
-  cat(paste0("\n","\u29D7"," D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)"))
+  cat(paste0("\n","\u29D7"," D","\u00e9","tection des rues (matching inexact avec fuzzystring)"))
 
   # /!\ NOTE : la cle de jointure est en minuscule (d'ou les str_to_lower() avant), car stringdist identifie la diff de case comme une diff !
   # /!\ NOTE2 : la jointure cree les colonnes de postal_street, meme si 0 match ! Important pour la suite, notamment le if statement pour la creation de l'objet sf
   res <- tibble()
   res <- foreach::foreach(i = unique(data_to_geocode_inexact$code_postal_to_geocode),
                           .combine = 'bind_rows',
-                          .packages=c("dplyr","fuzzyjoin"))  %dopar% {
+                          .packages=c("dplyr","fuzzystring"))  %dopar% {
 
                             data_to_geocode_inexact_i <- data_to_geocode_inexact |>
                               filter(code_postal_to_geocode == i)
@@ -824,7 +824,7 @@ phaco_geocode <- function(data_to_geocode,
                             postal_street_i <- postal_street |>
                               filter(postal_id == i)
 
-                            fuzzyjoin::stringdist_left_join(data_to_geocode_inexact_i,
+                            fuzzystring::fuzzystring_left_join(data_to_geocode_inexact_i,
                               postal_street_i,
                               by = c("address_join" = "address_join_street"),
                               method = method_stringdist,
@@ -834,7 +834,7 @@ phaco_geocode <- function(data_to_geocode,
                             )
                           }
 
-  cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","tection des rues (matching inexact avec fuzzyjoin)", "\033[K"))
+  cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","tection des rues (matching inexact avec fuzzystring)", "\033[K"))
 
   # On ne retient que l'adresse detectee avec la distance minimale
   res <- res |>
@@ -906,7 +906,7 @@ phaco_geocode <- function(data_to_geocode,
       res_adj <- tibble()
       res_adj <- foreach::foreach(i = unique(ADDRESS_last_tentative$`Refnis code`),
                                   .combine = 'bind_rows',
-                                  .packages=c("dplyr","fuzzyjoin"))  %dopar% {
+                                  .packages=c("dplyr","fuzzystring"))  %dopar% {
 
                                     # On calcule un vecteur reprenant les communes adjacentes par commune i
                                     com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == i]
@@ -919,7 +919,7 @@ phaco_geocode <- function(data_to_geocode,
                                       filter(`Refnis code` %in% c(i, com_adj_i)) |>  # On inclut i dans c(i, com_adj_i) car le code postal est plus petit que i
                                       select(-`Refnis code`)
 
-                                    fuzzyjoin::stringdist_left_join(ADDRESS_last_tentative_i,
+                                    fuzzystring::fuzzystring_left_join(ADDRESS_last_tentative_i,
                                                          postal_street_adj_i,
                                                          by = c("address_join" = "address_join_street"),
                                                          method = method_stringdist,

@@ -18,7 +18,7 @@ Imports:
     doParallel,
     dplyr,
     foreach,
-    fuzzyjoin,
+    fuzzystring,
     knitr,
     mapsf,
     purrr,
