@@ -179,6 +179,12 @@ phaco_best_data_update <- function(force=FALSE,
         ) |>
         distinct(key_street_unique, .keep_all = TRUE) |>
         select(street_id_phaco, postal_id, street_detected, langue_detected, key_street_unique)
+
+      temp$street_detected_utf8 <- NA
+      for(i in 1:nrow(temp)){
+        temp$street_detected_utf8[i] <- sum(utf8ToInt(temp$street_detected[i]))
+      }
+
       return(temp)
     }
 
@@ -436,7 +442,7 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\r",  colourise("\u2714", fg="green")," Cr", "\u00e9", "ation du fichier des adresses BeST (jointure spatiale avec les secteurs statistiques)"))
 
 
-    # 3. Belgium street : noms abrégés, mid_street et export ----------------------------------------------------------------------------------
+    # 3. Belgium street : noms abrégés, Charleroi, mid_street et export -----------------------------------------------------------------------
 
     cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
 
@@ -518,8 +524,8 @@ phaco_best_data_update <- function(force=FALSE,
 
     cat(paste0("\r",  colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation des noms propres abr", "\u00e9", "g", "\u00e9", "s pour le fichier des rues BeST"))
 
-    # Ajout des rues de Charleroi
 
+    # Ajout des rues de Charleroi
     cat(paste0("\n", "\u29D7", " Ajout des anciens noms de rue pour la commune de Charleroi"))
 
     # Certaines rues sont mal ecrites dans le fichier de la commune, on les corrige
@@ -553,6 +559,7 @@ phaco_best_data_update <- function(force=FALSE,
         ancien_nom_rue = 1
       ) |>
       select(-ancienne_denomination)
+
 
     # On remplace les noms propres par leurs abreviations (y compris noms composes)
     rue_charleroi_old_abv <- rue_charleroi_old |>
@@ -612,6 +619,7 @@ phaco_best_data_update <- function(force=FALSE,
     belgium_street_abv <- bind_rows(belgium_street_abv, rue_charleroi_old_abv)
 
     cat(paste0("\r", colourise("\u2714", fg="green"), " Ajout des anciens noms de rue pour la commune de Charleroi"))
+
 
     # Assigner a chaque rue par code postal les coordonnees du numero du milieu
     cat(paste0("\n", "\u29D7", " Recherche du num", "\u00e9", "ro au milieu de la rue par code postal"))
