@@ -152,61 +152,15 @@ phaco_geocode <- function(data_to_geocode,
   }
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en toute logique, pas installes)
-  if(sum(
-    file.exists(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_11.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_12.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_13.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_21.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_23.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_24.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_25.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_31.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_32.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_33.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_34.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_35.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_36.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_37.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_38.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_41.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_42.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_43.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_44.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_45.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_46.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_51.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_52.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_53.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_55.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_56.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_57.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_58.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_61.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_62.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_63.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_64.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_71.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_72.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_73.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_81.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_82.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_83.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_84.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_85.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_91.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_92.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_93.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/table_postal_arrond.rds"),
-                paste0(path_data,"BeST/PREPROCESSED/table_postal_com_name.rds"),
-                paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.rds")
-    )
-  ) != 49) {
+  if(phaco_check_rds_data(path_data = path_data) == FALSE) {
 
-    cat("\n")
-    stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
+    if(phaco_check_csv_data(path_data = path_data) == FALSE){
+      cat("\n")
+      stop(paste0("\u2716"," les fichiers ne sont pas install","\u00e9","s : lancez phaco_setup_data()"))
+    } else {
+      cat("\n")
+      stop(paste0("\u2716"," les fichiers install","\u00e9","s sont ceux d'une ancienne version de phacochr : relancez phaco_setup_data()"))
+    }
 
   }
 
@@ -807,7 +761,7 @@ phaco_geocode <- function(data_to_geocode,
 
   # J'importe les rues
   postal_street <- readRDS(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.rds")) |>
-    mutate(across(everything(), as.character)) |>
+    mutate(across(-street_detected_utf8, as.character)) |>
     mutate(address_join_street = str_to_lower(str_trim(street_detected)))
 
   if (length(lang_encoded) != 3){
@@ -930,7 +884,7 @@ phaco_geocode <- function(data_to_geocode,
     ADDRESS_last_tentative <- res |>
       filter(is.na(dist_fuzzy)) |>
       mutate(address_join = str_to_lower(str_trim(rue_recoded))) |>
-      select(-street_detected, -street_id_phaco, -langue_detected, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy,
+      select(-street_detected, -street_id_phaco, -langue_detected, -street_detected_utf8, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy,
              -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector2024)
 
     if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
@@ -1011,7 +965,7 @@ phaco_geocode <- function(data_to_geocode,
         # On liste les phaco_id_adress geocodes dans cette nouvelle procedure
         ADDRESS_last_tentative_vector <- unique(res_adj$phaco_id_adress)
 
-        # Et on les ajoute a res_bxl (prelablement deleste des adresses prealablement non trouvees mais desormais trouvees !)
+        # Et on les ajoute a res (prelablement deleste des adresses prealablement non trouvees mais desormais trouvees !)
         res <- res |>
           filter(phaco_id_adress %ni% ADDRESS_last_tentative_vector) |>
           bind_rows(res_adj)
@@ -1079,7 +1033,7 @@ phaco_geocode <- function(data_to_geocode,
       if (nrow(FULL_GEOCODING_APPROX) > 0) { # A partir d'ici, plein de if statement pour eviter d'appliquer les operations sur un tableau vide (possible a chaque etape)
         # On fait une jointure avec openaddress sur base des noms de rue, uniquement du meme cote de la rue
         APPROX_1 <- FULL_GEOCODING_APPROX |>
-          select(phaco_id_adress, num_rue_clean, street_id_phaco, street_detected) |>
+          select(phaco_id_adress, num_rue_clean, street_id_phaco, street_detected, street_detected_utf8) |>
           inner_join(select(openaddress_be, street_id_phaco, house_number_sans_lettre, x_31370, y_31370, cd_sector2024, cd_sector2025),
                      by=c("street_id_phaco")) |>
           distinct() |>
@@ -1092,16 +1046,9 @@ phaco_geocode <- function(data_to_geocode,
                    approx_num = abs(ecart)) |>
             group_by(phaco_id_adress) |>
             mutate(min = min(approx_num)) |>
-            filter(min == approx_num)  # selection plus proche
-
-          # Nous essayons de faire la meme approximation pour une rue donnee
-          # Pour cela, on transforme les caracteres de la rue en codes UFTF8, et on les somme => selon que cette somme est paire/impaire, on choisira en dessous ou au dessus
-          APPROX_1$street_detected_utf8 <- NA
-          for(i in 1:nrow(APPROX_1)){
-            APPROX_1$street_detected_utf8[i] <- sum(utf8ToInt(APPROX_1$street_detected[i]))
-          }
-
-          APPROX_1 <- APPROX_1 |>
+            filter(min == approx_num) |> # selection plus proche
+            # Nous essayons de faire la meme approximation pour une rue donnee
+            # Pour cela, on utilise street_detected_utf8 (= transformation des caracteres de la rue en codes UFTF8, ensuite sommés) => selon que cette somme est paire/impaire, on choisira en dessous ou au dessus
             mutate(
               n_selection = n(),
               selection = case_when(
@@ -1122,7 +1069,7 @@ phaco_geocode <- function(data_to_geocode,
 
           # On selectionne ceux qu'on n'a pas trouve en repartant de FULL_GEOCODING_APPROX avec un anti_join sur APPROX_1
           APPROX_2 <- FULL_GEOCODING_APPROX |>
-            select(phaco_id_adress, num_rue_clean, street_id_phaco, street_detected) |>
+            select(phaco_id_adress, num_rue_clean, street_id_phaco, street_detected, street_detected_utf8) |>
             anti_join(APPROX_1, by= "phaco_id_adress")
 
           if (nrow(APPROX_2) > 0){
@@ -1141,16 +1088,9 @@ phaco_geocode <- function(data_to_geocode,
                      approx_num = abs(ecart)) |>
               group_by(phaco_id_adress) |>
               mutate(min = min(approx_num)) |>
-              filter(min == approx_num)  # selection plus proche
-
-            # Nous essayons de faire la meme approximation pour une rue donnee
-            # Pour cela, on transforme les caracteres de la rue en codes UFTF8, et on les somme => selon que cette somme est paire/impaire, on choisira en dessous ou au dessus
-            APPROX_2$street_detected_utf8 <- NA
-            for(i in 1:nrow(APPROX_2)){
-              APPROX_2$street_detected_utf8[i] <- sum(utf8ToInt(APPROX_2$street_detected[i]))
-            }
-
-            APPROX_2 <- APPROX_2 |>
+              filter(min == approx_num) |> # selection plus proche
+              # Nous essayons de faire la meme approximation pour une rue donnee
+              # Pour cela, on utilise street_detected_utf8 (= transformation des caracteres de la rue en codes UFTF8, ensuite sommés) => selon que cette somme est paire/impaire, on choisira en dessous ou au dessus
               mutate(
                 n_selection = n(),
                 selection = case_when(
@@ -1172,7 +1112,7 @@ phaco_geocode <- function(data_to_geocode,
 
           if (nrow(APPROX_2) == 0){
             APPROX_2 <- APPROX_2 |>
-              select(-street_id_phaco, -street_detected, -num_rue_clean)
+              select(-street_id_phaco, -street_detected, -street_detected_utf8, -num_rue_clean)
           }
 
           # On rassemble les resultats
