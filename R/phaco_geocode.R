@@ -19,10 +19,11 @@
 #' @param lang_encoded Langue utilisée pour encoder les noms de rue. Par défaut: c("FR", "NL", "DE").
 #' @param anonymous Anonymisation des résultats en ajoutant uniquement les informations des entités administratives (secteurs statistiques, quartiers, (sous-)communes, etc.). Dans ce cas, les coordonnées X-Y indiquées sont le centroïde du secteur statistique. De plus, toutes les informations relatives à l'adresse dans les données originales sont supprimées. Par défaut: FALSE.
 #' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
+#' @param parallel TRUE pour activer le calcul multicore pour détecter les rues.
 #'
 #' @import dplyr
 #' @import stringr
-#' @importFrom foreach %dopar%
+#' @importFrom foreach %dopar% %do%
 #'
 #' @export
 #'
@@ -55,7 +56,8 @@ phaco_geocode <- function(data_to_geocode,
                           mid_street = TRUE,
                           lang_encoded = c("FR", "NL", "DE"),
                           anonymous = FALSE,
-                          path_data = NULL){
+                          path_data = NULL,
+                          parallel = FALSE){
 
 
   start_time <- Sys.time()
@@ -729,9 +731,11 @@ phaco_geocode <- function(data_to_geocode,
   # II. GEOCODAGE ===========================================================================================================================
   # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+  cat(paste0("\n","-- G","\u00e9","ocodage"))
+
   ## 0. Parametres/fonctions ----------------------------------------------------------------------------------------------------------------
 
-  # Parametres pour la parallelisation
+  # Parametres pour la parallelisation => pour foreach (optionnel) mais aussi stringdist (parallelisation toujours activee)
   chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
   if (nzchar(chk) && chk == "TRUE") {
     n.cores <- 2L # limite le nombre de coeurs a 2 pour les tests sur CRAN https://stackoverflow.com/questions/50571325/r-cran-check-fail-when-using-parallel-functions
@@ -743,16 +747,18 @@ phaco_geocode <- function(data_to_geocode,
     }
   }
 
-  cat(paste0("\n","-- G","\u00e9","ocodage"))
-  cat(paste0("\n","\u29D7"," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur"))
+  if(parallel){
+    cat(paste0("\n","\u29D7"," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur"))
 
-  my.cluster <- parallel::makeCluster(
-    n.cores,
-    type = "PSOCK")
-  doParallel::registerDoParallel(cl = my.cluster)
-  foreach::getDoParRegistered()
+    my.cluster <- parallel::makeCluster(
+      n.cores,
+      type = "PSOCK")
+    doParallel::registerDoParallel(cl = my.cluster)
+    foreach::getDoParRegistered()
 
-  cat(paste0("\r",colourise("\u2714", fg="green")," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur"))
+    cat(paste0("\r",colourise("\u2714", fg="green")," Param","\u00e9","trage pour utiliser ", n.cores, " coeurs de l'ordinateur"))
+  }
+  `%phacochr_do%` = ifelse(parallel, `%dopar%`, `%do%`)
 
 
   ## 1.  Jointure des rues  -----------------------------------------------------------------------------------------------------------------
@@ -819,7 +825,7 @@ phaco_geocode <- function(data_to_geocode,
   res <- tibble()
   res <- foreach::foreach(i = unique(data_to_geocode_inexact$code_postal_to_geocode),
                           .combine = 'bind_rows',
-                          .packages=c("dplyr","fuzzystring"))  %dopar% {
+                          .packages=c("dplyr","fuzzystring"))  %phacochr_do% {
 
                             data_to_geocode_inexact_i <- data_to_geocode_inexact |>
                               filter(code_postal_to_geocode == i)
@@ -832,8 +838,7 @@ phaco_geocode <- function(data_to_geocode,
                               by = c("address_join" = "address_join_street"),
                               method = method_stringdist,
                               max_dist = error_max,
-                              distance_col = "dist_fuzzy",
-                              nthread = n.cores
+                              distance_col = "dist_fuzzy"
                             )
                           }
 
@@ -901,7 +906,7 @@ phaco_geocode <- function(data_to_geocode,
       res_adj <- tibble()
       res_adj <- foreach::foreach(i = unique(ADDRESS_last_tentative$`Refnis code`),
                                   .combine = 'bind_rows',
-                                  .packages=c("dplyr","fuzzystring"))  %dopar% {
+                                  .packages=c("dplyr","fuzzystring"))  %phacochr_do% {
 
                                     # On calcule un vecteur reprenant les communes adjacentes par commune i
                                     com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == i]
@@ -1335,7 +1340,7 @@ phaco_geocode <- function(data_to_geocode,
   result$summary$`Approx.(n)`[is.na(result$summary$`Approx.(n)`)] <- 0
 
   # On stoppe la parallelisation
-  parallel::stopCluster(cl = my.cluster)
+  if(parallel) parallel::stopCluster(cl = my.cluster)
 
   cat(paste0("\r",colourise("\u2714", fg="green")," Cr","\u00e9","ation du fichier final et formatage des tables de v","\u00e9","rification"))
   cat(paste0("\n",colourise("\u2714", fg="green")," G","\u00e9","ocodage termin","\u00e9"))

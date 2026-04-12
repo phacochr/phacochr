@@ -21,7 +21,8 @@ phaco_geocode(
   mid_street = TRUE,
   lang_encoded = c("FR", "NL", "DE"),
   anonymous = FALSE,
-  path_data = NULL
+  path_data = NULL,
+  parallel = FALSE
 )
 }
 \arguments{
@@ -58,6 +59,8 @@ phaco_geocode(
 \item{anonymous}{Anonymisation des résultats en ajoutant uniquement les informations des entités administratives (secteurs statistiques, quartiers, (sous-)communes, etc.). Dans ce cas, les coordonnées X-Y indiquées sont le centroïde du secteur statistique. De plus, toutes les informations relatives à l'adresse dans les données originales sont supprimées. Par défaut: FALSE.}
 
 \item{path_data}{Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.}
+
+\item{parallel}{TRUE pour activer le calcul multicore pour détecter les rues.}
 }
 \description{
 Cette fonction est la principale du package phacochr. A partir d’une liste d’adresses, elle permet de retrouver leurs coordonnees X-Y.
