@@ -777,11 +777,14 @@ phaco_geocode <- function(data_to_geocode,
   ### ii. Boucle de jointure par commune ----------------------------------------------------------------------------------------------------
 
 
-  # data_to_geocode_id <- data_to_geocode |>
-  #   select(phaco_id_adress, rue_recoded, code_postal_to_geocode)
-  #
-  # data_to_geocode <- data_to_geocode |>
-  #   distinct(rue_recoded, code_postal_to_geocode, .keep_all = TRUE)
+  data_to_geocode_agreg <- data_to_geocode |>
+    distinct(address_join, code_postal_to_geocode) |>
+    mutate(phaco_id_adress_agreg = row_number())
+
+  data_to_geocode_id <- data_to_geocode |>
+    left_join(data_to_geocode_agreg, by = c("address_join", "code_postal_to_geocode"))
+
+  data_to_geocode <- data_to_geocode_agreg
 
 
   #### Matching exact -----------------------------------------------------------------------------------------------------------------------
@@ -795,14 +798,14 @@ phaco_geocode <- function(data_to_geocode,
     mutate(dist_fuzzy = 0)
 
   # /!\ NOTE : Securite pour eviter les dupliques
-  if(sum(duplicated(res_exact$phaco_id_adress)) > 0){
+  if(sum(duplicated(res_exact$phaco_id_adress_agreg)) > 0){
     res_exact <- res_exact |>
-      distinct(phaco_id_adress, .keep_all = TRUE)
+      distinct(phaco_id_adress_agreg, .keep_all = TRUE)
   }
 
   # On stocke les adresses dont la rue est pas detectee dans un autre objet data_to_geocode_inexact
   data_to_geocode_inexact <- data_to_geocode |>
-    filter(phaco_id_adress %ni% unique(res_exact$phaco_id_adress))
+    filter(phaco_id_adress_agreg %ni% unique(res_exact$phaco_id_adress_agreg))
 
   cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","tection des rues (matching exact)", "\033[K"))
 
@@ -838,37 +841,30 @@ phaco_geocode <- function(data_to_geocode,
 
   # On ne retient que l'adresse detectee avec la distance minimale
   res <- res |>
-    group_by(phaco_id_adress) |>
+    group_by(phaco_id_adress_agreg) |>
     mutate(min = min(dist_fuzzy)) |>
     filter(dist_fuzzy == min | is.na(dist_fuzzy)) |>
     select(-min, -postal_id)
 
   # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
-  # Si ca ne se lance pas, on supprime les cles de jointure dont on n'a plus besoin
-  if(sum(duplicated(res$phaco_id_adress)) == 0){
-    res <- res |>
-      select(-address_join, -address_join_street)
-  }
-
-  if(sum(duplicated(res$phaco_id_adress)) > 0){
+  if(sum(duplicated(res$phaco_id_adress_agreg)) > 0){
 
     cat(paste0("\n","\u29D7"," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
 
     res <- res |>
       mutate(distance_jw = stringdist::stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) |>  # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
-      group_by(phaco_id_adress) |>
+      group_by(phaco_id_adress_agreg) |>
       mutate(min_jw = min(distance_jw)) |>
       filter(distance_jw == min_jw | is.na(distance_jw)) |>
       # Au cas ou il reste ENCORE des doublons : on classe par ordre alphabetique et on selectionne le 1er (arrive uniquement lorsque la tolerance est elevee)
       arrange(street_detected) |>
       slice_head() |>
-      select(-min_jw, -distance_jw, -address_join, -address_join_street)
+      select(-min_jw, -distance_jw)
 
     cat(paste0("\r",colourise("\u2714", fg="green")," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
   }
 
   res <- res |>
-    relocate(street_detected, .after = recode) |>
     mutate(type_geocoding = NA,
            type_geocoding = as.character(type_geocoding)) # pour compatibilite avec res_adj si res = NA
 
@@ -883,8 +879,7 @@ phaco_geocode <- function(data_to_geocode,
     # On ne retient que les adresses dont les rues n'ont pas ete detectees
     ADDRESS_last_tentative <- res |>
       filter(is.na(dist_fuzzy)) |>
-      mutate(address_join = str_to_lower(str_trim(rue_recoded))) |>
-      select(-street_detected, -street_id_phaco, -langue_detected, -street_detected_utf8, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy,
+      select(-address_join_street, -street_detected, -street_id_phaco, -langue_detected, -street_detected_utf8, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy,
              -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector2024)
 
     if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
@@ -931,43 +926,36 @@ phaco_geocode <- function(data_to_geocode,
       if(nrow(res_adj) > 0){
         # On ne retient que l'adresse detectee avec la distance minimale
         res_adj <- res_adj |>
-          group_by(phaco_id_adress) |>
+          group_by(phaco_id_adress_agreg) |>
           mutate(min = min(dist_fuzzy)) |>
           filter(dist_fuzzy == min | is.na(dist_fuzzy)) |>
           select(-min)
 
         # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
-        # Si ca ne se lance pas, on supprime les cles de jointure dont on n'a plus besoin
-        if(sum(duplicated(res_adj$phaco_id_adress)) == 0){
-          res_adj <- res_adj |>
-            select(-address_join, -address_join_street)
-        }
-
-        if(sum(duplicated(res_adj$phaco_id_adress)) > 0){
+        if(sum(duplicated(res_adj$phaco_id_adress_agreg)) > 0){
           res_adj <- res_adj |>
             mutate(distance_jw = stringdist::stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) |>  # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
-            group_by(phaco_id_adress) |>
+            group_by(phaco_id_adress_agreg) |>
             mutate(min_jw = min(distance_jw)) |>
             filter(distance_jw == min_jw | is.na(distance_jw)) |>
             # Au cas ou il reste ENCORE des doublons : on classe par ordre alphabetique et on selectionne le 1er (arrive uniquement lorsque la tolerance est elevee)
             arrange(street_detected) |>
             slice_head() |>
-            select(-min_jw, -distance_jw, -address_join, -address_join_street)
+            select(-min_jw, -distance_jw)
         }
 
         res_adj <- res_adj |>
-          relocate(street_detected, .after = recode) |>
           mutate(type_geocoding = "elargissement_adj") |>
           filter(!is.na(dist_fuzzy)) |>
           mutate(code_postal_to_geocode = postal_id) |>
           select(-postal_id)
 
-        # On liste les phaco_id_adress geocodes dans cette nouvelle procedure
-        ADDRESS_last_tentative_vector <- unique(res_adj$phaco_id_adress)
+        # On liste les phaco_id_adress_agreg geocodes dans cette nouvelle procedure
+        ADDRESS_last_tentative_vector <- unique(res_adj$phaco_id_adress_agreg)
 
         # Et on les ajoute a res (prelablement deleste des adresses prealablement non trouvees mais desormais trouvees !)
         res <- res |>
-          filter(phaco_id_adress %ni% ADDRESS_last_tentative_vector) |>
+          filter(phaco_id_adress_agreg %ni% ADDRESS_last_tentative_vector) |>
           bind_rows(res_adj)
       }
     }
@@ -977,11 +965,14 @@ phaco_geocode <- function(data_to_geocode,
 
   # On remet les rues detectee avec le matching exact
   res <- res |>
-    bind_rows(res_exact)
+    bind_rows(res_exact) |>
+    # on supprime les cles de jointure dont on n'a plus besoin
+    select(-any_of(c("address_join", "address_join_street")))
 
-  # res <- data_to_geocode_id |>
-  #   left_join(res |> select(-phaco_id_adress), by = c("code_postal_to_geocode", "rue_recoded"))
-  # print(nrow(res))
+  res <- data_to_geocode_id |>
+    left_join(res |> select(-code_postal_to_geocode), by = "phaco_id_adress_agreg") |>
+    relocate(street_detected, .after = recode)
+
 
   ## 2. Jointure des adresses --------------------------------------------------------------------------------------------------------------
 
@@ -991,9 +982,9 @@ phaco_geocode <- function(data_to_geocode,
 
     cat(paste0("\n","\u29D7"," Chargement du fichier openaddress"))
 
-    # Ici on cree une liste des adresses en n'important que les arrondissements detectes dans data_to_geocode
+    # Ici on cree une liste des adresses en n'important que les arrondissements detectes dans res
     openaddress_be <- paste0(path_data,"BeST/PREPROCESSED/data_arrond_PREPROCESSED_",
-                             unique(data_to_geocode$arrond[!is.na(data_to_geocode$arrond)]),
+                             unique(res$arrond[!is.na(res$arrond)]),
                              ".rds") |>
       purrr::map_dfr(readRDS) |>
       mutate(across(everything(), as.character)) |>
@@ -1176,7 +1167,7 @@ phaco_geocode <- function(data_to_geocode,
   ## 1. Jointure ----------------------------------------------------------------------------------------------------------------------------
 
   # Il manque potentiellement des lignes par rapport a la BD originale, car pas de code postal, ou qui ne matchent pas avec les donnees BeST => on les recupere par un antijoin(), et les ajoute
-  MISSING <- data_to_geocode |>
+  MISSING <- data_to_geocode_id |>
     anti_join(FULL_GEOCODING, by = "phaco_id_adress") |>
     select(-address_join)
 
@@ -1241,7 +1232,7 @@ phaco_geocode <- function(data_to_geocode,
               "Dupliques" = sum(duplicated(phaco_id_adress)))
 
   Summary_original <- tibble(Region = "Total (original)",
-                             "n" = nrow(data_to_geocode),
+                             "n" = nrow(FULL_GEOCODING),
                              "Valid rue(%)" = NA,
                              "Rue detect.(%valid)" = NA,
                              "stringdist (moy)" = NA,
@@ -1256,7 +1247,7 @@ phaco_geocode <- function(data_to_geocode,
                              "Rue NL" = NA,
                              "Rue DE" = NA,
                              "Coord non valides" = NA,
-                             "Dupliques" = sum(duplicated(data_to_geocode$phaco_id_adress)))
+                             "Dupliques" = sum(duplicated(FULL_GEOCODING$phaco_id_adress)))
 
 
   Summary_full <- bind_rows(Summary_original, Summary_region) |>
