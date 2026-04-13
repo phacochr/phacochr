@@ -1,8 +1,8 @@
 Package: phacochr
 Title: Geocoder for Belgium - Geocodeur pour la Belgique
-Version: 0.9.2
+Version: 1.0
 Authors@R: c(
-    person("Joel", "Gires", , "jgires@ccc.brussels", role = c("aut", "cre")),
+    person("Joel", "Gires", , "joel.gires@vivalis.brussels", role = c("aut", "cre")),
     person("Hugo", "Perilleux", , "hugo.perilleux@ulb.be", role = "aut")
   )
 Description: From a list of addresses, it allows the finding of the X-Y
