@@ -252,7 +252,7 @@ phaco_geocode <- function(data_to_geocode,
     relocate(phaco_id_adress)
 
 
-  # On sauvegarde la BDD a geocoder avant les operations => sera joint à la fin pour recuperer les donnees
+  # /!\ ETAPE IMPORTANTE : On sauvegarde la BDD a geocoder avant les operations => sera joint à la fin pour recuperer les donnees
   data_rest_to_join <- data_to_geocode
 
 
@@ -323,7 +323,7 @@ phaco_geocode <- function(data_to_geocode,
   }
 
 
-  # On ne garde que les colonnes necessaires dans data_to_geocode
+  # /!\ ETAPE IMPORTANTE : On ne garde que les colonnes necessaires dans data_to_geocode
   data_to_geocode <- data_to_geocode |>
     # dans un any_of() au cas ou num_rue_to_geocode n'existe pas
     select(any_of(c("phaco_id_adress", "rue_to_geocode", "num_rue_to_geocode", "code_postal_to_geocode")))
@@ -782,14 +782,18 @@ phaco_geocode <- function(data_to_geocode,
 
   ### ii. Boucle de jointure par commune ----------------------------------------------------------------------------------------------------
 
-
+  # On agrege les donnees par address_join pour eviter de faire le matching plusieurs x pour une même rue
+  # On cree un ID pour la jointure apres
   data_to_geocode_agreg <- data_to_geocode |>
     distinct(address_join, code_postal_to_geocode) |>
     mutate(phaco_id_adress_agreg = row_number())
 
+  # On sauvegarde la BDD non agregee, a laquelle on joindra le resultat du matching apres
+  # Pour ce faire, on lui joint l'id des donnees agregees
   data_to_geocode_id <- data_to_geocode |>
     left_join(data_to_geocode_agreg, by = c("address_join", "code_postal_to_geocode"))
 
+  # On travaille dans la suite sur les donnees agregees
   data_to_geocode <- data_to_geocode_agreg
 
 
@@ -818,164 +822,175 @@ phaco_geocode <- function(data_to_geocode,
 
   #### Matching inexact ---------------------------------------------------------------------------------------------------------------------
 
-  cat(paste0("\n","\u29D7"," D","\u00e9","tection des rues (matching inexact avec fuzzystring)"))
+  # Un if statement car possible que le matching exact ait deja trouve toutes les rues
+  if(nrow(data_to_geocode_inexact) > 0){
 
-  # /!\ NOTE : la cle de jointure est en minuscule (d'ou les str_to_lower() avant), car stringdist identifie la diff de case comme une diff !
-  # /!\ NOTE2 : la jointure cree les colonnes de postal_street, meme si 0 match ! Important pour la suite, notamment le if statement pour la creation de l'objet sf
-  res <- tibble()
-  res <- foreach::foreach(i = unique(data_to_geocode_inexact$code_postal_to_geocode),
-                          .combine = 'bind_rows',
-                          .packages=c("dplyr","fuzzystring"))  %phacochr_do% {
+    cat(paste0("\n","\u29D7"," D","\u00e9","tection des rues (matching inexact avec fuzzystring)"))
 
-                            data_to_geocode_inexact_i <- data_to_geocode_inexact |>
-                              filter(code_postal_to_geocode == i)
+    # /!\ NOTE : la cle de jointure est en minuscule (d'ou les str_to_lower() avant), car stringdist identifie la diff de case comme une diff !
+    # /!\ NOTE2 : la jointure cree les colonnes de postal_street, meme si 0 match ! Important pour la suite, notamment le if statement pour la creation de l'objet sf
+    res <- foreach::foreach(i = unique(data_to_geocode_inexact$code_postal_to_geocode),
+                            .combine = 'bind_rows',
+                            .packages=c("dplyr","fuzzystring"))  %phacochr_do% {
 
-                            postal_street_i <- postal_street |>
-                              filter(postal_id == i)
+                              data_to_geocode_inexact_i <- data_to_geocode_inexact |>
+                                filter(code_postal_to_geocode == i)
 
-                            fuzzystring::fuzzystring_left_join(data_to_geocode_inexact_i,
-                              postal_street_i,
-                              by = c("address_join" = "address_join_street"),
-                              method = method_stringdist,
-                              max_dist = error_max,
-                              distance_col = "dist_fuzzy"
-                            )
-                          }
+                              postal_street_i <- postal_street |>
+                                filter(postal_id == i)
 
-  cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","tection des rues (matching inexact avec fuzzystring)", "\033[K"))
+                              fuzzystring::fuzzystring_left_join(data_to_geocode_inexact_i,
+                                postal_street_i,
+                                by = c("address_join" = "address_join_street"),
+                                method = method_stringdist,
+                                max_dist = error_max,
+                                distance_col = "dist_fuzzy"
+                              )
+                            }
 
-  # On ne retient que l'adresse detectee avec la distance minimale
-  res <- res |>
-    group_by(phaco_id_adress_agreg) |>
-    mutate(min = min(dist_fuzzy)) |>
-    filter(dist_fuzzy == min | is.na(dist_fuzzy)) |>
-    select(-min, -postal_id)
+    cat(paste0("\r",colourise("\u2714", fg="green")," D","\u00e9","tection des rues (matching inexact avec fuzzystring)", "\033[K"))
 
-  # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
-  if(sum(duplicated(res$phaco_id_adress_agreg)) > 0){
-
-    cat(paste0("\n","\u29D7"," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
-
+    # On ne retient que l'adresse detectee avec la distance minimale
     res <- res |>
-      mutate(distance_jw = stringdist::stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) |>  # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
       group_by(phaco_id_adress_agreg) |>
-      mutate(min_jw = min(distance_jw)) |>
-      filter(distance_jw == min_jw | is.na(distance_jw)) |>
-      # Au cas ou il reste ENCORE des doublons : on classe par ordre alphabetique et on selectionne le 1er (arrive uniquement lorsque la tolerance est elevee)
-      arrange(street_detected) |>
-      slice_head() |>
-      select(-min_jw, -distance_jw)
+      mutate(min = min(dist_fuzzy)) |>
+      filter(dist_fuzzy == min | is.na(dist_fuzzy)) |>
+      select(-min, -postal_id)
 
-    cat(paste0("\r",colourise("\u2714", fg="green")," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
-  }
+    # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
+    if(sum(duplicated(res$phaco_id_adress_agreg)) > 0){
 
-  res <- res |>
-    mutate(type_geocoding = NA,
-           type_geocoding = as.character(type_geocoding)) # pour compatibilite avec res_adj si res = NA
+      cat(paste0("\n","\u29D7"," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
 
+      res <- res |>
+        mutate(distance_jw = stringdist::stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) |>  # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
+        group_by(phaco_id_adress_agreg) |>
+        mutate(min_jw = min(distance_jw)) |>
+        filter(distance_jw == min_jw | is.na(distance_jw)) |>
+        # Au cas ou il reste ENCORE des doublons : on classe par ordre alphabetique et on selectionne le 1er (arrive uniquement lorsque la tolerance est elevee)
+        arrange(street_detected) |>
+        slice_head() |>
+        select(-min_jw, -distance_jw)
 
-  ### iii. Elargissement de la boucle aux communes adjacentes -------------------------------------------------------------------------------
-  # On supprime la contrainte de recherche de la rue dans la commune, pour augmenter le % de rues detectees
-
-  if (elargissement_com_adj == TRUE) {
-
-    cat(paste0("\n","\u29D7"," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes"))
-
-    # On ne retient que les adresses dont les rues n'ont pas ete detectees
-    ADDRESS_last_tentative <- res |>
-      filter(is.na(dist_fuzzy)) |>
-      select(-address_join_street, -street_detected, -street_id_phaco, -langue_detected, -street_detected_utf8, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy,
-             -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector2024)
-
-    if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
-
-      # On charge la table de conversion code postal > code INS recode (voir preprocessing)
-      table_INS_recod_code_postal <- readRDS(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.rds")) |>
-        mutate(across(everything(), as.character))
-
-      # On ajoute ce code INS recode 1) aux rues et 2) aux adresses non trouvees
-      postal_street_adj <- postal_street |>
-        left_join(table_INS_recod_code_postal, by = c("postal_id" = "code_postal"))
-      ADDRESS_last_tentative <- ADDRESS_last_tentative |>
-        left_join(table_INS_recod_code_postal, by = c("code_postal_to_geocode" = "code_postal"))
-
-      # On charge la table des communes (= code INS recodes) adjacentes par commune (voir preprocessing)
-      table_commune_adjacentes <- readRDS(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.rds"))|>
-        mutate(across(everything(), as.character))
-
-      res_adj <- tibble()
-      res_adj <- foreach::foreach(i = unique(ADDRESS_last_tentative$`Refnis code`),
-                                  .combine = 'bind_rows',
-                                  .packages=c("dplyr","fuzzystring"))  %phacochr_do% {
-
-                                    # On calcule un vecteur reprenant les communes adjacentes par commune i
-                                    com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == i]
-
-                                    ADDRESS_last_tentative_i <- ADDRESS_last_tentative |>
-                                      filter(`Refnis code` %in% i) |>
-                                      select(-`Refnis code`)
-
-                                    postal_street_adj_i <- postal_street_adj |>
-                                      filter(`Refnis code` %in% c(i, com_adj_i)) |>  # On inclut i dans c(i, com_adj_i) car le code postal est plus petit que i
-                                      select(-`Refnis code`)
-
-                                    fuzzystring::fuzzystring_left_join(ADDRESS_last_tentative_i,
-                                                         postal_street_adj_i,
-                                                         by = c("address_join" = "address_join_street"),
-                                                         method = method_stringdist,
-                                                         max_dist = error_max_adj,
-                                                         distance_col = "dist_fuzzy")
-                                  }
-
-      # Ce if statement car res_adj peut avoir 0 observations => NOTE : elucider pourquoi ? Pourquoi ca n'arrive pas avec "res" (boucle precedente) ?
-      if(nrow(res_adj) > 0){
-        # On ne retient que l'adresse detectee avec la distance minimale
-        res_adj <- res_adj |>
-          group_by(phaco_id_adress_agreg) |>
-          mutate(min = min(dist_fuzzy)) |>
-          filter(dist_fuzzy == min | is.na(dist_fuzzy)) |>
-          select(-min)
-
-        # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
-        if(sum(duplicated(res_adj$phaco_id_adress_agreg)) > 0){
-          res_adj <- res_adj |>
-            mutate(distance_jw = stringdist::stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) |>  # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
-            group_by(phaco_id_adress_agreg) |>
-            mutate(min_jw = min(distance_jw)) |>
-            filter(distance_jw == min_jw | is.na(distance_jw)) |>
-            # Au cas ou il reste ENCORE des doublons : on classe par ordre alphabetique et on selectionne le 1er (arrive uniquement lorsque la tolerance est elevee)
-            arrange(street_detected) |>
-            slice_head() |>
-            select(-min_jw, -distance_jw)
-        }
-
-        res_adj <- res_adj |>
-          mutate(type_geocoding = "elargissement_adj") |>
-          filter(!is.na(dist_fuzzy)) |>
-          mutate(code_postal_to_geocode = postal_id) |>
-          select(-postal_id)
-
-        # On liste les phaco_id_adress_agreg geocodes dans cette nouvelle procedure
-        ADDRESS_last_tentative_vector <- unique(res_adj$phaco_id_adress_agreg)
-
-        # Et on les ajoute a res (prelablement deleste des adresses prealablement non trouvees mais desormais trouvees !)
-        res <- res |>
-          filter(phaco_id_adress_agreg %ni% ADDRESS_last_tentative_vector) |>
-          bind_rows(res_adj)
-      }
+      cat(paste0("\r",colourise("\u2714", fg="green")," Ex-aequos : calcul de la distance Jaro-Winkler pour d","\u00e9","partager"))
     }
 
-    cat(paste0("\r",colourise("\u2714", fg="green")," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes"))
+    res <- res |>
+      mutate(type_geocoding = NA,
+             type_geocoding = as.character(type_geocoding)) # pour compatibilite avec res_adj si res = NA
+
+
+    ### iii. Elargissement de la boucle aux communes adjacentes -------------------------------------------------------------------------------
+    # On supprime la contrainte de recherche de la rue dans la commune, pour augmenter le % de rues detectees
+
+    if (elargissement_com_adj == TRUE) {
+
+      cat(paste0("\n","\u29D7"," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes"))
+
+      # On ne retient que les adresses dont les rues n'ont pas ete detectees
+      ADDRESS_last_tentative <- res |>
+        filter(is.na(dist_fuzzy)) |>
+        select(-address_join_street, -street_detected, -street_id_phaco, -langue_detected, -street_detected_utf8, -nom_propre_abv, -ancien_nom_rue, -dist_fuzzy,
+               -mid_num, -mid_x_31370, -mid_y_31370, -mid_cd_sector2024)
+
+      if (nrow(ADDRESS_last_tentative) > 0){ # Un if au cas ou toutes les adresses auraient ete trouvees (alors il ne faut pas lancer la partie entre crochets)
+
+        # On charge la table de conversion code postal > code INS recode (voir preprocessing)
+        table_INS_recod_code_postal <- readRDS(paste0(path_data,"BeST/PREPROCESSED/table_INS_recod_code_postal.rds")) |>
+          mutate(across(everything(), as.character))
+
+        # On ajoute ce code INS recode 1) aux rues et 2) aux adresses non trouvees
+        postal_street_adj <- postal_street |>
+          left_join(table_INS_recod_code_postal, by = c("postal_id" = "code_postal"))
+        ADDRESS_last_tentative <- ADDRESS_last_tentative |>
+          left_join(table_INS_recod_code_postal, by = c("code_postal_to_geocode" = "code_postal"))
+
+        # On charge la table des communes (= code INS recodes) adjacentes par commune (voir preprocessing)
+        table_commune_adjacentes <- readRDS(paste0(path_data,"BeST/PREPROCESSED/table_commune_adjacentes.rds"))|>
+          mutate(across(everything(), as.character))
+
+        res_adj <- tibble()
+        res_adj <- foreach::foreach(i = unique(ADDRESS_last_tentative$`Refnis code`),
+                                    .combine = 'bind_rows',
+                                    .packages=c("dplyr","fuzzystring"))  %phacochr_do% {
+
+                                      # On calcule un vecteur reprenant les communes adjacentes par commune i
+                                      com_adj_i <- table_commune_adjacentes$cd_munty_refnis_voisin[table_commune_adjacentes$cd_munty_refnis == i]
+
+                                      ADDRESS_last_tentative_i <- ADDRESS_last_tentative |>
+                                        filter(`Refnis code` %in% i) |>
+                                        select(-`Refnis code`)
+
+                                      postal_street_adj_i <- postal_street_adj |>
+                                        filter(`Refnis code` %in% c(i, com_adj_i)) |>  # On inclut i dans c(i, com_adj_i) car le code postal est plus petit que i
+                                        select(-`Refnis code`)
+
+                                      fuzzystring::fuzzystring_left_join(ADDRESS_last_tentative_i,
+                                                           postal_street_adj_i,
+                                                           by = c("address_join" = "address_join_street"),
+                                                           method = method_stringdist,
+                                                           max_dist = error_max_adj,
+                                                           distance_col = "dist_fuzzy")
+                                    }
+
+        # Ce if statement car res_adj peut avoir 0 observations => NOTE : elucider pourquoi ? Pourquoi ca n'arrive pas avec "res" (boucle precedente) ?
+        if(nrow(res_adj) > 0){
+          # On ne retient que l'adresse detectee avec la distance minimale
+          res_adj <- res_adj |>
+            group_by(phaco_id_adress_agreg) |>
+            mutate(min = min(dist_fuzzy)) |>
+            filter(dist_fuzzy == min | is.na(dist_fuzzy)) |>
+            select(-min)
+
+          # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler dans un if statement + au cas ou il reste ENCORE des doublons : tirage aleatoire (arrive uniquement lorsque la tolerance est elevee)
+          if(sum(duplicated(res_adj$phaco_id_adress_agreg)) > 0){
+            res_adj <- res_adj |>
+              mutate(distance_jw = stringdist::stringdist(address_join, address_join_street, method = "jw", p=0.1, nthread= n.cores)) |>  # Au cas ou il reste des doublons : nouveau calcul de distance Jaro-Winkler
+              group_by(phaco_id_adress_agreg) |>
+              mutate(min_jw = min(distance_jw)) |>
+              filter(distance_jw == min_jw | is.na(distance_jw)) |>
+              # Au cas ou il reste ENCORE des doublons : on classe par ordre alphabetique et on selectionne le 1er (arrive uniquement lorsque la tolerance est elevee)
+              arrange(street_detected) |>
+              slice_head() |>
+              select(-min_jw, -distance_jw)
+          }
+
+          res_adj <- res_adj |>
+            mutate(type_geocoding = "elargissement_adj") |>
+            filter(!is.na(dist_fuzzy)) |>
+            mutate(code_postal_to_geocode = postal_id) |>
+            select(-postal_id)
+
+          # On liste les phaco_id_adress_agreg geocodes dans cette nouvelle procedure
+          ADDRESS_last_tentative_vector <- unique(res_adj$phaco_id_adress_agreg)
+
+          # Et on les ajoute a res (prelablement deleste des adresses prealablement non trouvees mais desormais trouvees !)
+          res <- res |>
+            filter(phaco_id_adress_agreg %ni% ADDRESS_last_tentative_vector) |>
+            bind_rows(res_adj)
+        }
+      }
+
+      cat(paste0("\r",colourise("\u2714", fg="green")," \u00c9","largissement pour les rues non trouv","\u00e9","es aux communes adjacentes"))
+    }
   }
 
-  # On remet les rues detectee avec le matching exact
+  # S'il n'y a pas eu de matching inexact, car pour la suite il faut un objet res avec la colonne type_geocoding
+  if(nrow(data_to_geocode_inexact) == 0){
+    res <- tibble() |>
+      mutate(type_geocoding = NA)
+    }
+
+  # On remet les rues detectee avec le matching exact dans res
   res <- res |>
     bind_rows(res_exact) |>
     # on supprime les cles de jointure dont on n'a plus besoin
     select(-any_of(c("address_join", "address_join_street")))
 
+  # On 'desagrege' les donnees en joignant res à data_to_geocode_id
   res <- data_to_geocode_id |>
     left_join(res |> select(-code_postal_to_geocode), by = "phaco_id_adress_agreg") |>
+    select(-phaco_id_adress_agreg) |>
     relocate(street_detected, .after = recode)
 
 
@@ -1172,6 +1187,7 @@ phaco_geocode <- function(data_to_geocode,
   ## 1. Jointure ----------------------------------------------------------------------------------------------------------------------------
 
   # Il manque potentiellement des lignes par rapport a la BD originale, car pas de code postal, ou qui ne matchent pas avec les donnees BeST => on les recupere par un antijoin(), et les ajoute
+  # @@@@@ NOTE : POSSIBLE QUE CA NE SERVE PLUS A RIEN DEPUIS L'AGREGATION => INVESTIGUER !!! @@@@@
   MISSING <- data_to_geocode_id |>
     anti_join(FULL_GEOCODING, by = "phaco_id_adress") |>
     select(-address_join)
@@ -1180,18 +1196,10 @@ phaco_geocode <- function(data_to_geocode,
     bind_rows(MISSING) |>
     arrange(phaco_id_adress)
 
-  # On enleve address_join_geocoding dans un if statement car la colonne n'existe pas pour les situations sans numeros
-  if (situation != "no_num_rue_postal_s" & situation != "no_num_rue_postal_i") {
-    FULL_GEOCODING <- FULL_GEOCODING |>
-      select(-address_join_geocoding)
-  }
-
-  # J'enleve num_rue_to_geocode : pas besoin dans l'objet final
-  # Utilisation d'un if statement car la colonne n'est parfois pas creee
-  if("num_rue_to_geocode" %in% colnames(FULL_GEOCODING)) {
-    FULL_GEOCODING <- FULL_GEOCODING |>
-      select(-num_rue_to_geocode)
-  }
+  # On enleve les colonnes dont on n'a pas besoin dans l'objet final
+  # Utilisation d'un any_of car les colonnes ne sont pas toutes forcement creees
+  FULL_GEOCODING <- FULL_GEOCODING |>
+    select(-any_of(c("address_join_geocoding", "num_rue_to_geocode", "street_detected_utf8")))
 
   # On remet les bons noms de rue (ils sont abreges dans le cas des noms propres abreges, et on indique les nouvelles rues pour les anciennes)
   postal_street_join <- postal_street |>
@@ -1237,7 +1245,7 @@ phaco_geocode <- function(data_to_geocode,
               "Dupliques" = sum(duplicated(phaco_id_adress)))
 
   Summary_original <- tibble(Region = "Total (original)",
-                             "n" = nrow(FULL_GEOCODING),
+                             "n" = nrow(data_to_geocode_id),
                              "Valid rue(%)" = NA,
                              "Rue detect.(%valid)" = NA,
                              "stringdist (moy)" = NA,
@@ -1252,7 +1260,7 @@ phaco_geocode <- function(data_to_geocode,
                              "Rue NL" = NA,
                              "Rue DE" = NA,
                              "Coord non valides" = NA,
-                             "Dupliques" = sum(duplicated(FULL_GEOCODING$phaco_id_adress)))
+                             "Dupliques" = sum(duplicated(data_to_geocode_id$phaco_id_adress)))
 
 
   Summary_full <- bind_rows(Summary_original, Summary_region) |>
