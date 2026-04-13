@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## Géocodage au secteur statistique
 
-`phacochr` a d'abord été pensé pour fonctionner en local : il devait donc être léger, rapide et portable. Cette spécificité permet notamment de géocoder des données sensibles qui ne peuvent pas être envoyées sur un serveur via une API de géocodage. Des options supplémentaires ont de ce fait été intégrées afin d'anonymiser les données qui lui sont passées. Nous en montrons un exemple sur cette page.
+`phacochr` a d'abord été pensé pour fonctionner en local : il doit donc être léger, rapide et portable. Cette spécificité permet notamment de géocoder des données sensibles qui ne peuvent pas être envoyées sur un serveur via une API de géocodage. Des options supplémentaires ont de ce fait été intégrées afin d'anonymiser les données qui lui sont passées. Nous en montrons un exemple sur cette page.
 
 Partons des [données d'exemples `snacks`](https://phacochr.github.io/phacochr/reference/snacks.html) contenues dans `phacochr`, et imaginons que nous voulons produire une information spatiale un tant soi peu précise à partir de ces données, mais en ne donnant pas d'indication de l'adresse. La fonction `phaco_geocode()` doit alors prendre l'argument `anonymous = TRUE` (par défaut réglé sur `FALSE`):
 

@@ -14,11 +14,17 @@ knitr::opts_chunk$set(
 )
 ```
 
+::: {style="border:0px; background-color:#f7a0b9; padding: 10px; margin-bottom: 10px"}
+**Page plus à jour !**
+
+Cette page n'est plus à jour depuis la nouvelle version de `phacochr 1.0`. Elle sera réécrite dans un avenir proche.
+:::
+
 ## Performances
 
 Nous présentons ici quelques mesures des performances de `phacochr`. Nous avons réalisé des tests sur 18 bases de données réelles fournies par des collègues (merci à elles et eux).
 
-La vitesse d'exécution par adresse suit une fonction inverse (1/x). `phacochr` est bien meilleur avec un nombre conséquent d'adresses. Ceci vient entre autre du fait qu'il doit charger des données volumineuses avant de réaliser les traitements : le "coût" marginal en temps de ce chargement est d'autant plus faible que les données sont nombreuses à géocoder. A partir de 2000 adresses, la vitesse d'exécution se situe entre 0,4 et 0,8 secondes / 100 adresses sur un PC de puissance moyenne. A titre d'exemple, sur ce même PC, 2 adresses sont trouvées en 16s, géocoder 300 adresses prend environ 20s, 1000 adresses  25s, 20 000 adresses 140s.
+La vitesse d'exécution par adresse suit une fonction inverse (1/x). `phacochr` est bien meilleur avec un nombre conséquent d'adresses. Ceci vient entre autre du fait qu'il doit charger des données volumineuses avant de réaliser les traitements : le "coût" marginal en temps de ce chargement est d'autant plus faible que les données sont nombreuses à géocoder. A partir de 2000 adresses, la vitesse d'exécution se situe entre 0,4 et 0,8 secondes / 100 adresses sur un PC de puissance moyenne. A titre d'exemple, sur ce même PC, 2 adresses sont trouvées en 16s, géocoder 300 adresses prend environ 20s, 1000 adresses 25s, 20 000 adresses 140s.
 
 ```{r out.width = '70%', echo = FALSE}
 # Graphique du temps de calcul nécessaire pour géocoder avec phacochr selon le nombre d'adresses à géocoder
@@ -31,7 +37,6 @@ knitr::include_graphics("img/graph_temps_calcul.png")
 # Graphique du pourcentage d'adresses géocodées
 knitr::include_graphics("img/graph_match_rate.png")
 ```
-
 
 ## Fiabilité
 
