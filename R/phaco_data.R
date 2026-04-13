@@ -22,7 +22,9 @@
 #'   \item \code{"quartiers"}, \code{"quartiers2024"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2019-2024)
 #'   \item \code{"quartiers2025"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2025-...)
 #'   \item \code{"quartiers2011"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2011-2017)
-#'   \item \code{"couronnes"} : couronnes de Bruxelles (IBSA)
+#'   \item \code{"couronnes"} : couronnes de Bruxelles (IBSA) sur base des secteurs statistiques (version 2019-2024)
+#'   \item \code{"couronnes2024"} : couronnes de Bruxelles (IBSA) sur base des secteurs statistiques (version 2019-2024)
+#'   \item \code{"couronnes2025"} : couronnes de Bruxelles (IBSA) sur base des secteurs statistiques (version 2025-...)
 #'   \item \code{"qss"} : quartiers social-sant<c3><a9> (Vivalis) sur base des secteurs statistiques (version 2019-2024)
 #'   \item \code{"bassins"} : bassins (Vivalis) sur base des secteurs statistiques (version 2019-2024)
 #'   \item \code{"provinces"} : provinces de Belgique
@@ -75,6 +77,8 @@
 #' quartiers2025 <- phaco_data("quartiers2025")
 #'
 #' couronnes <- phaco_data("couronnes")
+#' couronnes2024 <- phaco_data("couronnes2024")
+#' couronnes2025 <- phaco_data("couronnes2025")
 #'
 #' # Vivalis
 #' qss <- phaco_data("qss")
@@ -116,10 +120,13 @@ phaco_data <- function(data=NULL,
       "\"communes\", \"communes2011\",\"communes2024\",\"communes2025\",\n",
       "\"communes_bxl\", \"communes_bxl2011\",\"communes_bxl2024\",\"communes_bxl2025\",\n",
       "\"quartiers\", \"quartiers2011\",\"quartiers2024\", \"quartiers2025\",\n",
-      "\"qss\", \"bassins\", \"couronnes\"\n",
+      "\"qss\", \"bassins\"\n",
+      "\"couronnes\", \"couronnes2024\", \"couronnes2025\"\n",
       "\"provinces\", \"regions\", \"belgique\", \"rbc\""
     ))
   }
+
+
 
   # PATH -----
   if(is.null(path_data)){path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/"))}
@@ -165,7 +172,9 @@ phaco_data <- function(data=NULL,
   if(data=="quartiers2024"|data=="quartiers"){result<- readRDS(paste0(path_data,"IBSA/quartiers2024.rds"))}
   if(data=="quartiers2025"){result<- readRDS(paste0(path_data,"IBSA/quartiers2025.rds"))}
 
-  if(data=="couronnes"){result<- readRDS(paste0(path_data,"IBSA/ibsa_couronnes.rds"))}
+  if(data=="couronnes2024"|data=="couronnes"){result<- readRDS(paste0(path_data,"IBSA/couronnes2024.rds"))}
+  if(data=="couronnes2025"){result<- readRDS(paste0(path_data,"IBSA/couronnes2025.rds"))}
+
 
   # OBSS
   if(data=="qss"){result<- readRDS(paste0(path_data,"OBSS/QSS_2024.rds"))}
@@ -198,7 +207,8 @@ phaco_data <- function(data=NULL,
   if(data=="bassins"){warning("Vous chargez les bassins (Vivalis) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
 
   if(data=="couronnes"){warning("Vous chargez les couronnes (IBSA) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
-
+  if(data=="couronnes2024"){warning("Vous chargez les couronnes (IBSA) construits sur base des secteurs 2019-2024 (Statbel).",call. = F)}
+  if(data=="couronnes2025"){warning("Vous chargez les couronnes (IBSA) construits sur base des secteurs 2025-... (Statbel).",call. = F)}
 
   return(result)
 }

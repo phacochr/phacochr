@@ -72,10 +72,10 @@ phaco_best_data_update <- function(force=FALSE,
   if(sum(
     file.exists(
       # paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"),
-                paste0(path_data, "CHARLEROI/Rues-Nouveaux-noms_2024-01-17.xlsx"),
+                paste0(path_data, "CHARLEROI/Rues-Nouveaux-noms_2024-01-17.rds"),
                 paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.rds"),
                 paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.rds"),
-                paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx")
+                paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.rds")
     )
   ) != 4) {
     cat("\n")
@@ -529,7 +529,7 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\n", "\u29D7", " Ajout des anciens noms de rue pour la commune de Charleroi"))
 
     # Certaines rues sont mal ecrites dans le fichier de la commune, on les corrige
-    rue_charleroi <- readxl::read_excel(paste0(path_data,"CHARLEROI/Rues-Nouveaux-noms_2024-01-17.xlsx")) |>
+    rue_charleroi <- readRDS(paste0(path_data,"CHARLEROI/Rues-Nouveaux-noms_2024-01-17.rds")) |>
       mutate(
         section = substr(section, 1, 4),
         nouveau_nom = str_replace(nouveau_nom, "' ", "'"),
@@ -655,7 +655,7 @@ phaco_best_data_update <- function(force=FALSE,
     # On cree la table de conversion codes postaux > arrondissements
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
-    code_postal_INS <- readxl::read_excel(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx"), progress= F) |>
+    code_postal_INS <- readRDS(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.rds"), progress= F) |>
       rename("code_postal" = "Postal code")
 
     BE_SS_lite_comm_arrond_rgn <- BE_SS2024 |>
@@ -802,75 +802,6 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\r", colourise("\u2714", fg="green")," Export des fichiers BeST par arrondissement"))
 
 
-    # 7. Table secteurs - quartiers - communes -  arrond - region -----------------------------------------------------------------------------
-
-    # On cree une table avec les infos administratives pour jointure a la fin de phaco_geocode()
-    cat(paste0("\n", "\u29D7", " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers IBSA)"))
-
-    # Quartiers du monitoring
-    # BXL_QUARTIERS_sf <- st_read(paste0(path_data, "URBIS/URBIS_ADM_MD/UrbAdm_MONITORING_DISTRICT.gpkg"), quiet=T,crs=31370)
-    # jointure spatiale avec le centroid des secteurs statistiques
-    # BXL_QUARTIERS <- st_join(BXL_QUARTIERS_sf, st_point_on_surface(BE_SS)) |>
-    #   as.data.frame() |>
-    #   select(cd_sector, MDRC, NAME_FRE, NAME_DUT)
-
-    # On calcule les centroides des secteurs stats (en cas d'anonymisation des donnees)
-    BE_SS_coord2024 <- BE_SS2024 |>
-      sf::st_point_on_surface() %>% # pipe magrittr pour utiliser le dot (.)
-      mutate(cd_sector2024_x_31370 = sf::st_coordinates(.)[,1] |>
-                      str_replace(",", ".") |>
-                      as.numeric() |>
-                      round(precision_digits),
-                    cd_sector2024_y_31370 = sf::st_coordinates(.)[,2] |>
-                      str_replace(",", ".") |>
-                      as.numeric() |>
-                      round(precision_digits)) |>
-      as.data.frame() |>
-      select(cd_sector, cd_sector2024_x_31370, cd_sector2024_y_31370)
-
-    table_secteurs_prov_commune_quartier <- BE_SS2024 |>
-      left_join(BE_SS_coord2024, by="cd_sector") |>
-      as.data.frame() |>
-      rename(cd_sector2024= cd_sector) |>
-      select(-tx_sector_descr_de, -tx_munty_descr_de, -tx_adm_dstr_descr_de,
-             -tx_rgn_descr_de, -cd_country,- cd_nuts_lvl1, -cd_nuts_lvl2, -cd_nuts_lvl3,
-             -ms_area_ha, -ms_perimeter_m, -dt_situation, -GEOMETRY, -tx_prov_descr_de) # NOTE : dans BE_SS version gpkg, le champ geometrie = "geom" et non "geometry" => PKOI ? Réponse: une histoire de convention parfois liés aux formats des fichiers, ça peut être geom, geometry, the_geom en minuscule ou majuscule ...
-
-
-    saveRDS(table_secteurs_prov_commune_quartier, file=paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.rds"))
-
-    cat(paste0("\r", colourise("\u2714", fg="green"), " Collecte des informations par secteur statistique (jointure secteurs statistiques Statbel - quartiers IBSA)"))
-
-
-    # 8. Liste des communes adjacentes par commune --------------------------------------------------------------------------------------------
-
-    # On cree une liste des communes adjacentes par commune (via INS recode)
-    cat(paste0("\n", "\u29D7", " Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))
-
-    # D'abord un recodage car codes postaux et INS n'ont pas de relation bi-univoque : https://statbel.fgov.be/fr/propos-de-statbel/methodologie/classifications/geographie
-    BE_communes <- BE_SS2024 |>
-      mutate(cd_munty_refnis = case_when(cd_munty_refnis == "21004" |
-                                         cd_munty_refnis == "21005" |
-                                         cd_munty_refnis == "21009" ~ "21004-21005-21009",
-                                         cd_munty_refnis == "23088" |
-                                         cd_munty_refnis == "23096" ~ "23088-23096",
-                                         TRUE ~ cd_munty_refnis)) |>
-      group_by(cd_munty_refnis) |>
-      summarize(GEOMETRY = sf::st_union(GEOMETRY))
-
-    nb <- spdep::poly2nb(BE_communes)
-    mat <- spdep::nb2mat(nb, style="B")
-    colnames(mat) <- BE_communes$cd_munty_refnis
-    mat <- mat |>
-      as.data.frame() |>
-      mutate(cd_munty_refnis= BE_communes$cd_munty_refnis) |>
-      tidyr::pivot_longer(cols= 1:last_col(1), names_to= "cd_munty_refnis_voisin", values_to= "voisin") |>
-      filter(voisin==1) |>
-      select(-voisin)
-
-    saveRDS(mat, file= paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.rds"))
-
-    cat(paste0("\r", colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))
 
 
     # 9. Delete des fichiers openaddress originaux --------------------------------------------------------------------------------------------
