@@ -106,7 +106,7 @@ devtools::install_github("phacochr/phacochr")
 
 Il est indispensable lors de la première utilisation d'installer les
 données nécessaires à son utilisation via la fonction
-`phaco_setup_data()`. Ces fichiers (+/- 130Mo) sont téléchargés et
+`phaco_setup_data()`. Ces fichiers (+/- 135Mo) sont téléchargés et
 stockés de manière permanente dans un répertoire de travail sur
 l'ordinateur (dépendant du système d'exploitation et renseigné par la
 fonction lors de l'installation).
@@ -252,7 +252,7 @@ premier nombre et le code postal être en fin de champ (situations les
 plus courantes).
 
 | num_rue_code_postal | Statut | Note |
-|:----------------------------------|:-----------------:|:------------------|
+|:---------------------------------|:-----------------:|:------------------|
 | rue Belliard, [71 1040]{style="color: #0000FF"} | :heavy_check_mark: | Dans le cas où la rue, le numéro et le code postal sont intégrés dans un même champ, il faut observer une règle fondamentale : le numéro doit être le premier nombre et le code postal être en fin de champ. |
 | [71,]{style="color: #0000FF"} rue Belliard [1040]{style="color: #0000FF"} | :heavy_check_mark: |  |
 | rue Belliard [1040 n°71]{style="color: #FF0000"} | :x: | *Ici le numéro vient après le code postal : `phacochr` interprète alors que le numéro de rue est 1040 (alors que c'est 71).* |

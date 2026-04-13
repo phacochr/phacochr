@@ -29,10 +29,8 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    spdep,
     lubridate,
-    readr,
-    readxl
+    readr
 Suggests: 
     rmarkdown
 VignetteBuilder: 
