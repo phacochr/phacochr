@@ -10,17 +10,17 @@ Date : avril 2026
 
 -   Les données géocodées contiennent désormais le nouveau secteur statistique 2025 (les délimitations des secteurs ont changé en 2025). Le secteur 2024 reste présent dans le résultat du géocodage, puisque nous avons anticipé que la migration vers les nouveaux secteurs statistiques ne se fera pas immédiatement pour les différentes institutions.
 
--   Les anciens noms de rues de Charleroi ont été intégrés suite au renommage récent de nombreuses rues dans la commune. II est désormais possible de trouver la même adresse avec l'ancien ou le nouveau nom.
+-   Création d'une fonction `phaco_data()`, qui permet de charger à la plupart des données contenues dans `phacochr`. Elle permet de charger des géométries utiles pour la cartographie ou l'analyse (secteurs statistiques, quartiers du Monitoring ou quartiers social-santé pour Bruxelles, communes, etc.). Les secteurs statistiques (et la plupart des découpages qui découlent) sont chargeables dans leur version de 2011-2017, 2019-2024 et 2025-... . `phaco_data()` contient également les données de rue ou d'adresses BeST utilisées par `phacochr`. Cela peut être utile pour consulter la référence sur laquelle est réalisée le géocodage et chercher à comprendre pourquoi une rue n'est pas trouvée.
+
+-   La base de données d’adresses de référence (BeST) a été enrichie avec les anciens noms de rue de la commune de Charleroi. La commune a changé les noms de 250 rues pour éviter les homonymes suite à la fusion des communes. Ces noms de rues ont été rajoutée parce qu’ils sont encore largement présents dans beaucoup de base de données. Il est désormais possible de trouver la même adresse avec l'ancien ou le nouveau nom. <https://www.charleroi.be/vie-communale/publications/nouveaux-noms-de-rues>
 
 -   La dimension aléatoire du géocodage a été supprimée. Auparavant, celle-ci pouvait avoir lieu à deux moments. En premier lieu dans la détection des rues : lorsque `phacochr` hésitait entre plusieurs rues après plusieurs tests de ressemblance, l'une d'elle était choisie au hasard. Désormais, c'est la première dans l'ordre alphabétique. En deuxième lieu lorsque le numéro de rue n'était pas trouvé (du fait d'une erreur d'encodage, par exemple) : une approximation était alors réalisée au numéro localisé le plus proche, aléatoirement au dessus ou en dessous du numéro entré par l'utilisateur. Désormais, chaque rue dans BeST défini un sens dans l'approximation, fixé quelle que soit la base de données. *Attention cependant que le sens est différent selon la langue de la rue pour les zones bilingues (comportement à changer ?)*. **Ainsi, à paramètres donnés (mêmes arguments pour le géocodage, même base de données BeST), le résultat sera toujours le même**.
 
--   Création d'une fonction `phaco_data()`, qui permet d'avoir accès à la plupart des données contenues dans `phacochr`. Ce sont notamment des géométries (secteurs statistiques, quartiers du Monitoring ou quartiers social-santé pour Bruxelles, communes, etc.) et les données de rue ou d'adresses BeST utilisées par `phacochr`. `phaco_data()` contient par ailleurs plusieurs années pour certaines délimitations (communes, secteurs statistiques...).
-
 ## Modifications mineures
 
--   L'output de `phaco_geocode()` est plus propre : les noms ont été simplifiés.
+-   L'output de `phaco_geocode()` est plus propre : les noms ont été simplifié: phaco_id_address remplace ID_adress pour insister sur le fait qu’il s’agit d’un id créé par phacochr; street_detected remplace street_FINAL_detected et langue_detected remplace langue_FINAL_detected pour plus de simplicité.
 
--   Les noms de colonne "interdits" dans la base de données à géocoder ont été réduits à un seul.
+-   Les noms de colonne "interdits" dans la base de données à géocoder ont été réduits à un seul: phaco_id_adress.
 
 -   Un script de préparation des fichiers de base a été ajouté au package (`prepa_fichiers.R` dans `/data_raw`), par transparence vis-à-vis des utilisateurs. Le script renvoie au maximum vers des sources authentiques (principalement Statbel), pour correspondre aux découpages officiels.
 
@@ -28,7 +28,7 @@ Date : avril 2026
 
 -   Le nombre de dépendances vis-à-vis de packages externes a été diminué.
 
--   Le calcul multicore est désormais optionnel dans `phaco_geocode()` et se règle via l'argument `parallel`. Vu l'optimisation du processus de géocodage, le calcul parallélisé n'est plus nécessaire et est désactivé par défaut. Il peut éventuellement être plus performant dans le cas de géocodage de grosses bases de données.
+-   Le calcul multicore est désormais optionnel dans `phaco_geocode()` et se règle via l'argument `parallel`. Vu l'optimisation du processus de géocodage, le calcul parallélisé n'est plus nécessaire et est désactivé par défaut. Il peut éventuellement être plus performant dans le cas de géocodage de grosses bases de données (n\> 20 000).
 
 # phacochr 0.9.1.14
 
