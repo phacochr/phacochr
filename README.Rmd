@@ -214,7 +214,7 @@ renseigner les arguments `colonne_num`, `colonne_rue` et
 `colonne_code_postal`.
 
 | rue | num | code_postal | Statut | Note |
-|:--------------|:--------------|:--------------|:-------------:|:--------------|
+|:---|:---|:---|:--:|:---|
 | rue Belliard | 71 | 1040 | :heavy_check_mark: | Situation idéale ! |
 | rue Belliard | 71[B]{style="color: #FF0000"} | 1040 | :heavy_check_mark: | S'il y a des caractères non numériques après le numéro de rue (lettres, caractères typographiques...), ceux-ci ne sont pas pris en compte. |
 | rue Belliard | 71[-73]{style="color: #FF0000"} | 1040 | :heavy_check_mark: | Si le champ de numéro de rue compte plusieurs numéros, seul le premier est considéré. |
@@ -235,7 +235,7 @@ numéro) ne peut par exemple pas précéder le numéro de rue (cas cependant
 peu courant).
 
 | code_postal | num_rue | Statut | Note |
-|:------------------|:-----------------|:----------------:|:-----------------|
+|:---|:---|:--:|:---|
 | 1040 | [71, rue Belliard]{style="color: #0000FF"} | :heavy_check_mark: | Si la rue et le numéro sont intégrés dans le même champ, leur ordre n’a pas d’importance. La présence de signes de ponctuation (virgule, tiret…) ne pose pas de problèmes pour la détection de la rue =\> ils sont nettoyés avec la correction. |
 | 1040 | [rue Belliard, 71]{style="color: #0000FF"} | :heavy_check_mark: |  |
 | 1040 | rue Belliard, 71 [bte 5]{style="color: #FF0000"} | :heavy_check_mark: | Le fait que le numéro de boite soit indiqué n’a pas d’incidence =\> il est nettoyé avant la détection de la rue. Il faut cependant respecter une règle importante : le numéro de rue doit être le premier numéro indiqué dans le champ. Le numéro de boite (ou autre numéro) ne peut par exemple pas précéder le numéro de rue (cas peu courant). |
@@ -252,7 +252,7 @@ premier nombre et le code postal être en fin de champ (situations les
 plus courantes).
 
 | num_rue_code_postal | Statut | Note |
-|:---------------------------------|:-----------------:|:------------------|
+|:---|:--:|:---|
 | rue Belliard, [71 1040]{style="color: #0000FF"} | :heavy_check_mark: | Dans le cas où la rue, le numéro et le code postal sont intégrés dans un même champ, il faut observer une règle fondamentale : le numéro doit être le premier nombre et le code postal être en fin de champ. |
 | [71,]{style="color: #0000FF"} rue Belliard [1040]{style="color: #0000FF"} | :heavy_check_mark: |  |
 | rue Belliard [1040 n°71]{style="color: #FF0000"} | :x: | *Ici le numéro vient après le code postal : `phacochr` interprète alors que le numéro de rue est 1040 (alors que c'est 71).* |
@@ -281,7 +281,7 @@ fonctionne pas (situation peu courante). Ce format demande de renseigner
 l'argument `colonne_rue_code_postal`.
 
 | rue_code_postal | Statut | Note |
-|:---------------------------------|:-----------------:|:------------------|
+|:---|:--:|:---|
 | rue Belliard [1040]{style="color: #0000FF"} | :heavy_check_mark: | Lorsqu’un champ contient la rue et le code postal, ce dernier doit être en fin de champ. Lorsque ce n’est pas le cas, le programme ne fonctionne pas (peu courant). |
 | [1040]{style="color: #FF0000"} rue Belliard | :x: | *Ici le code postal est au début du champ : il n'est donc pas repéré.* |
 
@@ -376,7 +376,7 @@ entités spatiales) mais également d'indices sur la qualité du géocodage.
 En voici une liste exhaustive et commentée:
 
 | **Colonne créée** | **Signification** |
-|------------------------------------|------------------------------------|
+|----|----|
 | **phaco_id_address** | Un identifiant unique par ligne du tableau original créé pour le bon fonctionnement de `phacochr`. Le nombre maximal de cet identifiant est égal au nombre de lignes du tableau. |
 | **rue_recoded** | La rue extraite, nettoyée et corrigée à partir du champ original contenant la rue. C’est par le biais de cette colonne qu’est réalisé le matching inexact pour la rue. |
 | **recode** | Indique les diffétents nettoyages / corrections réalisés pour obtenir `rue_recoded`. |
