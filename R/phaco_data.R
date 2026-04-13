@@ -175,14 +175,12 @@ phaco_data <- function(data=NULL,
   if(data=="couronnes2024"|data=="couronnes"){result<- readRDS(paste0(path_data,"IBSA/couronnes2024.rds"))}
   if(data=="couronnes2025"){result<- readRDS(paste0(path_data,"IBSA/couronnes2025.rds"))}
 
-
   # OBSS
   if(data=="qss"){result<- readRDS(paste0(path_data,"OBSS/QSS_2024.rds"))}
   if(data=="bassins"){result<- readRDS(paste0(path_data,"OBSS/Bassins_2024.rds"))}
 
 
-  # WARNINGS
-
+  # WARNINGS -----
   if(data=="sec2011"){warning("Vous chargez les secteurs statistique 2011-2017 (Statbel).",call. = F)}
   if(data=="sec2024"|data=="sec"){warning("Vous chargez les secteurs statistique 2019-2024 (Statbel).",call. = F)}
   if(data=="sec2025"){warning("Vous chargez les secteurs statistique 2025-... (Statbel).",call. = F)}
@@ -212,7 +210,3 @@ phaco_data <- function(data=NULL,
 
   return(result)
 }
-
-
-
-

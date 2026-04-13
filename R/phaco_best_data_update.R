@@ -413,14 +413,12 @@ phaco_best_data_update <- function(force=FALSE,
     BE_SS2024 <- phaco_data("sec2024")
 
     BE_SS_lite_sector_arrond2024 <- BE_SS2024 |>
-      select(cd_sector, cd_dstr_refnis) |>
-      rename(cd_sector2024= cd_sector) |>
+      select(cd_sector2024, cd_dstr_refnis) |>
       mutate(arrond= as.numeric(substr(cd_dstr_refnis, 1, 2))) |>
       select(-cd_dstr_refnis)
 
     BE_SS_lite_sector2025 <- BE_SS2025 |>
-      select(cd_sector) |>
-      rename(cd_sector2025= cd_sector)
+      select(cd_sector2025)
 
     # Bruxelles
     openaddress_bebru <- readr::read_delim(paste0(path_data, "BeST/openaddress/openaddress-bebru.csv"), progress= F, col_types = readr::cols(.default = readr::col_character()))
@@ -655,7 +653,7 @@ phaco_best_data_update <- function(force=FALSE,
     # On cree la table de conversion codes postaux > arrondissements
     cat(paste0("\n", "\u29D7"," Cr", "\u00e9", "ation de la table de conversion 'codes postaux - arrondissements' (Statbel)"))
 
-    code_postal_INS <- readRDS(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.rds"), progress= F) |>
+    code_postal_INS <- readRDS(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.rds")) |>
       rename("code_postal" = "Postal code")
 
     BE_SS_lite_comm_arrond_rgn <- BE_SS2024 |>
@@ -802,9 +800,7 @@ phaco_best_data_update <- function(force=FALSE,
     cat(paste0("\r", colourise("\u2714", fg="green")," Export des fichiers BeST par arrondissement"))
 
 
-
-
-    # 9. Delete des fichiers openaddress originaux --------------------------------------------------------------------------------------------
+    # 7. Delete des fichiers openaddress originaux --------------------------------------------------------------------------------------------
 
     cat(paste0("\n", colourise("\u2714", fg="green")," Supression des fichiers initiaux BeST sur le disque dur"))
 
