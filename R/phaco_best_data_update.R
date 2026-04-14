@@ -5,6 +5,7 @@
 #' @param force Force la mise à jour même si les données sont à jour. Par défaut: FALSE.
 #' @param precision Indique la précision des coordonnées désirées. Par défaut : "m". Choix possibles : "m", "dm", "cm", "mm".
 #' @param corrections_REGEX Correction orthographique des adresses BEST. Par défaut: TRUE, car les adresses BEST ne sont pas toujours homogènes : elles contiennent des précisions entre parenthèses, des abréviations, etc. qui nuisent à la détection des rues.
+#' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
 #'
 #' @import dplyr
 #' @import stringr
@@ -17,9 +18,10 @@
 #'
 #'
 
-phaco_best_data_update <- function(force=FALSE,
-                                   precision="mm",
-                                   corrections_REGEX=TRUE) {
+phaco_best_data_update <- function(force = FALSE,
+                                   precision = "mm",
+                                   corrections_REGEX = TRUE,
+                                   path_data = NULL) {
 
   # Ne pas lancer la fonction si les arguments ne sont pas corrects
   if(length(force) > 1) {
@@ -66,7 +68,10 @@ phaco_best_data_update <- function(force=FALSE,
 
   # 0. Mise a jour --------------------------------------------------------------------------------------------------------------------------
 
-  path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+  # Definition du chemin ou se trouve les donnees
+  if(is.null(path_data)){
+    path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+  }
 
   # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
   if(sum(

@@ -59,7 +59,6 @@ Début de la mise à jour régulière du fichier `NEWS.md` pour documenter les m
 ## To do
 
 -   Dans le fichier de préparation des fichiers : remettre les couronnes (IBSA) en `.xlsx` sur github.
--   Ajouter l'argument `path` dans toutes les fonctions.
 -   Il y a des coordonnées mid manquantes =\> investiguer pourquoi.
 -   Pour l'approximation du numéro, chaque rue dans BeST définit un sens dans l'approximation, fixé quelle que soit la base de données. Néanmoins, le sens est différent selon la langue de la rue pour les zones bilingues =\> comportement à changer ?
 -   Pourquoi il y a des `st_point_on_surface()` pour lier les couronnes aux secteurs statistiques ? =\> Pas plus sur et plus rapide une jointure normale ?
