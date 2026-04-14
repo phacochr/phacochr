@@ -25,6 +25,11 @@ phaco_setup_data <- function(){
     stop(paste0("\u2716"," le dossier d'installation n'a pas pu", " \u00ea", "tre cr","\u00e9\u00e9", " : v","\u00e9","rifiez vos droits d'","\u00e9","criture sur le disque"))
   }
 
+  # On supprime les anciennes donnes de phacochr si l'utilisateur est OK
+  if(utils::askYesNo("Voulez-vous supprimer les anciennes donnees de phacochr ? Cela n'aura d'effet que si votre version actuelle de phacochr est inferieure a 1.0")){
+    phaco_rm_old_data()
+  }
+
   # Telecharger les donnees
 
   options(timeout=300)

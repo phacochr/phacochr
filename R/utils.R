@@ -228,3 +228,90 @@ phaco_check_csv_data <- function(path_data = NULL) {
   return(verif)
 
 }
+
+
+#' phaco_rm_old_data
+#'
+#' Internal function to remove old data installed
+#'
+#' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
+#'
+#' @noRd
+#'
+phaco_rm_old_data <- function(path_data = NULL) {
+
+  if(is.null(path_data)){
+    path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
+  }
+
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_11.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_12.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_13.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_21.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_23.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_24.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_25.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_31.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_32.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_33.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_34.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_35.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_36.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_37.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_38.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_41.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_42.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_43.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_44.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_45.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_46.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_51.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_52.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_53.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_55.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_56.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_57.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_58.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_61.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_62.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_63.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_64.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_71.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_72.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_73.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_81.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_82.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_83.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_84.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_85.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_91.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_92.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/data_arrond_PREPROCESSED_93.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/table_INS_recod_code_postal.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/table_postal_arrond.csv"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "BeST/PREPROCESSED/table_postal_com_name.csv"), showWarnings = FALSE)
+
+  file.remove(paste0(path_data, "STATBEL/code_postaux/Conversion Postal code_Refnis code_va01012019.xlsx"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/code_postaux/Lien statbel.txt"), showWarnings = FALSE)
+
+  file.remove(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_F.xlsx"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/prenoms/Lien.txt"), showWarnings = FALSE)
+
+  unlink(paste0(path_data, "STATBEL/PREPROCESSED"), force = TRUE)
+
+  file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/Licence open data_FR.pdf"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/Licence open data_NL.pdf"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20220101-readme-de.doc"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20220101-readme-en.doc"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20220101-readme-fr.doc"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20220101-readme-nl.doc"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_20220101.gpkg"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/source_secteurs_statistiques.txt"), showWarnings = FALSE)
+  file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), showWarnings = FALSE)
+
+  unlink(paste0(path_data, "URBIS"), force = TRUE)
+
+}
