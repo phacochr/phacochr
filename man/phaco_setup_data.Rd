@@ -4,7 +4,10 @@
 \alias{phaco_setup_data}
 \title{phaco_setup_data : Téléchargement et installation des données pour géocoder}
 \usage{
-phaco_setup_data()
+phaco_setup_data(path_data = NULL)
+}
+\arguments{
+\item{path_data}{Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.}
 }
 \description{
 Cette fonction permet d'installer sur l'ordinateur les fichiers nécessaires pour le geocodage des adresses.

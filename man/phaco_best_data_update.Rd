@@ -7,7 +7,8 @@
 phaco_best_data_update(
   force = FALSE,
   precision = "mm",
-  corrections_REGEX = TRUE
+  corrections_REGEX = TRUE,
+  path_data = NULL
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ phaco_best_data_update(
 \item{precision}{Indique la précision des coordonnées désirées. Par défaut : "m". Choix possibles : "m", "dm", "cm", "mm".}
 
 \item{corrections_REGEX}{Correction orthographique des adresses BEST. Par défaut: TRUE, car les adresses BEST ne sont pas toujours homogènes : elles contiennent des précisions entre parenthèses, des abréviations, etc. qui nuisent à la détection des rues.}
+
+\item{path_data}{Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.}
 }
 \description{
 Cette fonction met à jour les données BeST Address vers la dernière version disponible sur le site de BOSA : https://opendata.bosa.be ainsi que les fichiers connexes nécessaires au géocodage.
