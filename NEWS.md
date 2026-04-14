@@ -30,6 +30,8 @@ Date : avril 2026
 
 -   Le calcul multicore est désormais optionnel dans `phaco_geocode()` et se règle via l'argument `parallel`. Vu l'optimisation du processus de géocodage, le calcul parallélisé n'est plus nécessaire et est désactivé par défaut. Il peut éventuellement être plus performant dans le cas de géocodage de grosses bases de données (n\>20 000).
 
+-   L'argument `path` a été implémenté dans toutes les fonction, pour que l'utilisateur définisse lui-même où doivent être installées/lues les données de `phacochr`.
+
 # phacochr 0.9.1.14
 
 Date : 5 mai 2023
