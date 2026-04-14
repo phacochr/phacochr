@@ -300,7 +300,7 @@ phaco_rm_old_data <- function(path_data = NULL) {
   file.remove(paste0(path_data, "STATBEL/prenoms/TA_POP_2018_M.xlsx"), showWarnings = FALSE)
   file.remove(paste0(path_data, "STATBEL/prenoms/Lien.txt"), showWarnings = FALSE)
 
-  unlink(paste0(path_data, "STATBEL/PREPROCESSED"), force = TRUE)
+  unlink(paste0(path_data, "STATBEL/PREPROCESSED"), force = TRUE, recursive = TRUE)
 
   file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/Licence open data_FR.pdf"), showWarnings = FALSE)
   file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/Licence open data_NL.pdf"), showWarnings = FALSE)
@@ -312,6 +312,6 @@ phaco_rm_old_data <- function(path_data = NULL) {
   file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/source_secteurs_statistiques.txt"), showWarnings = FALSE)
   file.remove(paste0(path_data, "STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.csv"), showWarnings = FALSE)
 
-  unlink(paste0(path_data, "URBIS"), force = TRUE)
+  unlink(paste0(path_data, "URBIS"), force = TRUE, recursive = TRUE)
 
 }
