@@ -10,7 +10,7 @@ library(stringr)
 
 
 path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/"))
-dir.create(paste0(path_data,"TEMP"))
+dir.create(paste0(path_data,"TEMP"), recursive = TRUE)
 
 
 # 0. Version de phacochr -----
@@ -59,6 +59,13 @@ saveRDS(readxl::read_excel(paste0(path_data,"TEMP/Conversion\ Postal\ code_Refni
 # 4. Secteurs statistiques (Statbel) -----
 dir.create(paste0(path_data,"STATBEL/secteurs_statistiques"), recursive = TRUE)
 
+# Conversion 2024-2025 -----
+download.file("https://github.com/phacochr/phacochr_data/raw/main/data_phacochr/Statsect2025_2024.csv",
+              paste0(path_data,"TEMP/Statsect2025_2024.csv"))
+
+saveRDS(readr::read_delim(paste0(path_data,"TEMP/Statsect2025_2024.csv"), delim = ";", col_types = readr::cols(.default = readr::col_character())), file = paste0(path_data,"STATBEL/secteurs_statistiques/Statsect2025_2024.rds"))
+
+
 ## 2025 -----
 download.file("https://statbel.fgov.be/sites/default/files/files/opendata/Statistische%20sectoren/sh_statbel_statistical_sectors_31370_20250101.sqlite.zip",
               paste0(path_data,"TEMP/sh_statbel_statistical_sectors_31370_20250101.sqlite.zip"))
@@ -66,7 +73,6 @@ unzip(paste0(path_data,"TEMP/sh_statbel_statistical_sectors_31370_20250101.sqlit
 
 sec2025 <- st_read(paste0(path_data,"TEMP/sh_statbel_statistical_sectors_31370_20250101.sqlite/sh_statbel_statistical_sectors_31370_20250101.sqlite/sh_statbel_statistical_sectors_31370_20250101.sqlite")) |>
   rename("cd_sector2025"="cd_sector")
-
 
 
 ## 2024 -----
@@ -411,6 +417,8 @@ mat <- mat |>
   filter(voisin == 1) |>
   select(-voisin)
 
+# Au cas ou le repertoire est pas existant
+dir.create(paste0(path_data,"BeST/PREPROCESSED"), recursive = TRUE)
 saveRDS(mat, file = paste0(path_data, "BeST/PREPROCESSED/table_commune_adjacentes.rds"))
 
 # cat(paste0("\r", colourise("\u2714", fg="green"), " Cr", "\u00e9", "ation de la table des communes adjacentes (Statbel)"))

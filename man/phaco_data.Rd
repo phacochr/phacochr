@@ -15,6 +15,7 @@ Les valeurs possibles sont :
 \item \code{"sec"}, \code{"sec2024"} : secteurs statistiques Statbel (version 2019-2024)
 \item \code{"sec2025"} : secteurs statistiques Statbel (version 2025--...)
 \item \code{"sec2011"} : secteurs statistiques Statbel (version 2011-2017)
+\item \code{"conv_sec2024_2025"} : Table de conversion entre les secteurs statistiques de 2024 et 2025
 \item \code{"sec_bxl"}, \code{"sec_bxl2024"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2019-2024)
 \item \code{"sec_bxl2025"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2025--...)
 \item \code{"sec_bxl2011"} : secteurs statistiques de la Région de Bruxelles-Capitale (version 2011-2017)

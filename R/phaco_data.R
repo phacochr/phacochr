@@ -10,6 +10,7 @@
 #'   \item `"sec"`, `"sec2024"` : secteurs statistiques Statbel (version 2019-2024)
 #'   \item `"sec2025"` : secteurs statistiques Statbel (version 2025--...)
 #'   \item `"sec2011"` : secteurs statistiques Statbel (version 2011-2017)
+#'   \item `"conv_sec2024_2025"` : Table de conversion entre les secteurs statistiques de 2024 et 2025
 #'   \item `"sec_bxl"`, `"sec_bxl2024"` : secteurs statistiques de la Région de Bruxelles-Capitale (version 2019-2024)
 #'   \item `"sec_bxl2025"` : secteurs statistiques de la Région de Bruxelles-Capitale (version 2025--...)
 #'   \item `"sec_bxl2011"` : secteurs statistiques de la Région de Bruxelles-Capitale (version 2011-2017)
@@ -98,7 +99,7 @@ phaco_data <- function(data,
                        path_data = NULL) {
   # CHECk ERROR -----
   if(sum(data %in% c("rues", "adresses",
-                     "sec","sec2024","sec2025","sec2011",
+                     "sec","sec2024","sec2025","sec2011", "conv_sec2024_2025",
                      "sec_bxl","sec_bxl2011", "sec_bxl2024", "sec_bxl2025",
                      "communes", "communes2011","communes2024","communes2025",
                      "communes_bxl", "communes_bxl2011","communes_bxl2024","communes_bxl2025",
@@ -137,6 +138,8 @@ phaco_data <- function(data,
   if(data=="sec2011"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds"))}
   if(data=="sec2024"|data=="sec"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20240101.rds"))}
   if(data=="sec2025"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"))}
+
+  if(data=="conv_sec2024_2025"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/Statsect2025_2024.rds"))}
 
   if(data=="sec_bxl2011"){result<- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_2011_2017.rds")) |>
     filter(as.numeric(cd_rgn_refnis)==04000)}
