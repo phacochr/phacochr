@@ -12,15 +12,15 @@ Date : avril 2026
 
 -   Création d'une fonction `phaco_data()`, qui permet de charger la plupart des données contenues dans `phacochr`. Elle permet de charger des géométries utiles pour la cartographie ou l'analyse (secteurs statistiques, quartiers du Monitoring ou quartiers social-santé pour Bruxelles, communes, etc.). Les secteurs statistiques (et la plupart des découpages qui en découlent) sont chargeables dans leur version de 2011-2017, 2019-2024 et 2025-... . `phaco_data()` contient également les données de rue ou d'adresses BeST utilisées par `phacochr`. Cela peut être utile pour consulter la référence sur laquelle est réalisée le géocodage et chercher à comprendre pourquoi une rue n'est pas trouvée.
 
--   La base de données d’adresses de référence (BeST) a été enrichie avec les anciens noms de rue de la commune de Charleroi. La commune a changé les noms de 250 rues pour éviter les homonymes suite à la fusion des communes. Ces noms de rues ont été rajoutée parce qu’ils sont encore largement présents dans beaucoup de base de données. Il est désormais possible de trouver la même adresse avec l'ancien ou le nouveau nom. <https://www.charleroi.be/vie-communale/publications/nouveaux-noms-de-rues>
+-   La base de données d’adresses de référence (BeST) a été enrichie avec les anciens noms de rue de la commune de Charleroi. La commune a changé les noms de 250 rues pour éviter les homonymes suite à la fusion des communes. Ces noms de rues ont été rajoutés parce qu’ils sont encore largement présents dans beaucoup de bases de données. Il est désormais possible de trouver la même adresse avec l'ancien ou le nouveau nom. Voir : <https://www.charleroi.be/vie-communale/publications/nouveaux-noms-de-rues>
 
--   La dimension aléatoire du géocodage a été supprimée. Auparavant, celle-ci pouvait avoir lieu à deux moments. En premier lieu dans la détection des rues : lorsque `phacochr` hésitait entre plusieurs rues après plusieurs tests de ressemblance, l'une d'elle était choisie au hasard. Désormais, c'est la première dans l'ordre alphabétique. En deuxième lieu lorsque le numéro de rue n'était pas trouvé (du fait d'une erreur d'encodage, par exemple) : une approximation était alors réalisée au numéro localisé le plus proche, aléatoirement au dessus ou en dessous du numéro entré par l'utilisateur. Désormais, chaque rue dans BeST défini un sens dans l'approximation, fixé quelle que soit la base de données. *Attention cependant que le sens est différent selon la langue de la rue pour les zones bilingues (comportement à changer ?)*. **Ainsi, à paramètres donnés (mêmes arguments pour le géocodage, même base de données BeST), le résultat sera toujours le même**.
+-   La dimension aléatoire du géocodage a été supprimée. Auparavant, celle-ci pouvait avoir lieu à deux moments. En premier lieu dans la détection des rues : lorsque `phacochr` hésitait entre plusieurs rues après plusieurs tests de ressemblance, l'une d'elle était choisie au hasard. Désormais, c'est la première dans l'ordre alphabétique. En deuxième lieu lorsque le numéro de rue n'était pas trouvé (du fait d'une erreur d'encodage, par exemple) : une approximation était alors réalisée au numéro localisé le plus proche, aléatoirement au dessus ou en dessous du numéro entré par l'utilisateur. Désormais, chaque rue dans BeST définit un sens dans l'approximation, fixé quelle que soit la base de données. *Attention cependant que le sens est différent selon la langue de la rue pour les zones bilingues (comportement à changer ?)*. **Ainsi, à paramètres donnés (mêmes arguments pour le géocodage, même base de données BeST), le résultat sera toujours le même**.
 
 ## Modifications mineures
 
--   L'output de `phaco_geocode()` est plus propre : les noms ont été simplifié: phaco_id_address remplace ID_adress pour insister sur le fait qu’il s’agit d’un id créé par phacochr; street_detected remplace street_FINAL_detected et langue_detected remplace langue_FINAL_detected pour plus de simplicité.
+-   L'output de `phaco_geocode()` est plus propre : les noms ont été simplifié: `phaco_id_address` remplace `ID_adress` pour insister sur le fait qu’il s’agit d’un id créé par phacochr; `street_detected` remplace `street_FINAL_detected` et `langue_detected` remplace `langue_FINAL_detected` pour plus de simplicité.
 
--   Les noms de colonne "interdits" dans la base de données à géocoder ont été réduits à un seul: phaco_id_adress.
+-   Les noms de colonne "interdits" dans la base de données à géocoder ont été réduits à un seul: `phaco_id_adress`.
 
 -   Un script de préparation des fichiers de base a été ajouté au package (`prepa_fichiers.R` dans `/data_raw`), par transparence vis-à-vis des utilisateurs. Le script renvoie au maximum vers des sources authentiques (principalement Statbel), pour correspondre aux découpages officiels.
 
@@ -28,7 +28,7 @@ Date : avril 2026
 
 -   Le nombre de dépendances vis-à-vis de packages externes a été diminué.
 
--   Le calcul multicore est désormais optionnel dans `phaco_geocode()` et se règle via l'argument `parallel`. Vu l'optimisation du processus de géocodage, le calcul parallélisé n'est plus nécessaire et est désactivé par défaut. Il peut éventuellement être plus performant dans le cas de géocodage de grosses bases de données (n\> 20 000).
+-   Le calcul multicore est désormais optionnel dans `phaco_geocode()` et se règle via l'argument `parallel`. Vu l'optimisation du processus de géocodage, le calcul parallélisé n'est plus nécessaire et est désactivé par défaut. Il peut éventuellement être plus performant dans le cas de géocodage de grosses bases de données (n\>20 000).
 
 # phacochr 0.9.1.14
 
@@ -53,3 +53,15 @@ Début de la mise à jour régulière du fichier `NEWS.md` pour documenter les m
 ## Modifications mineures
 
 -   Ajout de `ifelse()` pour l'exécution des corrections orthographiques dans la fonction `phaco_geocode()`. Le temps de calcul pour le géocodage diminue de +/- 1%.
+
+<div>
+
+## To do
+
+-   Dans le fichier de préparation des fichiers : remettre les couronnes (IBSA) en `.xlsx` sur github.
+-   Ajouter l'argument `path` dans toutes les fonctions.
+-   Il y a des coordonnées mid manquantes =\> investiguer pourquoi.
+-   Pour l'approximation du numéro, chaque rue dans BeST définit un sens dans l'approximation, fixé quelle que soit la base de données. Néanmoins, le sens est différent selon la langue de la rue pour les zones bilingues =\> comportement à changer ?
+-   Pourquoi il y a des `st_point_on_surface()` pour lier les couronnes aux secteurs statistiques ? =\> Pas plus sur et plus rapide une jointure normale ?
+
+</div>
