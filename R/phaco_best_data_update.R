@@ -90,6 +90,8 @@ phaco_best_data_update <- function(force=FALSE,
 
   # Premiere fois
   if (!file.exists(paste0(path_data, "BeST/openaddress/log.csv"))){
+    # Au cas ou le repertoire est pas existant
+    dir.create(paste0(path_data,"BeST/openaddress"), recursive = TRUE)
     log <- data.frame(update = "0001-01-01 00:00:00 UTC")
     readr::write_delim(log, paste0(path_data, "BeST/openaddress/log.csv"), delim = ";", progress=F)
   }
@@ -98,7 +100,7 @@ phaco_best_data_update <- function(force=FALSE,
   log$update <- as.POSIXct(log$update)
 
   # @@@@@@@@ REMPLACER LUBRIDATE PAR FONCTION DE BASE @@@@@@@@
-  if (max(as.Date(log$update)) + lubridate::days(7) < Sys.Date() | force==TRUE) {
+  if (max(as.Date(log$update)) + 7 < Sys.Date() | force==TRUE) {
 
     options(timeout=300)
 

@@ -29,7 +29,6 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    lubridate,
     readr
 Suggests: 
     rmarkdown
