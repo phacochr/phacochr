@@ -3,8 +3,10 @@
 
 
 library(httr2)
+library(readxl)
 
 
+# path_test <- "C:/0. Unsynchronized Data/PhacochR/" # Joël
 snacks_tom <- read_excel(paste0(path_test, "Exemples/snack_geocode.xlsx"))
 
 
