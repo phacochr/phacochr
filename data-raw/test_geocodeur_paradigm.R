@@ -9,11 +9,6 @@ library(readxl)
 # path_test <- "C:/0. Unsynchronized Data/PhacochR/" # Joël
 snacks_tom <- read_excel(paste0(path_test, "Exemples/snack_geocode.xlsx"))
 
-
-# initialiser colonnes
-snacks_tom$x_31370 <- NA_real_
-snacks_tom$y_31370 <- NA_real_
-
 start<-Sys.time()
 for (i in 1:nrow(snacks_tom)) {
 
@@ -21,21 +16,34 @@ for (i in 1:nrow(snacks_tom)) {
     req_url_query(
       freeText = snacks_tom$query[i],
       searchLanguage = "fr",
-      model = "BeSt"
+      model = "BeStPlus"
     ) |>
     req_perform() |>
     resp_body_json()
 
   # extraction sécurisée
   coords <- tryCatch(
-    res$resultsList[[1]]$result[[1]]$address$position$pointGeometry$point$pos[[1]]$value,
+    res$resultsList[[1]]$result[[1]]$address$position$pointGeometry$point$pos,
+    error = function(e) NA
+  )
+  houseNumber <- tryCatch(
+    res$resultsList[[1]]$result[[1]]$address$houseNumber,
+    error = function(e) NA
+  )
+  streetname <- tryCatch(
+    res$resultsList[[1]]$result[[1]]$address$hasStreetName$streetname$name[[1]]$spelling,
+    error = function(e) NA
+  )
+  postalcode <- tryCatch(
+    res$resultsList[[1]]$result[[1]]$address$hasPostalInfo$code$objectIdentifier,
     error = function(e) NA
   )
 
-  if (!all(is.na(coords))) {
-    snacks_tom$x_31370[i] <- coords[[1]]
-    snacks_tom$y_31370[i] <- coords[[2]]
-  }
+  snacks_tom$paradigm_x_31370[i] <- as.numeric(str_extract_all(coords, "\\w+[.]\\w+")[[1]][1])
+  snacks_tom$paradigm_y_31370[i] <- as.numeric(str_extract_all(coords, "\\w+[.]\\w+")[[1]][2])
+  snacks_tom$paradigm_houseNumber[i] <- houseNumber
+  snacks_tom$paradigm_streetname[i] <- streetname
+  snacks_tom$paradigm_postalcode[i] <- postalcode
 
   if (i %% 10 == 0) {
     cat("Ligne", i, "/", nrow(snacks_tom), "\n")
@@ -67,3 +75,14 @@ snacks_tom
 #   "searchLanguage": "fr",
 #   "model": "BeSt"
 # }'
+
+# # COMPARAISON PHACOCHR
+# snacks_tom_result <- phaco_geocode(snacks_tom,
+#                                    colonne_num_rue_code_postal = "query")
+#
+# comp <- snacks_tom_result$data_geocoded |>
+#   select(query, house_number_sans_lettre, street_detected, code_postal_to_geocode, paradigm_houseNumber, paradigm_streetname, paradigm_postalcode, x_31370, y_31370, paradigm_x_31370, paradigm_y_31370) |>
+#   mutate(
+#     diff_x = as.numeric(x_31370) - as.numeric(paradigm_x_31370),
+#     diff_y = as.numeric(y_31370) - as.numeric(paradigm_y_31370)
+#   )
