@@ -20,6 +20,7 @@
 #'   \item `"communes_bxl"`, `"communes_bxl2024"` : communes de la Région de Bruxelles-Capitale (version 2019-2024)
 #'   \item `"communes_bxl2025"` : communes de la Région de Bruxelles-Capitale (version 2025-...)
 #'   \item `"communes_bxl2011"` : communes de la Région de Bruxelles-Capitale (version 2011-2017)
+#'   \item `"conv_postal_communes2024"` : Table de conversion entre les codes postaux et les codes NIS des communes (version 2024)
 #'   \item `"quartiers"`, `"quartiers2024"` : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2019-2024)
 #'   \item `"quartiers2025"` : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2025-...)
 #'   \item `"quartiers2011"` : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2011-2017)
@@ -103,17 +104,20 @@ phaco_data <- function(data,
                      "sec_bxl","sec_bxl2011", "sec_bxl2024", "sec_bxl2025",
                      "communes", "communes2011","communes2024","communes2025",
                      "communes_bxl", "communes_bxl2011","communes_bxl2024","communes_bxl2025",
+                     "conv_postal_communes2024",
                      "quartiers", "quartiers2011","quartiers2024", "quartiers2025",
                      "qss", "bassins",
+                     "couronnes", "couronnes2024", "couronnes2025",
                      "provinces", "regions", "belgique", "rbc")) == 0) {
     cat("\n")
     stop(paste0(
       "\u2716", " Dans phaco_data(\"data\") \"data\" doit prendre une des valeurs :\n",
       "\"rues\", \"adresses\",\n",
-      "\"sec\",\"sec2024\",\"sec2025\",\"sec2011\",\n",
+      "\"sec\",\"sec2024\",\"sec2025\",\"sec2011\",\"conv_sec2024_2025\",\n",
       "\"sec_bxl\",\"sec_bxl2011\", \"sec_bxl2024\", \"sec_bxl2025\",\n",
       "\"communes\", \"communes2011\",\"communes2024\",\"communes2025\",\n",
       "\"communes_bxl\", \"communes_bxl2011\",\"communes_bxl2024\",\"communes_bxl2025\",\n",
+      "\"conv_postal_communes2024\",\n",
       "\"quartiers\", \"quartiers2011\",\"quartiers2024\", \"quartiers2025\",\n",
       "\"qss\", \"bassins\"\n",
       "\"couronnes\", \"couronnes2024\", \"couronnes2025\"\n",
@@ -158,6 +162,8 @@ phaco_data <- function(data,
     filter(as.numeric(cd_rgn_refnis)==04000)}
   if(data=="communes_bxl2025"){result<- readRDS(paste0(path_data,"STATBEL/communes/communes2025.rds")) |>
     filter(as.numeric(cd_rgn_refnis)==04000)}
+
+  if(data=="conv_postal_communes2024"){result<- readRDS(paste0(path_data,"STATBEL/code_postaux/Conversion\ Postal\ code_Refnis\ code_va01012019.rds"))}
 
   if(data=="provinces"){result<- readRDS(paste0(path_data,"STATBEL/autres/provinces.rds"))}
   if(data=="regions"){result<- readRDS(paste0(path_data,"STATBEL/autres/regions.rds"))}
