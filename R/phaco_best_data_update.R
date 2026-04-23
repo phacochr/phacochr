@@ -19,7 +19,7 @@
 #'
 
 phaco_best_data_update <- function(force = FALSE,
-                                   precision = "mm",
+                                   precision = "cm",
                                    corrections_REGEX = TRUE,
                                    path_data = NULL) {
 
@@ -502,7 +502,7 @@ phaco_best_data_update <- function(force = FALSE,
         )
       ) |>
       filter(detect == TRUE) |>
-      select(-key_street_unique, "street_detected_Origin" = "street_detected", "street_detected" = "street_detected_abv", nom_propre_abv = detect) |>
+      select(-key_street_unique, street_detected_Origin = street_detected, street_detected = street_detected_abv, nom_propre_abv = detect, street_detected_utf8) |>
       mutate(nom_propre_abv = 1)
 
     # On supprime qques abreviations fausses
@@ -518,7 +518,7 @@ phaco_best_data_update <- function(force = FALSE,
       filter(Count >= 10 & Count <= 25) |>
       filter(Saint == FALSE) |>
       filter(King == FALSE) |>
-      select(street_id_phaco, postal_id, street_detected, langue_detected, nom_propre_abv)
+      select(street_id_phaco, postal_id, street_detected, langue_detected, nom_propre_abv, street_detected_utf8)
 
     # Export Belgium street
     belgium_street <- belgium_street |>
@@ -601,7 +601,7 @@ phaco_best_data_update <- function(force = FALSE,
         )
       ) |>
       filter(detect==TRUE) |>
-      rename("street_detected_Origin" = "street_detected", "street_detected" = "street_detected_abv") |>
+      rename(street_detected_Origin = street_detected, street_detected = street_detected_abv) |>
       mutate(nom_propre_abv = 1)
 
     # On supprime qques abreviations fausses
@@ -617,7 +617,7 @@ phaco_best_data_update <- function(force = FALSE,
       filter(Count >= 10 & Count <= 25) |>
       filter(Saint == FALSE) |>
       filter(King == FALSE) |>
-      select(street_id_phaco, postal_id, street_detected, langue_detected, ancien_nom_rue, nom_propre_abv)
+      select(street_id_phaco, postal_id, street_detected, langue_detected, ancien_nom_rue, nom_propre_abv, street_detected_utf8)
 
     rue_charleroi_old_abv <- bind_rows(rue_charleroi_old, rue_charleroi_old_abv)
 
