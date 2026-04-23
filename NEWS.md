@@ -60,9 +60,17 @@ Début de la mise à jour régulière du fichier `NEWS.md` pour documenter les m
 
 ## To do
 
--   Dans le fichier de préparation des fichiers : remettre les couronnes (IBSA) en `.xlsx` sur github.
+### Prioritaire
+
+-   Du fait de l'ajout de l'étape de désagrégation, on supprime le nouveau code postal trouvé en cas d'élargissement =\> trouver un moyen de le rappatrier.
+-   Pour l'approximation du numéro, chaque rue dans BeST définit un sens dans l'approximation, fixé quelle que soit la base de données. Néanmoins, le sens est différent selon la langue de la rue pour les zones bilingues =\> comportement à changer.
 -   Il y a des coordonnées mid manquantes =\> investiguer pourquoi.
--   Pour l'approximation du numéro, chaque rue dans BeST définit un sens dans l'approximation, fixé quelle que soit la base de données. Néanmoins, le sens est différent selon la langue de la rue pour les zones bilingues =\> comportement à changer ?
+
+### Secondaire
+
+-   Dans le fichier de préparation des fichiers : remettre les couronnes (IBSA) en `.xlsx` sur github.
 -   Pourquoi il y a des `st_point_on_surface()` pour lier les couronnes aux secteurs statistiques ? =\> Pas plus sur et plus rapide une jointure normale ?
+-   Faire une géométrie de secteurs stats spécifique pour Bruxelles, pour minimiser les chargements ?
+-   Simplifier `phaco_best_data_update()` : les opérations d'abréviation sont faites 2x : 1x pour les rues, 1x pour charleroi =\> simplifier, introduire charleroi avant les abréviations puis appliquer les abréviations.
 
 </div>
