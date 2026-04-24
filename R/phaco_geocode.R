@@ -989,7 +989,8 @@ phaco_geocode <- function(data_to_geocode,
 
   # On 'desagrege' les donnees en joignant res à data_to_geocode_id
   res <- data_to_geocode_id |>
-    left_join(res |> select(-code_postal_to_geocode), by = "phaco_id_adress_agreg") |>
+    select(-code_postal_to_geocode) |>
+    left_join(res, by = "phaco_id_adress_agreg") |>
     select(-phaco_id_adress_agreg) |>
     relocate(street_detected, .after = recode)
 
