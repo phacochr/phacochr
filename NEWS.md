@@ -14,7 +14,7 @@ Date : avril 2026
 
 -   La base de données d’adresses de référence (BeST) a été enrichie avec les anciens noms de rue de la commune de Charleroi. La commune a changé les noms de 250 rues pour éviter les homonymes suite à la fusion des communes. Ces noms de rues ont été rajoutés parce qu’ils sont encore largement présents dans beaucoup de bases de données. Il est désormais possible de trouver la même adresse avec l'ancien ou le nouveau nom. Voir : <https://www.charleroi.be/vie-communale/publications/nouveaux-noms-de-rues>
 
--   La dimension aléatoire du géocodage a été supprimée. Auparavant, celle-ci pouvait avoir lieu à deux moments. En premier lieu dans la détection des rues : lorsque `phacochr` hésitait entre plusieurs rues après plusieurs tests de ressemblance, l'une d'elle était choisie au hasard. Désormais, c'est la première dans l'ordre alphabétique. En deuxième lieu lorsque le numéro de rue n'était pas trouvé (du fait d'une erreur d'encodage, par exemple) : une approximation était alors réalisée au numéro localisé le plus proche, aléatoirement au dessus ou en dessous du numéro entré par l'utilisateur. Désormais, chaque rue dans BeST définit un sens dans l'approximation, fixé quelle que soit la base de données. *Attention cependant que le sens est différent selon la langue de la rue pour les zones bilingues (comportement à changer ?)*. **Ainsi, à paramètres donnés (mêmes arguments pour le géocodage, même base de données BeST), le résultat sera toujours le même**.
+-   La dimension aléatoire du géocodage a été supprimée. Auparavant, celle-ci pouvait avoir lieu à deux moments. En premier lieu dans la détection des rues : lorsque `phacochr` hésitait entre plusieurs rues après plusieurs tests de ressemblance, l'une d'elle était choisie au hasard. Désormais, c'est la première dans l'ordre alphabétique. En deuxième lieu lorsque le numéro de rue n'était pas trouvé (du fait d'une erreur d'encodage, par exemple) : une approximation était alors réalisée au numéro localisé le plus proche, aléatoirement au dessus ou en dessous du numéro entré par l'utilisateur. Désormais, chaque rue dans BeST définit un sens dans l'approximation, fixé quelle que soit la base de données. **Ainsi, à paramètres donnés (mêmes arguments pour le géocodage, même base de données BeST), le résultat sera toujours le même**.
 
 ## Modifications mineures
 
@@ -62,9 +62,8 @@ Début de la mise à jour régulière du fichier `NEWS.md` pour documenter les m
 
 ### Prioritaire
 
--   Du fait de l'ajout de l'étape de désagrégation, on supprime le nouveau code postal trouvé en cas d'élargissement =\> trouver un moyen de le rappatrier.
--   Pour l'approximation du numéro, chaque rue dans BeST définit un sens dans l'approximation, fixé quelle que soit la base de données. Néanmoins, le sens est différent selon la langue de la rue pour les zones bilingues =\> comportement à changer.
 -   Il y a des coordonnées mid manquantes =\> investiguer pourquoi.
+-   Explorer la question des accents. Est-ce que `é`, `e` et `è` sont vu comme des différences ? Si oui, sans doute pas nécessaire.
 
 ### Secondaire
 
