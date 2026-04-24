@@ -6,7 +6,7 @@
 \usage{
 phaco_best_data_update(
   force = FALSE,
-  precision = "mm",
+  precision = "cm",
   corrections_REGEX = TRUE,
   path_data = NULL
 )

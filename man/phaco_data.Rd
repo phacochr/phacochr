@@ -25,6 +25,7 @@ Les valeurs possibles sont :
 \item \code{"communes_bxl"}, \code{"communes_bxl2024"} : communes de la Région de Bruxelles-Capitale (version 2019-2024)
 \item \code{"communes_bxl2025"} : communes de la Région de Bruxelles-Capitale (version 2025-...)
 \item \code{"communes_bxl2011"} : communes de la Région de Bruxelles-Capitale (version 2011-2017)
+\item \code{"conv_postal_communes2024"} : Table de conversion entre les codes postaux et les codes NIS des communes (version 2024)
 \item \code{"quartiers"}, \code{"quartiers2024"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2019-2024)
 \item \code{"quartiers2025"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2025-...)
 \item \code{"quartiers2011"} : quartiers monitoring des quartiers (IBSA) sur base des secteurs statistiques (version 2011-2017)
