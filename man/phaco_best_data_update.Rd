@@ -14,7 +14,7 @@ phaco_best_data_update(
 \arguments{
 \item{force}{Force la mise à jour même si les données sont à jour. Par défaut: FALSE.}
 
-\item{precision}{Indique la précision des coordonnées désirées. Par défaut : "m". Choix possibles : "m", "dm", "cm", "mm".}
+\item{precision}{Indique la précision des coordonnées désirées. Par défaut : "cm". Choix possibles : "m", "dm", "cm", "mm".}
 
 \item{corrections_REGEX}{Correction orthographique des adresses BEST. Par défaut: TRUE, car les adresses BEST ne sont pas toujours homogènes : elles contiennent des précisions entre parenthèses, des abréviations, etc. qui nuisent à la détection des rues.}
 

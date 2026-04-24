@@ -3,7 +3,7 @@
 #' Cette fonction met à jour les données BeST Address vers la dernière version disponible sur le site de BOSA : https://opendata.bosa.be ainsi que les fichiers connexes nécessaires au géocodage.
 #'
 #' @param force Force la mise à jour même si les données sont à jour. Par défaut: FALSE.
-#' @param precision Indique la précision des coordonnées désirées. Par défaut : "m". Choix possibles : "m", "dm", "cm", "mm".
+#' @param precision Indique la précision des coordonnées désirées. Par défaut : "cm". Choix possibles : "m", "dm", "cm", "mm".
 #' @param corrections_REGEX Correction orthographique des adresses BEST. Par défaut: TRUE, car les adresses BEST ne sont pas toujours homogènes : elles contiennent des précisions entre parenthèses, des abréviations, etc. qui nuisent à la détection des rues.
 #' @param path_data Chemin absolu vers le dossier où se trouve le données. Par défaut data_path = NULL et phacochr trouve le dossier d'installation choisi par défaut.
 #'
@@ -187,10 +187,18 @@ phaco_best_data_update <- function(force = FALSE,
         distinct(key_street_unique, .keep_all = TRUE) |>
         select(street_id_phaco, postal_id, street_detected, langue_detected, key_street_unique)
 
+      # On cree un nombre associe a chaque rue, pour determiner l'aleatoire si numero inconnu (voir phaco_geocode())
       temp$street_detected_utf8 <- NA
       for(i in 1:nrow(temp)){
         temp$street_detected_utf8[i] <- sum(utf8ToInt(temp$street_detected[i]))
       }
+
+      # Ce nombre doit etre identique quelle que soit la langue => astuce ou on selectionne le premier (ordre alphabetique) pour chaque rue
+      temp <- temp |>
+        group_by(street_id_phaco) |>
+        arrange(street_detected, .by_group = TRUE) |>
+        mutate(street_detected_utf8 = first(street_detected_utf8)) |>
+        ungroup()
 
       return(temp)
     }
