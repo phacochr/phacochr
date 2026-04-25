@@ -10,6 +10,8 @@ Date : avril 2026
 
 -   Les données géocodées contiennent désormais le nouveau secteur statistique 2025 (les délimitations des secteurs ont changé en 2025). Le secteur 2024 reste présent dans le résultat du géocodage, puisque nous avons anticipé que la migration vers les nouveaux secteurs statistiques ne se fera pas immédiatement dans les différentes institutions.
 
+-   Le taux de détection des rue est augmenté du fait que la `phaco_geocode()` est désormais insensible aux accents (par exemple, `"é"`, `"è"`, `"ê"` ou `"e"` sont considérés comme identifiques) et à la présence de tirets (`"saint-jean"` ou `"saint jean"` sont identiques). L'option est désactivable via l'argument `accent_insensitive`.
+
 -   Création d'une fonction `phaco_data()`, qui permet de charger la plupart des données contenues dans `phacochr`. Elle permet de charger des géométries utiles pour la cartographie ou l'analyse (secteurs statistiques, quartiers du Monitoring ou quartiers social-santé pour Bruxelles, communes, etc.). Les secteurs statistiques (et la plupart des découpages qui en découlent) sont chargeables dans leur version de 2011-2017, 2019-2024 et 2025-... . `phaco_data()` contient également les données de rue ou d'adresses BeST utilisées par `phacochr`. Cela peut être utile pour consulter la référence sur laquelle est réalisée le géocodage et chercher à comprendre pourquoi une rue n'est pas trouvée.
 
 -   La base de données d’adresses de référence (BeST) a été enrichie avec les anciens noms de rue de la commune de Charleroi. La commune a changé les noms de 250 rues pour éviter les homonymes suite à la fusion des communes. Ces noms de rues ont été rajoutés parce qu’ils sont encore largement présents dans beaucoup de bases de données. Il est désormais possible de trouver la même adresse avec l'ancien ou le nouveau nom. Voir : <https://www.charleroi.be/vie-communale/publications/nouveaux-noms-de-rues>
@@ -63,10 +65,10 @@ Début de la mise à jour régulière du fichier `NEWS.md` pour documenter les m
 ### Prioritaire
 
 -   Il y a des coordonnées mid manquantes =\> investiguer pourquoi.
--   Explorer la question des accents. Est-ce que `é`, `e` et `è` sont vu comme des différences ? Si oui, sans doute pas nécessaire.
 
 ### Secondaire
 
+-   Supprimer la dépendance au package `scales` (utilisé dans `phaco_map_s()`).
 -   Dans le fichier de préparation des fichiers : remettre les couronnes (IBSA) en `.xlsx` sur github.
 -   Pourquoi il y a des `st_point_on_surface()` pour lier les couronnes aux secteurs statistiques ? =\> Pas plus sur et plus rapide une jointure normale ?
 -   Faire une géométrie de secteurs stats spécifique pour Bruxelles, pour minimiser les chargements ?

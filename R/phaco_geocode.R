@@ -11,6 +11,7 @@
 #' @param colonne_num_rue_code_postal Nom de la colonne avec numéros, rues et code postaux ensemble.
 #' @param method_stringdist Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles: "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw","soundex".
 #' @param corrections_REGEX Correction orthographique. Par défaut: TRUE. Cette option n'est désactivable que si la rue est contenue dans une colonne séparée (c'est-à-dire qu'elle ne contient ni le numéro ni le code postal).
+#' @param accent_insensitive
 #' @param error_max Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: 4.
 #' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50.
 #' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE.
@@ -49,6 +50,7 @@ phaco_geocode <- function(data_to_geocode,
                           colonne_rue_code_postal = NULL,
                           method_stringdist = "lcs",
                           corrections_REGEX = TRUE,
+                          accent_insensitive = TRUE,
                           error_max = 4,
                           approx_num_max = 50,
                           elargissement_com_adj = TRUE,
@@ -491,9 +493,9 @@ phaco_geocode <- function(data_to_geocode,
                                   str_replace(rue_recoded, regex("\\sRez\\s", ignore_case = TRUE), " "),
                                   rue_recoded),
 
-             rue_recoded_Bis = str_detect(rue_recoded, regex("\\sBis\\s", ignore_case = TRUE)),
+             rue_recoded_Bis = str_detect(rue_recoded, regex("\\sBis(\\s|$)", ignore_case = TRUE)),
              rue_recoded = ifelse(rue_recoded_Bis == TRUE,
-                                  str_replace(rue_recoded, regex("\\sBis\\s", ignore_case = TRUE), " "),
+                                  str_replace(rue_recoded, regex("\\sBis(\\s|$)", ignore_case = TRUE), " "),
                                   rue_recoded),
 
              rue_recoded_Rdc = str_detect(rue_recoded, regex("\\sRdc\\s", ignore_case = TRUE)),
@@ -767,13 +769,27 @@ phaco_geocode <- function(data_to_geocode,
 
   # J'importe les rues
   postal_street <- readRDS(paste0(path_data,"BeST/PREPROCESSED/belgium_street_abv_PREPROCESSED.rds")) |>
-    mutate(across(-street_detected_utf8, as.character)) |>
-    mutate(address_join_street = str_to_lower(str_trim(street_detected)))
+    mutate(across(-street_detected_utf8, as.character))
 
   if (length(lang_encoded) != 3){
     postal_street <- postal_street |>
       filter(langue_detected %in% lang_encoded)
   }
+
+  # Pour remettre les bons noms (pas agreges, sans suppression d'accents, nouveaux noms pour Charleroi)
+  postal_street_original <- postal_street
+
+  if(accent_insensitive){
+    postal_street <- postal_street |>
+      mutate(street_detected = phaco_accent_insensitive_formating(street_detected))
+
+    data_to_geocode <- data_to_geocode |>
+      mutate(rue_recoded = phaco_accent_insensitive_formating(rue_recoded))
+  }
+
+  # Creation d'une cle de jointure
+  postal_street <- postal_street |>
+    mutate(address_join_street = str_to_lower(str_trim(street_detected)))
 
   # On filtre + creation d'une cle de jointure
   data_to_geocode <- data_to_geocode |>
@@ -791,7 +807,9 @@ phaco_geocode <- function(data_to_geocode,
   # On sauvegarde la BDD non agregee, a laquelle on joindra le resultat du matching apres
   # Pour ce faire, on lui joint l'id des donnees agregees
   data_to_geocode_id <- data_to_geocode |>
-    left_join(data_to_geocode_agreg, by = c("address_join", "code_postal_to_geocode"))
+    left_join(data_to_geocode_agreg, by = c("address_join", "code_postal_to_geocode")) |>
+    # On supprime la cle dont on n'a plus besoin dans data_to_geocode_id
+    select(-address_join)
 
   # On travaille dans la suite sur les donnees agregees
   data_to_geocode <- data_to_geocode_agreg
@@ -1090,9 +1108,7 @@ phaco_geocode <- function(data_to_geocode,
               # On fait une jointure avec openaddress sur base des noms de rue, cette fois n'importe quel cote de la rue
               inner_join(select(openaddress_be, street_id_phaco, house_number_sans_lettre, x_31370, y_31370, cd_sector2024, cd_sector2025),
                          by=c("street_id_phaco"))
-          }
 
-          if (nrow(APPROX_2) > 0){
             # On ne retient que le numero avec la distance minimale
             APPROX_2 <- APPROX_2 |>
               distinct() |>
@@ -1120,9 +1136,7 @@ phaco_geocode <- function(data_to_geocode,
               select(-street_id_phaco, -street_detected, -num_rue_clean, -ecart, -street_detected_utf8, -n_selection, -selection)
 
             #sum(duplicated(APPROX_2$phaco_id_adress))
-          }
-
-          if (nrow(APPROX_2) == 0){
+          } else {
             APPROX_2 <- APPROX_2 |>
               select(-street_id_phaco, -street_detected, -street_detected_utf8, -num_rue_clean)
           }
@@ -1190,8 +1204,8 @@ phaco_geocode <- function(data_to_geocode,
   # Il manque potentiellement des lignes par rapport a la BD originale, car pas de code postal, ou qui ne matchent pas avec les donnees BeST => on les recupere par un antijoin(), et les ajoute
   # @@@@@ NOTE : POSSIBLE QUE CA NE SERVE PLUS A RIEN DEPUIS L'AGREGATION => INVESTIGUER !!! @@@@@
   MISSING <- data_to_geocode_id |>
-    anti_join(FULL_GEOCODING, by = "phaco_id_adress") |>
-    select(-address_join)
+    select(-phaco_id_adress_agreg) |>
+    anti_join(FULL_GEOCODING, by = "phaco_id_adress")
 
   FULL_GEOCODING <- FULL_GEOCODING |>
     bind_rows(MISSING) |>
@@ -1203,7 +1217,7 @@ phaco_geocode <- function(data_to_geocode,
     select(-any_of(c("address_join_geocoding", "num_rue_to_geocode", "street_detected_utf8")))
 
   # On remet les bons noms de rue (ils sont abreges dans le cas des noms propres abreges, et on indique les nouvelles rues pour les anciennes)
-  postal_street_join <- postal_street |>
+  postal_street_join <- postal_street_original |>
     filter(is.na(nom_propre_abv) & is.na(ancien_nom_rue)) |>
     select(street_id_phaco, street_detected_full = street_detected, langue_detected)
 
@@ -1212,7 +1226,7 @@ phaco_geocode <- function(data_to_geocode,
     relocate(street_detected_full, .after = street_detected) |>
     select(-street_detected, street_detected = street_detected_full)
 
-  # @@@@@@@@@@ QUESTION : DOIT-ON AUSSI REMPLACER LES NOMS DES ANCIENNES RUES (CHARLEROI) PAR LES NOUVELLES ? @@@@@@@@@@
+  # @@@@@@@@@@ QUESTION : DOIT-ON REMPLACER LES NOMS DES ANCIENNES RUES (CHARLEROI) PAR LES NOUVELLES ? @@@@@@@@@@
 
   # On joint les donnees de region, provinces, communes, quartiers (BXL)... aux secteurs stat
   table_secteurs_prov_commune_quartier <- readRDS(paste0(path_data,"STATBEL/secteurs_statistiques/table_secteurs_prov_commune_quartier.rds"))

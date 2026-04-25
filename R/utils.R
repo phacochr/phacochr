@@ -315,3 +315,26 @@ phaco_rm_old_data <- function(path_data = NULL) {
   unlink(paste0(path_data, "URBIS"), force = TRUE, recursive = TRUE)
 
 }
+
+
+#' phaco_accent_insensitive_formating
+#'
+#' Internal function to correct street for matching
+#'
+#' @noRd
+#'
+phaco_accent_insensitive_formating <- function(x){
+
+  x <- str_replace_all(x, regex("[-]", ignore_case = TRUE), " ")
+
+  x <- str_replace_all(x, regex("[\u00e0\u00e2\u00e2\u00e3\u00e4\u00e5]", ignore_case = TRUE), "a")
+  x <- str_replace_all(x, regex("[\u00e8\u00e9\u00ea\u00eb]", ignore_case = TRUE), "e")
+  x <- str_replace_all(x, regex("[\u00ec\u00ed\u00ee\u00ef]", ignore_case = TRUE), "i")
+  x <- str_replace_all(x, regex("[\u00f2\u00f3\u00f4\u00f5\u00f6\u00f8]", ignore_case = TRUE), "o")
+  x <- str_replace_all(x, regex("[\u00f9\u00fa\u00fb\u00fc]", ignore_case = TRUE), "u")
+  x <- str_replace_all(x, regex("[\u00fd\u00ff]", ignore_case = TRUE), "y")
+  x <- str_replace_all(x, regex("[\u00f1]", ignore_case = TRUE), "n")
+  x <- str_replace_all(x, regex("[\u00e7]", ignore_case = TRUE), "c")
+
+  return(x)
+}
