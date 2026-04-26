@@ -11,7 +11,7 @@
 #' @param colonne_num_rue_code_postal Nom de la colonne avec numéros, rues et code postaux ensemble.
 #' @param method_stringdist Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles: "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw","soundex".
 #' @param corrections_REGEX Correction orthographique. Par défaut: TRUE. Cette option n'est désactivable que si la rue est contenue dans une colonne séparée (c'est-à-dire qu'elle ne contient ni le numéro ni le code postal).
-#' @param accent_insensitive
+#' @param special_char_insensitive
 #' @param error_max Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: 4.
 #' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50.
 #' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE.
@@ -50,7 +50,7 @@ phaco_geocode <- function(data_to_geocode,
                           colonne_rue_code_postal = NULL,
                           method_stringdist = "lcs",
                           corrections_REGEX = TRUE,
-                          accent_insensitive = TRUE,
+                          special_char_insensitive = TRUE,
                           error_max = 4,
                           approx_num_max = 50,
                           elargissement_com_adj = TRUE,
@@ -776,15 +776,16 @@ phaco_geocode <- function(data_to_geocode,
       filter(langue_detected %in% lang_encoded)
   }
 
-  # Pour remettre les bons noms (pas agreges, sans suppression d'accents, nouveaux noms pour Charleroi)
+  # Pour remettre les bons noms a la fin (pas agreges, sans suppression d'accents, nouveaux noms pour Charleroi)
   postal_street_original <- postal_street
 
-  if(accent_insensitive){
+  # On remplace les caracteres speciaux
+  if(special_char_insensitive){
     postal_street <- postal_street |>
-      mutate(street_detected = phaco_accent_insensitive_formating(street_detected))
+      mutate(street_detected = phaco_special_char_insensitive(street_detected))
 
     data_to_geocode <- data_to_geocode |>
-      mutate(rue_recoded = phaco_accent_insensitive_formating(rue_recoded))
+      mutate(rue_recoded = phaco_special_char_insensitive(rue_recoded))
   }
 
   # Creation d'une cle de jointure

@@ -10,7 +10,7 @@ Date : avril 2026
 
 -   Les données géocodées contiennent désormais le nouveau secteur statistique 2025 (les délimitations des secteurs ont changé en 2025). Le secteur 2024 reste présent dans le résultat du géocodage, puisque nous avons anticipé que la migration vers les nouveaux secteurs statistiques ne se fera pas immédiatement dans les différentes institutions.
 
--   Le taux de détection des rue est augmenté du fait que la `phaco_geocode()` est désormais insensible aux accents (par exemple, `"é"`, `"è"`, `"ê"` ou `"e"` sont considérés comme identifiques) et à la présence de tirets (`"saint-jean"` ou `"saint jean"` sont identiques). L'option est désactivable via l'argument `accent_insensitive`.
+-   Le taux de détection des rue est augmenté du fait que la `phaco_geocode()` est désormais insensible aux accents (par exemple, `"é"`, `"è"`, `"ê"` ou `"e"` sont considérés comme identifiques) et à la présence de tirets (`"saint-jean"` ou `"saint jean"` sont identiques). L'option est désactivable via l'argument `special_char_insensitive`.
 
 -   Création d'une fonction `phaco_data()`, qui permet de charger la plupart des données contenues dans `phacochr`. Elle permet de charger des géométries utiles pour la cartographie ou l'analyse (secteurs statistiques, quartiers du Monitoring ou quartiers social-santé pour Bruxelles, communes, etc.). Les secteurs statistiques (et la plupart des découpages qui en découlent) sont chargeables dans leur version de 2011-2017, 2019-2024 et 2025-... . `phaco_data()` contient également les données de rue ou d'adresses BeST utilisées par `phacochr`. Cela peut être utile pour consulter la référence sur laquelle est réalisée le géocodage et chercher à comprendre pourquoi une rue n'est pas trouvée.
 

@@ -317,13 +317,13 @@ phaco_rm_old_data <- function(path_data = NULL) {
 }
 
 
-#' phaco_accent_insensitive_formating
+#' phaco_special_char_insensitive
 #'
-#' Internal function to correct street for matching
+#' Internal function to format street for matching
 #'
 #' @noRd
 #'
-phaco_accent_insensitive_formating <- function(x){
+phaco_special_char_insensitive <- function(x){
 
   x <- str_replace_all(x, regex("[-]", ignore_case = TRUE), " ")
 
