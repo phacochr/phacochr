@@ -10,7 +10,7 @@ Date : avril 2026
 
 -   Les données géocodées contiennent désormais le nouveau secteur statistique 2025 (les délimitations des secteurs ont changé en 2025). Le secteur 2024 reste présent dans le résultat du géocodage, puisque nous avons anticipé que la migration vers les nouveaux secteurs statistiques ne se fera pas immédiatement dans les différentes institutions.
 
--   Le taux de détection des rue est augmenté du fait que la `phaco_geocode()` est désormais insensible aux accents (par exemple, `"é"`, `"è"`, `"ê"` ou `"e"` sont considérés comme identifiques) et à la présence de tirets (`"saint-jean"` ou `"saint jean"` sont identiques). L'option est désactivable via l'argument `special_char_insensitive`.
+-   Le taux de détection des rue est augmenté du fait que la `phaco_geocode()` est désormais insensible à la présence des signes diacritiques les plus courantes (par exemple, `"é"`, `"è"`, `"ê"` ou `"e"` sont considérés comme identifiques) et à la présence de tirets (`"saint-jean"` ou `"saint jean"` sont considérés comme identiques). L'option est désactivable via l'argument `special_char_insensitive`.
 
 -   Création d'une fonction `phaco_data()`, qui permet de charger la plupart des données contenues dans `phacochr`. Elle permet de charger des géométries utiles pour la cartographie ou l'analyse (secteurs statistiques, quartiers du Monitoring ou quartiers social-santé pour Bruxelles, communes, etc.). Les secteurs statistiques (et la plupart des découpages qui en découlent) sont chargeables dans leur version de 2011-2017, 2019-2024 et 2025-... . `phaco_data()` contient également les données de rue ou d'adresses BeST utilisées par `phacochr`. Cela peut être utile pour consulter la référence sur laquelle est réalisée le géocodage et chercher à comprendre pourquoi une rue n'est pas trouvée.
 
@@ -65,13 +65,16 @@ Début de la mise à jour régulière du fichier `NEWS.md` pour documenter les m
 ### Prioritaire
 
 -   Il y a des coordonnées mid manquantes =\> investiguer pourquoi.
+-   Ajouter un check pour `path_data` (dans toutes les fonction) pour ajouter un `/` à la fin si non présent (sinon ça ne fonctionne pas).
+-   Revoir les prénoms retenus pour créer les abréviations =\> utiliser un dictionnaire.
+-   Implémenter l'élargissement progressif : d'abord commune puis communes avoisinantes =\> nécessité de créer des fonctions.
+-   Faire une géométrie de secteurs stats spécifique pour Bruxelles, pour minimiser les chargements =\> la joindre si un charge la Belgique (plus rapide que filtrer).
+-   Simplifier `phaco_best_data_update()` : les opérations d'abréviation sont faites 2x : 1x pour les rues, 1x pour charleroi =\> simplifier, introduire charleroi avant les abréviations puis appliquer les abréviations.
 
 ### Secondaire
 
 -   Supprimer la dépendance au package `scales` (utilisé dans `phaco_map_s()`).
 -   Dans le fichier de préparation des fichiers : remettre les couronnes (IBSA) en `.xlsx` sur github.
 -   Pourquoi il y a des `st_point_on_surface()` pour lier les couronnes aux secteurs statistiques ? =\> Pas plus sur et plus rapide une jointure normale ?
--   Faire une géométrie de secteurs stats spécifique pour Bruxelles, pour minimiser les chargements ?
--   Simplifier `phaco_best_data_update()` : les opérations d'abréviation sont faites 2x : 1x pour les rues, 1x pour charleroi =\> simplifier, introduire charleroi avant les abréviations puis appliquer les abréviations.
 
 </div>
