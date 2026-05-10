@@ -14,7 +14,7 @@ phaco_geocode(
   colonne_rue_code_postal = NULL,
   method_stringdist = "lcs",
   corrections_REGEX = TRUE,
-  accent_insensitive = TRUE,
+  special_char_insensitive = TRUE,
   error_max = 4,
   approx_num_max = 50,
   elargissement_com_adj = TRUE,
