@@ -387,15 +387,15 @@ phaco_best_data_update <- function(force = FALSE,
     select_id_street <- function(x) {
       temp <- x |>
         rename(
-          "x_31370" = "EPSG:31370_x",
-          "y_31370" = "EPSG:31370_y"
+          "x_3812" = "EPSG:3812_x",
+          "y_3812" = "EPSG:3812_y"
         ) |>
         # On enleve les adresses sans coordonnees et celles rejetees
-        filter(x_31370 != "0.00000" & status != "rejected") |>
+        filter(x_3812 != "0.00000" & status != "rejected") |>
         mutate(house_number_sans_lettre = str_extract(house_number, regex("[0-9]+", ignore_case = TRUE))) |>
         # On classe selon le status pour creer la priorite current > proposed > retired dans le distinct
         arrange(postcode, streetname_fr, streetname_nl, streetname_de, as.numeric(house_number_sans_lettre), status) |>
-        select(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, x_31370, y_31370) |>
+        select(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, x_3812, y_3812) |>
         distinct(house_number_sans_lettre, streetname_de, streetname_fr, streetname_nl, postcode, .keep_all = TRUE) |>
         tidyr::pivot_longer(
           cols = c("streetname_de", "streetname_fr", "streetname_nl"),
@@ -405,7 +405,7 @@ phaco_best_data_update <- function(force = FALSE,
         filter(!is.na(street_name)) |>
         mutate(key_street_unique = paste(street_name, postcode)) |>
         left_join(belgium_street, by = "key_street_unique") |>
-        select(house_number_sans_lettre, street_id_phaco, x_31370, y_31370, postcode) |>
+        select(house_number_sans_lettre, street_id_phaco, x_3812, y_3812, postcode) |>
         # J'enleve les coordonnees car 1 adresse en double avec des coordonnees differentes (?)
         distinct(house_number_sans_lettre, street_id_phaco, postcode, .keep_all = TRUE)
       return(temp)
@@ -413,9 +413,17 @@ phaco_best_data_update <- function(force = FALSE,
 
     # Fonction pour faire la jointure spatiale avec les secteurs statistiques
     join_ss_adress <- function(x) {
+
+      x <- x |>
+        sf::st_as_sf(coords = c("x_3812", "y_3812"), remove = TRUE) |>
+        sf::st_set_crs(3812) |>
+        sf::st_transform(31370) |>
+        mutate(
+          x_31370 = sf::st_coordinates(geometry)[, 1],
+          y_31370 = sf::st_coordinates(geometry)[, 2]
+        )
+
       temp <- x |>
-        sf::st_as_sf(coords = c("x_31370", "y_31370"), remove = FALSE) |>
-        sf::st_set_crs(31370) |>
         sf::st_join(BE_SS_lite_sector_arrond2024) |>
         sf::st_join(BE_SS_lite_sector2025) |>
         as.data.frame() |>
