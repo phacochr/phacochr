@@ -66,17 +66,17 @@ colourise <- function(text, fg = "black") {
 #' 1:5 %!in% c(2, 4)
 #' 1:5 %notin% c(2, 4)
 #'
-#' @export
+#' @noRd
 `%ni%` <- function(x, y) {
   !x %in% y
 }
 
 #' @rdname notin
-#' @export
+#' @noRd
 `%!in%` <- `%ni%`
 
 #' @rdname notin
-#' @export
+#' @noRd
 `%notin%` <- `%ni%`
 
 

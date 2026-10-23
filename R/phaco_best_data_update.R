@@ -73,7 +73,7 @@ phaco_best_data_update <- function(force = FALSE,
     path_data <- gsub("\\\\", "/", paste0(rappdirs::user_data_dir("phacochr"),"/data_phacochr/")) # bricolage pour windows
   }
 
-  # Ne pas lancer la fonction si les fichiers ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
+  # Ne pas lancer la fonction si les fichiers non produits par l'update ne sont pas presents (cad qu'ils ne sont, en tout logique, pas installes)
   if(sum(
     file.exists(
       # paste0(path_data, "STATBEL/secteurs_statistiques/sh_statbel_statistical_sectors_31370_20250101.rds"),

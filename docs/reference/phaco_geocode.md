@@ -1,0 +1,142 @@
+# phaco_geocode : Géocodeur pour la Belgique
+
+Cette fonction est la principale du package phacochr. A partir d’une
+liste d’adresses, elle permet de retrouver leurs coordonnees X-Y.
+
+## Usage
+
+``` r
+phaco_geocode(
+  data_to_geocode,
+  colonne_rue = NULL,
+  colonne_num = NULL,
+  colonne_code_postal = NULL,
+  colonne_num_rue = NULL,
+  colonne_num_rue_code_postal = NULL,
+  colonne_rue_code_postal = NULL,
+  method_stringdist = "lcs",
+  corrections_REGEX = TRUE,
+  special_char_insensitive = TRUE,
+  error_max = 4,
+  approx_num_max = 50,
+  elargissement_com_adj = TRUE,
+  error_max_adj = NULL,
+  mid_street = TRUE,
+  lang_encoded = c("FR", "NL", "DE"),
+  anonymous = FALSE,
+  path_data = NULL,
+  parallel = FALSE
+)
+```
+
+## Arguments
+
+- data_to_geocode:
+
+  Un dataframe avec les adresses a geocoder.
+
+- colonne_rue:
+
+  Nom de la colonne avec les rues.
+
+- colonne_num:
+
+  Nom de la colonne avec les numéros.
+
+- colonne_code_postal:
+
+  Nom de la colonne avec les codes postaux.
+
+- colonne_num_rue:
+
+  Nom de la colonne avec numéros et rues ensemble.
+
+- colonne_num_rue_code_postal:
+
+  Nom de la colonne avec numéros, rues et code postaux ensemble.
+
+- colonne_rue_code_postal:
+
+  Nom de la colonne avec rues et code postaux ensemble.
+
+- method_stringdist:
+
+  Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles:
+  "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard",
+  "jw","soundex".
+
+- corrections_REGEX:
+
+  Correction orthographique. Par défaut: TRUE. Cette option n'est
+  désactivable que si la rue est contenue dans une colonne séparée
+  (c'est-à-dire qu'elle ne contient ni le numéro ni le code postal).
+
+- special_char_insensitive:
+
+  TRUE pour activer la detection des rues sans les accents, cédilles,
+  etc.
+
+- error_max:
+
+  Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de
+  la rue dans la base de donnée de référence (BeST). Par défaut: 4.
+
+- approx_num_max:
+
+  Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par
+  défaut: 50.
+
+- elargissement_com_adj:
+
+  Élargissement aux communes limitrophes. Par défaut: TRUE.
+
+- error_max_adj:
+
+  Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de
+  la rue dans la base de donnée de référence (BeST), en cas
+  d'élargissement aux communes limitrophes. Par défaut: error_max/2.
+
+- mid_street:
+
+  Indique les coordonnées du milieu de la rue si les coordonnées du
+  numéro ne sont pas trouvée. Par défaut: TRUE.
+
+- lang_encoded:
+
+  Langue utilisée pour encoder les noms de rue. Par défaut: c("FR",
+  "NL", "DE").
+
+- anonymous:
+
+  Anonymisation des résultats en ajoutant uniquement les informations
+  des entités administratives (secteurs statistiques, quartiers,
+  (sous-)communes, etc.). Dans ce cas, les coordonnées X-Y indiquées
+  sont le centroïde du secteur statistique. De plus, toutes les
+  informations relatives à l'adresse dans les données originales sont
+  supprimées. Par défaut: FALSE.
+
+- path_data:
+
+  Chemin absolu vers le dossier où se trouve le données. Par défaut
+  data_path = NULL et phacochr trouve le dossier d'installation choisi
+  par défaut.
+
+- parallel:
+
+  TRUE pour activer le calcul multicore pour détecter les rues.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+x <- data.frame(nom = c(paste0("Observatoire de la Sant","\u00e9"," et du Social"), "ULB"),
+rue = c("rue Belliard","avenue Antoine Depage"),
+num = c("71", "30"),
+code_postal = c("1040","1000"))
+
+result <- phaco_geocode(data_to_geocode = x,
+colonne_rue = "rue",
+colonne_num = "num",
+colonne_code_postal = "code_postal")
+} # }
+```

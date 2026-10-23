@@ -11,7 +11,7 @@
 #' @param colonne_num_rue_code_postal Nom de la colonne avec numéros, rues et code postaux ensemble.
 #' @param method_stringdist Méthode pour la jointure inexacte. Par défaut: "lcs". Choix possibles: "osa", "lv", "dl", "hamming", "lcs", "qgram", "cosine", "jaccard", "jw","soundex".
 #' @param corrections_REGEX Correction orthographique. Par défaut: TRUE. Cette option n'est désactivable que si la rue est contenue dans une colonne séparée (c'est-à-dire qu'elle ne contient ni le numéro ni le code postal).
-#' @param special_char_insensitive
+#' @param special_char_insensitive TRUE pour activer la detection des rues sans les accents, cédilles, etc.
 #' @param error_max Nombre maximal d'erreurs entre le nom de la rue a trouver et le nom de la rue dans la base de donnée de référence (BeST). Par défaut: 4.
 #' @param approx_num_max Nombre de numéros d'écart maximum si le numéro n'a pas été trouve. Par défaut: 50.
 #' @param elargissement_com_adj Élargissement aux communes limitrophes. Par défaut: TRUE.

@@ -4,11 +4,11 @@ globalVariables(unique(c(
   # phaco_best_data_update:
   "ancien_nom_rue", "ancienne_denomination", "arrond", "arrond2", "cd_dstr_refnis", "cd_munty_refnis", "cd_sector2024", "cd_sector2025", "code_postal", "Count", "cp_n_abv", "cp_n_eng", "cp_n_fr", "cp_n_nl", "CP_NAME", "detect", "Gemeentenaam", "house_number_sans_lettre", "id_regex_belgium_street", "key_street_unique", "King", "langue_detected", "Last", "Last_double", "mid_cd_sector2024", "mid_num", "mid_x_31370", "mid_y_31370", "MS_FREQUENCY", "n_cp_abv", "n_cp_eng", "n_cp_fr", "n_cp_nl", "name", "name_abv", "name_eng", "Nom commune", "nom_propre_abv", "nouveau_nom", "postal_id", "postcode", "Refnis code", "rue_recoded", "rue_recoded_apostrophe", "rue_recoded_avenue", "rue_recoded_boulevard", "rue_recoded_burg", "rue_recoded_chaussee", "rue_recoded_Commandant", "rue_recoded_dokter", "rue_recoded_koning", "rue_recoded_Lieutenant", "rue_recoded_parenthese", "rue_recoded_place", "rue_recoded_professor", "rue_recoded_route", "rue_recoded_Saint", "rue_recoded_square", "rue_recoded_steenweg", "rue_recoded_virgule", "Saint", "section", "street_detected", "street_detected_abv", "street_detected_Origin", "street_detected_utf8", "street_id_phaco", "TX_FST_NAME", "tx_rgn_descr_fr", "x_31370", "y_31370",
   # phaco_best_data_update : extract_street:
-  "key_street_unique", "langue_detected", "postal_id", "street_detected", "street_id_phaco",
+  "key_street_unique", "langue_detected", "postal_id", "street_detected", "street_detected_utf8", "street_id_phaco",
   # phaco_best_data_update : join_ss_adress:
   "geometry",
   # phaco_best_data_update : select_id_street:
-  "house_number", "house_number_sans_lettre", "postcode", "status", "street_id_phaco", "street_name", "streetname_de", "streetname_fr", "streetname_nl", "x_31370", "y_31370",
+  "house_number", "house_number_sans_lettre", "postcode", "status", "street_id_phaco", "street_name", "streetname_de", "streetname_fr", "streetname_nl", "x_3812", "y_3812",
   # phaco_data:
   "cd_rgn_refnis",
   # phaco_geocode:

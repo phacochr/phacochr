@@ -1,12 +1,14 @@
-# phacochr 1.0
+# phacochr 1.0.1
 
-Date : avril 2026
+Date : 23 octobre 2026
 
 `phacochr` fait peau neuve et présente de grosses modifications dans sa nouvelle version ! De ce fait, la nouvelle version demande de relancer `phaco_setup_data()` pour installer les nouveaux fichiers nécessaires.
 
 ## Modifications majeures
 
 -   La rapidité du géocodage a été très largement augmentée : la nouvelle version de `phacochr` est 2 à 5 fois plus rapide que la précédente selon le cas de figure, à la fois pour de petites ou grosses bases de données. `phacochr` a également été optimisé pour trouver des adresses individuelles, bien que ce ne soit pas son utilité première (1-2 sec. pour une adresse unique). D'un point de vue technique, les raisons sont l'optimisation du processus de détection des rues (introduction d'un matching exact avant le matching inexact, agrégation des rues similaires avant leur détection, changement de package de matching inexact [nous passons de `fuzzyjoin` à `fuzzystring`]) et le changement du système de fichiers (nous utilisons des fichiers `.rds` au lieu des `.csv`).
+
+-   La fonction `phaco_best_data_update()` gère depuis le 23 octobre 2026 l'update des données BeST encodées en Lambert 2008. Pour des raisons de compatibilité avec les autres données contenues dans `phacochr`, les données BeST sont converties en interne au format Lambert 72. **Le résultat produit par `phacochr` reste donc encodé en Lambert 72**.
 
 -   Les données géocodées contiennent désormais le nouveau secteur statistique 2025 (les délimitations des secteurs ont changé en 2025). Le secteur 2024 reste présent dans le résultat du géocodage, puisque nous avons anticipé que la migration vers les nouveaux secteurs statistiques ne se fera pas immédiatement dans les différentes institutions.
 
@@ -30,7 +32,7 @@ Date : avril 2026
 
 -   Le nombre de dépendances vis-à-vis de packages externes a été diminué.
 
--   Le calcul multicore est désormais optionnel dans `phaco_geocode()` et se règle via l'argument `parallel`. Vu l'optimisation du processus de géocodage, le calcul parallélisé n'est plus nécessaire et est désactivé par défaut. Il peut éventuellement être plus performant dans le cas de géocodage de grosses bases de données (n\>20 000).
+-   Le calcul multicore est désormais optionnel dans `phaco_geocode()` et se règle via l'argument `parallel`. Vu l'optimisation du processus de géocodage, le calcul parallélisé n'est plus nécessaire et est désactivé par défaut. Il peut éventuellement être plus performant dans le cas de géocodage de grosses bases de données (n\>100 000 ?).
 
 -   L'argument `path` a été implémenté dans toutes les fonction, pour que l'utilisateur définisse lui-même où doivent être installées/lues les données de `phacochr`.
 
