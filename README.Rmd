@@ -40,7 +40,8 @@ fonctionnalités et ses performances : [voir la page
 News](https://phacochr.github.io/phacochr/news/index.html). Pour
 utiliser cette nouvelle version, il est nécessaire d'installer la
 dernière version du package via Github, et la dernière version des
-fichiers avec la fonction `phaco_setup_data()` (voir ci-dessous).
+fichiers avec la fonction `phaco_setup_data()` (voir ci-dessous pour la
+marche à suivre).
 :::
 
 Le package est très rapide pour géocoder des bases de données d'adresses
@@ -435,3 +436,4 @@ d'amélioration ! Rendez-vous dans la section 'issues' sur notre
 <center><a href="https://opendata.bosa.be/">
 <img src="man/figures/bosa.png" align="center" height="140/"/>
 </a></center>
+

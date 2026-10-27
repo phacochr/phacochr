@@ -12,7 +12,7 @@ Date : 23 octobre 2026
 
 -   Les données géocodées contiennent désormais le nouveau secteur statistique 2025 (les délimitations des secteurs ont changé en 2025). Le secteur 2024 reste présent dans le résultat du géocodage, puisque nous avons anticipé que la migration vers les nouveaux secteurs statistiques ne se fera pas immédiatement dans les différentes institutions.
 
--   Le taux de détection des rue est augmenté du fait que la `phaco_geocode()` est désormais insensible à la présence des signes diacritiques les plus courantes (par exemple, `"é"`, `"è"`, `"ê"` ou `"e"` sont considérés comme identifiques) et à la présence de tirets (`"saint-jean"` ou `"saint jean"` sont considérés comme identiques). L'option est désactivable via l'argument `special_char_insensitive`.
+-   Le taux de détection des rue est augmenté du fait que la fonction `phaco_geocode()` est désormais insensible à la présence des signes diacritiques les plus courantes (par exemple, `"é"`, `"è"`, `"ê"` ou `"e"` sont considérés comme identifiques) et à la présence de tirets (`"saint-jean"` ou `"saint jean"` sont considérés comme identiques). L'option est désactivable via l'argument `special_char_insensitive`.
 
 -   Création d'une fonction `phaco_data()`, qui permet de charger la plupart des données contenues dans `phacochr`. Elle permet de charger des géométries utiles pour la cartographie ou l'analyse (secteurs statistiques, quartiers du Monitoring ou quartiers social-santé pour Bruxelles, communes, etc.). Les secteurs statistiques (et la plupart des découpages qui en découlent) sont chargeables dans leur version de 2011-2017, 2019-2024 et 2025-... . `phaco_data()` contient également les données de rue ou d'adresses BeST utilisées par `phacochr`. Cela peut être utile pour consulter la référence sur laquelle est réalisée le géocodage et chercher à comprendre pourquoi une rue n'est pas trouvée.
 
@@ -34,7 +34,7 @@ Date : 23 octobre 2026
 
 -   Le calcul multicore est désormais optionnel dans `phaco_geocode()` et se règle via l'argument `parallel`. Vu l'optimisation du processus de géocodage, le calcul parallélisé n'est plus nécessaire et est désactivé par défaut. Il peut éventuellement être plus performant dans le cas de géocodage de grosses bases de données (n\>100 000 ?).
 
--   L'argument `path` a été implémenté dans toutes les fonction, pour que l'utilisateur définisse lui-même où doivent être installées/lues les données de `phacochr`.
+-   L'argument optionnel `path` a été implémenté dans toutes les fonction, pour que l'utilisateur puisse définir lui-même où doivent être installées/lues les données de `phacochr`.
 
 # phacochr 0.9.1.14
 
@@ -78,5 +78,7 @@ Début de la mise à jour régulière du fichier `NEWS.md` pour documenter les m
 -   Supprimer la dépendance au package `scales` (utilisé dans `phaco_map_s()`).
 -   Dans le fichier de préparation des fichiers : remettre les couronnes (IBSA) en `.xlsx` sur github.
 -   Pourquoi il y a des `st_point_on_surface()` pour lier les couronnes aux secteurs statistiques ? =\> Pas plus sur et plus rapide une jointure normale ?
+-   Dans `phaco_map_s()`, changer à la volée le nom des communes pour les cartos de Bruxelles ("Molenbeek Saint-Jean" =\> "Molenbeek") et des provinces pour les cartos de Belgique ("Province d'Anvers" =\> "Anvers").
 
 </div>
+
