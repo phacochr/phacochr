@@ -81,4 +81,3 @@ Début de la mise à jour régulière du fichier `NEWS.md` pour documenter les m
 -   Dans `phaco_map_s()`, changer à la volée le nom des communes pour les cartos de Bruxelles ("Molenbeek Saint-Jean" =\> "Molenbeek") et des provinces pour les cartos de Belgique ("Province d'Anvers" =\> "Anvers").
 
 </div>
-
